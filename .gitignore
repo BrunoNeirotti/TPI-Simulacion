@@ -1,0 +1,84 @@
+# ---------------------------------------------------------------------------
+# Datos
+# ---------------------------------------------------------------------------
+# data/raw/ son 2,2 GB y todo es redescargable de data.buenosaires.gob.ar.
+# La lista de lo que hay que bajar esta en docs/contexto-del-proyecto.md, seccion 4.
+data/*
+!data/processed/
+
+# Unica salida derivada que no entra: 66 MB de etapas individuales. Se regenera
+# corriendo src/06_matriz_od.py.
+data/processed/etapas_subte.csv
+
+# ---------------------------------------------------------------------------
+# Documentacion oficial: se versiona, salvo lo que no entra en GitHub
+# ---------------------------------------------------------------------------
+# El ZIP original del expediente es el mismo contenido que los 98 PDF sueltos
+# que estan al lado. Ademas pesa 195 MB.
+docs/Documentos-EX-2026-20211143/*.zip
+
+# Excede el limite de 100 MB por archivo de GitHub. Se baja del portal BA Obras,
+# proceso 10241-0094-LPU25.
+docs/Documentos-BA-Obras/*.zip
+
+# Mapas de la red publicados por el operador. Son material de terceros y estan
+# en su sitio; las figuras del trabajo se dibujan por codigo, no salen de aca.
+docs/mapa/
+
+# ---------------------------------------------------------------------------
+# Notas internas del grupo
+# ---------------------------------------------------------------------------
+CLAUDE.md
+decisiones.md
+docs/estado-del-proyecto-*.docx
+docs/estado-del-proyecto-*.pdf
+docs/respuestas-oficiales/borrador-*.md
+
+# ---------------------------------------------------------------------------
+# Versiones anteriores del documento, ya superadas por definitivo-main.tex
+# ---------------------------------------------------------------------------
+docs/main.tex
+docs/main.pdf
+docs/new-main.tex
+docs/new-main.pdf
+*.bak
+*.bak2
+
+# ---------------------------------------------------------------------------
+# LaTeX
+# ---------------------------------------------------------------------------
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# AnyLogic: los .alp se versionan (son XML y son el modelo). Lo que no se
+# versiona es lo que AnyLogic genera al compilar.
+# ---------------------------------------------------------------------------
+anylogic/**/bin/
+anylogic/**/*.jar
+anylogic/**/build/
+anylogic/**/export/
+*.alp.bak
+
+# ---------------------------------------------------------------------------
+# Sistema
+# ---------------------------------------------------------------------------
+Thumbs.db
+desktop.ini
+.DS_Store

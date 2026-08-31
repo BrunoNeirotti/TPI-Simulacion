@@ -1,8 +1,8 @@
 # Preparación de datos: bitácora
 
-Documento de trabajo del pipeline de datos del TPI. Es aparte de `main.tex`: acá
-va el detalle técnico y los hallazgos de calidad de datos, y de acá se toma
-después lo que corresponda para el informe.
+Bitácora del pipeline de datos. Acá va el detalle técnico y los problemas de
+calidad de datos que fuimos encontrando; de acá se toma después lo que
+corresponda para el informe.
 
 Cada paso corresponde al plan de trabajo de la sección 8 de `contexto-del-proyecto.md`.
 
@@ -130,9 +130,9 @@ E`/`Retiro.E`. Si no se consolidan, la demanda de cada una queda partida en dos.
 - `data/processed/tabla_maestra_estaciones.csv`: 90 filas: línea, `stop_id`,
   nombre GTFS, coordenadas, cantidad de andenes, nombres en molinetes,
   molinetes, registros y pasajeros 2025.
-- `data/processed/molinetes_inventario.csv` ( 794 filas, un molinete por fila,
+- `data/processed/molinetes_inventario.csv`: 794 filas, un molinete por fila,
   con su sentido normalizado y sus banderas de control.
-- `reports/01_tabla_maestra.md` ) reporte de control completo.
+- `reports/01_tabla_maestra.md`: el reporte de control completo.
 
 ### 1.4 Hallazgo que afecta una decisión de modelado
 
@@ -190,7 +190,7 @@ ferroviaria, así que la diferencia es plausible y merece revisarse en el paso 5
 segunda estación (San Pedrito, 6,26 millones). Es coherente con lo que sostiene
 el EsIA de la Línea F sobre el peso del nodo.
 
-### 1.6 Pendiente que este paso deja abierto
+### 1.6 Lo que este paso dejó abierto, y cómo se cerró
 
 - ~~Redescargar `viajes_anual.csv`.~~ **Cerrado el 05/08/2026: el recurso está
   discontinuado.** Se redescargó del dataset Subte: Estaciones y trae exactamente
@@ -206,10 +206,11 @@ el EsIA de la Línea F sobre el peso del nodo.
   contraste contra 2019 (341,3 millones frente a 206,6 en 2025) queda solo como
   referencia de orden de magnitud, y ni siquiera es limpio: median cosas distintas
   y en el medio está la pandemia y el cambio de medios de pago.
-- **Verificar el viernes 8 de agosto de 2025.** Tras reconstruir las fechas,
-  ese día queda con 38.454 filas contra ~49.000 de los viernes comparables, un
-  22 % menos. Puede ser una interrupción real de servicio o un faltante de
-  datos. No se corrigió nada; queda anotado para revisar antes del paso 3.
+- **El viernes 8 de agosto de 2025.** Tras reconstruir las fechas, ese día
+  quedaba con 38.454 filas contra unas 49.000 de los viernes comparables, un
+  22 % menos, y no sabíamos si era una interrupción real de servicio o un
+  faltante de datos. El paso 3 lo resolvió: el día es normal y no hay que
+  corregir nada.
 
 ---
 
@@ -297,9 +298,11 @@ la vuelta 112 s. Las combinaciones mas caras son Carlos Pellegrini [B] con
 Diagonal Norte [C] (243 s) y Catedral [D] con Bolivar [E] (220 s); la mas barata,
 Leandro N. Alem [B] con Correo Central [E] (58 s).
 
-### 2.6 Pendientes que este paso deja abiertos
+### 2.6 Lo que este paso dejó abierto
 
-- **Confirmar el reparo de la Linea E**.
+- **Confirmar el reparo de la Linea E.** Sigue abierto. El paso 6 lo acotó:
+  apagarlo cambia 58 pares de 6.006, o sea el 1,0 %, asi que para la eleccion de
+  ruta pesa poco. Afecta si los tiempos de viaje sobre la E.
 - **La detencion endogena** en el modelo, con 24 s de piso.
 - El GTFS tiene **un unico perfil de marcha nominal**. Si la marcha se degrada en
   hora pico, el grafo no lo sabe: lo tiene que producir el modelo. El paso 4
@@ -369,9 +372,11 @@ contra la mediana anual saldría enero entero.
 La forma de la lista es compatible con el calendario de feriados (1/1, 1/5,
 25/12, el 24 y el 31, los lunes de carnaval, los puentes) **pero compatible no es
 verificado**. El método detecta anomalías, no feriados: un paro o un corte de
-servicio aparece igual. **Es el único pendiente de verificación externa que este
-paso deja.** Los días atípicos quedan fuera del perfil de día hábil y no se
-reasignan a domingo, que sería un supuesto sin sustento.
+servicio aparece igual, así que en este paso quedaba sin verificar contra una
+fuente externa. Lo cerró el paso 4: la columna `Tipo Día` del dataset de
+despachos es el calendario operativo del propio operador y confirma el criterio.
+Los días atípicos quedan fuera del perfil de día hábil y no se reasignan a
+domingo, que sería un supuesto sin sustento.
 
 ### 3.5 La concentración horaria: las dos cifras de la Línea F no cierran
 
@@ -427,16 +432,17 @@ Confirma la decisión de modelar la demanda por estación: el faltante no está 
 enteras. El contraste que queda es **parcial y sesgado por construcción**, útil
 solo donde el dato existe.
 
-### 3.7 Pendientes que este paso deja abiertos
+### 3.7 Lo que este paso dejó abierto, y cómo se cerró
 
-- **Contrastar los 25 días atípicos contra el calendario oficial de feriados de
-  2025.** Único pendiente de verificación externa.
-- **Declarar el hueco del 10/04/2025** en el documento, junto con los otros
-  defectos del dataset.
-- **Llevar al documento el resultado de 3.5.** Es hallazgo propio y toca dos
-  afirmaciones que el documento ya hace sobre la demanda de la Línea F.
-- **Ya se pueden elegir los períodos de ajuste y validación**: la tabla diaria da los candidatos a
-  ventana de ajuste y de validación.
+- **Contrastar los 25 días atípicos contra el calendario oficial.** Cerrado en
+  el paso 4: la columna `Tipo Día` del dataset de despachos es el calendario del
+  propio operador y confirma el criterio.
+- **Declarar el hueco del 10/04/2025** junto con los otros defectos del dataset.
+  Hecho.
+- **Llevar el resultado de 3.5 a la propuesta.** Hecho: el documento reporta el
+  9,9 % de la red, el contraste de Constitución y las dos lecturas del hecho.
+- **Elegir los períodos de ajuste y validación.** Sigue abierto, pero la tabla
+  diaria ya da los candidatos.
 
 ---
 
@@ -559,9 +565,10 @@ Insumo directo de la capacidad del modelo: A y C y E despachan 5 coches (C y E c
 algún 6), y B, D y H despachan 6. La capacidad por coche no sale de acá (depende
 del modelo de material rodante) pero la cantidad sí.
 
-### 4.8 Pendientes que este paso deja abiertos
+### 4.8 Lo que este paso dejó abierto
 
-- **Corregir la sección 4 de `contexto-del-proyecto.md`** (punto 4.1).
+- **Corregir lo que teníamos anotado sobre el recurso agregado** (punto 4.1).
+  Hecho, en `contexto-del-proyecto.md`.
 - **Los 4 días atípicos sin explicación** (01/08, 26/12, 29/12, 30/12): menor
   demanda con oferta declarada normal.
 - **El contraste GTFS contra operación real sigue faltando.** Este paso mide
@@ -670,19 +677,19 @@ Y toca directamente al trabajo: Constitución es el nodo de carga máxima
 proyectada de la Línea F, y el EsIA destaca que el 70 % de los viajes con etapa
 en la Línea C combinan con el ferrocarril.
 
-### 5.6 Pendientes que este paso deja abiertos
+### 5.6 Lo que este paso dejó abierto, y cómo se cerró
 
-- **Ya se puede decidir cuál es la matriz del modelo**, con la evidencia de la sección 5 del
-  reporte. Lo que el paso resuelve: el escalado **por franja horaria queda
-  descartado** (factor entre 1,035 y 1,082 de 6 a 22 h, sin forma sistemática).
-  Lo que no resuelve: si corregir por categoría de nodo o por complejo.
-- **Lo de las etapas incompletas se puede decidir midiendo**: `matriz_od.csv` trae
-  `expandidas` y `expandidas_completas` en columnas separadas. Las
-  `viaje_incompleto` son 24.057 etapas (4,1 %) que expanden a 30.491 (4,1 %).
-- **Qué hacer con el par San Pedrito / San José de Flores.** Es defecto conocido
-  de la fuente, con magnitud medida y signo conocido. Se puede dejar declarado,
-  o repararlo redistribuyendo el par según molinetes. No es lo mismo que
-  escalar: acá el total ya cierra.
+- **Cuál es la matriz del modelo.** Cerrado el 27/08/2026 a favor de la de
+  SBASE, que viene expandida y no necesita escalado. Este paso ya había
+  descartado el escalado por franja horaria, con un factor entre 1,035 y 1,082
+  de 6 a 22 h y sin forma sistemática.
+- **Las etapas incompletas.** Sigue abierto y se decide midiendo: `matriz_od.csv`
+  trae `expandidas` y `expandidas_completas` en columnas separadas. Son 24.057
+  etapas, el 4,1 %, que expanden a 30.491.
+- **Qué hacer con el par San Pedrito / San José de Flores.** Dejó de importar:
+  la matriz de SBASE no tiene el defecto, así que al cambiar de matriz no hay
+  nada que reparar. Era un problema de imputación de la fuente y no un rasgo de
+  la demanda.
 - Las **84 etapas intracomplejo** (0,014 %) se descartan: son pares a distancia
   de caminata dentro de la misma combinación, no viajes de subte.
 
@@ -778,9 +785,12 @@ Queda una explicación no verificable: el sesgo de las fuentes. Retiro [C] y Ret
 declara como discrepancia abierta y no se corrige**: corregirla sería ajustar la
 ruta contra una fuente cuyo sesgo apunta justo en esa dirección.
 
-### 6.6 Pendientes que este paso deja abiertos
+### 6.6 Lo que este paso dejó abierto, y cómo se cerró
 
-- **Penalización por transbordo**: su valor y la aceptación de la asignación todo-o-nada.
+- **El valor de la penalización por transbordo.** Cerrado en el paso 10: se
+  conservan los 120 s, pero ahora se sabe que el dato no alcanza para fijar el
+  parámetro por encima de 30 s, y que el indicador central es poco sensible a
+  él.
 - La asignación es **todo-o-nada**: cada par manda todo su flujo por un camino.
   Está medido cuánto pesa: **50 pares** tienen una alternativa por otra línea a menos
   de 60 s, que es 0,8 % del total pero **6,5 % de los 770 pares que realmente tienen
@@ -859,10 +869,12 @@ cabecera** que encabeza cada bloque.
   que no comparte origen con las otras tres. Le da la razón a molinetes en Retiro y
   deja al modelo como el que se aparta.
 
-### 7.6 Lo que este paso deja abierto
+### 7.6 Lo que este paso dejó abierto, y cómo se cerró
 
-- **La pregunta por la matriz se reformula**: hay dos matrices y hay que decidir cuál es la del modelo.
-- **La penalización gana función objetivo**: recorrer la penalización midiendo el error de carga.
+- **Cuál de las dos matrices es la del modelo.** Se decidió por la de SBASE, y
+  el armado está en el paso 11.
+- **La penalización ganó función objetivo**, o sea que se podía recorrer
+  midiendo el error de carga. Es lo que hizo el paso 10.
 - **La discrepancia de Retiro deja de ser una discrepancia entre fuentes** y pasa a
   ser un error del modelo, con tres fuentes coincidiendo en contra.
 - Los perfiles son **solo de hora pico**; el resto del día de servicio sigue sin

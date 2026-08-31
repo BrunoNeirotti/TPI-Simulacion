@@ -1,0 +1,790 @@
+linea,estacion_molinetes,molinete,n_registros,pax_total,primera_fecha,ultima_fecha,es_centinela,es_premetro,sentido,sentido_crudo,sufijo_linea,sufijo_incoherente,clave
+LineaA,Acoyte,LineaA_Acoyte_N_Asc01,5786,8439,2025-01-01,2025-12-27,False,False,N,N,,False,ACOYTE
+LineaA,Acoyte,LineaA_Acoyte_N_Turn01,25449,315442,2025-02-01,2025-12-31,False,False,N,N,,False,ACOYTE
+LineaA,Acoyte,LineaA_Acoyte_N_Turn02,22210,170716,2025-01-01,2025-12-31,False,False,N,N,,False,ACOYTE
+LineaA,Acoyte,LineaA_Acoyte_N_Turn03,22794,362676,2025-01-01,2025-12-31,False,False,N,N,,False,ACOYTE
+LineaA,Acoyte,LineaA_Acoyte_N_Turn04,29497,480203,2025-01-01,2025-12-31,False,False,N,N,,False,ACOYTE
+LineaA,Acoyte,LineaA_Acoyte_N_Turn05,23984,431433,2025-01-01,2025-12-31,False,False,N,N,,False,ACOYTE
+LineaA,Acoyte,LineaA_Acoyte_N_Turn06,24341,725299,2025-01-01,2025-12-31,False,False,N,N,,False,ACOYTE
+LineaA,Acoyte,LineaA_Acoyte_S_Asc01,2858,4155,2025-01-02,2025-12-31,False,False,S,S,,False,ACOYTE
+LineaA,Acoyte,LineaA_Acoyte_S_Turn01,24724,190079,2025-02-01,2025-12-31,False,False,S,S,,False,ACOYTE
+LineaA,Acoyte,LineaA_Acoyte_S_Turn02,23848,370655,2025-01-01,2025-12-31,False,False,S,S,,False,ACOYTE
+LineaA,Acoyte,NULL,2095,44999,2025-01-01,2025-01-31,False,False,,,,False,ACOYTE
+LineaA,Alberti,LineaA_Alberti_Turn01,27642,371771,2025-02-01,2025-12-31,False,False,,Alberti,,False,ALBERTI
+LineaA,Alberti,LineaA_Alberti_Turn02,24023,333693,2025-01-01,2025-12-31,False,False,,Alberti,,False,ALBERTI
+LineaA,Alberti,LineaA_Alberti_Turn03,24451,484353,2025-01-01,2025-12-31,False,False,,Alberti,,False,ALBERTI
+LineaA,Alberti,NULL,1874,13021,2025-01-01,2025-01-31,False,False,,,,False,ALBERTI
+LineaA,Carabobo,LineaA_Carabobo_E_Turn01,25604,340357,2025-02-01,2025-12-31,False,False,E,E,,False,CARABOBO
+LineaA,Carabobo,LineaA_Carabobo_E_Turn02,27097,270187,2025-01-01,2025-12-31,False,False,E,E,,False,CARABOBO
+LineaA,Carabobo,LineaA_Carabobo_E_Turn03,23240,368510,2025-01-01,2025-12-31,False,False,E,E,,False,CARABOBO
+LineaA,Carabobo,LineaA_Carabobo_E_Turn04,22017,367145,2025-01-01,2025-12-31,False,False,E,E,,False,CARABOBO
+LineaA,Carabobo,LineaA_Carabobo_O_Turn01,25362,201493,2025-01-01,2025-12-31,False,False,O,O,,False,CARABOBO
+LineaA,Carabobo,LineaA_Carabobo_O_Turn02,25366,195927,2025-01-01,2025-12-31,False,False,O,O,,False,CARABOBO
+LineaA,Carabobo,LineaA_Carabobo_O_Turn03,23258,292713,2025-01-01,2025-12-31,False,False,O,O,,False,CARABOBO
+LineaA,Carabobo,LineaA_Carabobo_O_Turn04,22259,291427,2025-01-01,2025-12-31,False,False,O,O,,False,CARABOBO
+LineaA,Carabobo,NULL,1995,34917,2025-01-01,2025-01-31,False,False,,,,False,CARABOBO
+LineaA,Castro Barros,LineaA_CBarros_N_Turn01,27816,504831,2025-02-01,2025-12-31,False,False,N,N,,False,CASTRO BARROS
+LineaA,Castro Barros,LineaA_CBarros_N_Turn02,24699,498634,2025-01-01,2025-12-31,False,False,N,N,,False,CASTRO BARROS
+LineaA,Castro Barros,LineaA_CBarros_N_Turn03,24034,377158,2025-01-01,2025-12-31,False,False,N,N,,False,CASTRO BARROS
+LineaA,Castro Barros,LineaA_CBarros_S_Asc01,6739,10598,2025-01-01,2025-12-31,False,False,S,S,,False,CASTRO BARROS
+LineaA,Castro Barros,LineaA_CBarros_S_Turn01,26480,271455,2025-02-01,2025-12-31,False,False,S,S,,False,CASTRO BARROS
+LineaA,Castro Barros,LineaA_CBarros_S_Turn02,24937,523578,2025-01-01,2025-12-31,False,False,S,S,,False,CASTRO BARROS
+LineaA,Castro Barros,NULL,2080,30213,2025-01-01,2025-01-31,False,False,,,,False,CASTRO BARROS
+LineaA,Congreso,LineaA_Congreso_N_Asc01,2590,3538,2025-01-04,2025-11-09,False,False,N,N,,False,CONGRESO
+LineaA,Congreso,LineaA_Congreso_N_Turn01,18889,118618,2025-02-01,2025-11-09,False,False,N,N,,False,CONGRESO
+LineaA,Congreso,LineaA_Congreso_N_Turn02,16418,90170,2025-01-01,2025-11-09,False,False,N,N,,False,CONGRESO
+LineaA,Congreso,LineaA_Congreso_N_Turn03,19108,193787,2025-01-01,2025-11-09,False,False,N,N,,False,CONGRESO
+LineaA,Congreso,LineaA_Congreso_S_Asc01,4882,7947,2025-01-01,2025-11-09,False,False,S,S,,False,CONGRESO
+LineaA,Congreso,LineaA_Congreso_S_Turn01,23784,459910,2025-02-01,2025-11-09,False,False,S,S,,False,CONGRESO
+LineaA,Congreso,LineaA_Congreso_S_Turn02,20406,324239,2025-01-01,2025-11-09,False,False,S,S,,False,CONGRESO
+LineaA,Congreso,LineaA_Congreso_S_Turn03,21238,762107,2025-01-01,2025-11-09,False,False,S,S,,False,CONGRESO
+LineaA,Congreso,NULL,2072,33426,2025-01-01,2025-01-31,False,False,,,,False,CONGRESO
+LineaA,Flores,LineaA_Flores_Este_Turn01,27094,448323,2025-02-01,2025-12-31,False,False,E,Este,,False,SAN JOSE DE FLORES
+LineaA,Flores,LineaA_Flores_Este_Turn02,22553,516456,2025-01-01,2025-12-31,False,False,E,Este,,False,SAN JOSE DE FLORES
+LineaA,Flores,LineaA_Flores_Este_Turn03,23308,577520,2025-01-01,2025-12-31,False,False,E,Este,,False,SAN JOSE DE FLORES
+LineaA,Flores,LineaA_Flores_Oeste_Turn01,24477,224839,2025-02-01,2025-12-31,False,False,O,Oeste,,False,SAN JOSE DE FLORES
+LineaA,Flores,LineaA_Flores_Oeste_Turn02,24267,181759,2025-01-01,2025-12-31,False,False,O,Oeste,,False,SAN JOSE DE FLORES
+LineaA,Flores,LineaA_Flores_Oeste_Turn03,23162,380785,2025-01-01,2025-12-31,False,False,O,Oeste,,False,SAN JOSE DE FLORES
+LineaA,Flores,LineaA_Flores_Oeste_Turn04,22247,317202,2025-01-01,2025-12-31,False,False,O,Oeste,,False,SAN JOSE DE FLORES
+LineaA,Flores,NULL,2027,37790,2025-01-01,2025-01-31,False,False,,,,False,SAN JOSE DE FLORES
+LineaA,Lima,LineaA_Lima_N_Turn01,15389,53012,2025-04-14,2025-12-31,False,False,N,N,,False,LIMA
+LineaA,Lima,LineaA_Lima_N_Turn02,16649,114640,2025-01-01,2025-12-31,False,False,N,N,,False,LIMA
+LineaA,Lima,LineaA_Lima_S_Turn01,21799,252106,2025-04-14,2025-12-31,False,False,S,S,,False,LIMA
+LineaA,Lima,LineaA_Lima_S_Turn02,18238,294258,2025-01-01,2025-12-31,False,False,S,S,,False,LIMA
+LineaA,Lima,LineaA_Lima_S_Turn03,16793,221282,2025-01-01,2025-12-31,False,False,S,S,,False,LIMA
+LineaA,Lima,NULL,342,2577,2025-01-01,2025-01-06,False,False,,,,False,LIMA
+LineaA,Loria,LineaA_Loria_N_Asc01,2805,3786,2025-01-01,2025-10-16,False,False,N,N,,False,LORIA
+LineaA,Loria,LineaA_Loria_N_Discap04,11515,138580,2025-02-01,2025-06-30,False,False,N,N,,False,LORIA
+LineaA,Loria,LineaA_Loria_N_Turn01-EMV+QR,10681,130793,2025-07-01,2025-10-16,False,False,N,N,,False,LORIA
+LineaA,Loria,LineaA_Loria_N_Turn02,19284,290960,2025-01-01,2025-10-16,False,False,N,N,,False,LORIA
+LineaA,Loria,LineaA_Loria_N_Turn03,18350,250491,2025-01-01,2025-10-16,False,False,N,N,,False,LORIA
+LineaA,Loria,LineaA_Loria_S_Turn01,20977,140412,2025-02-01,2025-10-23,False,False,S,S,,False,LORIA
+LineaA,Loria,LineaA_Loria_S_Turn02,19690,311229,2025-01-01,2025-10-19,False,False,S,S,,False,LORIA
+LineaA,Loria,NULL,2056,25421,2025-01-01,2025-01-31,False,False,,,,False,LORIA
+LineaA,Pasco,LineaA_Pasco_Turn01,23286,159907,2025-02-01,2025-12-31,False,False,,Pasco,,False,PASCO
+LineaA,Pasco,LineaA_Pasco_Turn02,21938,198467,2025-01-01,2025-12-31,False,False,,Pasco,,False,PASCO
+LineaA,Pasco,LineaA_Pasco_Turn03,22944,231382,2025-01-01,2025-12-31,False,False,,Pasco,,False,PASCO
+LineaA,Pasco,NULL,1608,6691,2025-01-01,2025-01-31,False,False,,,,False,PASCO
+LineaA,Peru,LineaA_Peru_N_Asc01,2489,3712,2025-01-02,2025-11-22,False,False,N,N,,False,PERU
+LineaA,Peru,LineaA_Peru_N_Turn01,9093,35191,2025-02-01,2025-12-31,False,False,N,N,,False,PERU
+LineaA,Peru,LineaA_Peru_N_Turn02,13891,60679,2025-01-01,2025-12-31,False,False,N,N,,False,PERU
+LineaA,Peru,LineaA_Peru_S_Asc01,6246,10364,2025-01-02,2025-12-31,False,False,S,S,,False,PERU
+LineaA,Peru,LineaA_Peru_S_Turn01,25692,432988,2025-02-01,2025-12-31,False,False,S,S,,False,PERU
+LineaA,Peru,LineaA_Peru_S_Turn02,22680,295030,2025-01-01,2025-12-31,False,False,S,S,,False,PERU
+LineaA,Peru,LineaA_Peru_S_Turn03,20401,200583,2025-01-01,2025-12-31,False,False,S,S,,False,PERU
+LineaA,Peru,LineaA_Peru_S_Turn04,20779,361181,2025-01-01,2025-12-31,False,False,S,S,,False,PERU
+LineaA,Peru,LineaA_Peru_S_Turn05,20890,267153,2025-01-01,2025-12-31,False,False,S,S,,False,PERU
+LineaA,Peru,LineaA_Peru_S_Turn06,20624,214538,2025-01-01,2025-12-31,False,False,S,S,,False,PERU
+LineaA,Peru,NULL,1936,42592,2025-01-01,2025-01-31,False,False,,,,False,PERU
+LineaA,Piedras,LineaA_Piedras_N_Turn01,9345,22327,2025-02-01,2025-12-31,False,False,N,N,,False,PIEDRAS
+LineaA,Piedras,LineaA_Piedras_N_Turn02,14901,51733,2025-01-01,2025-12-31,False,False,N,N,,False,PIEDRAS
+LineaA,Piedras,LineaA_Piedras_S_Turn01,26027,445425,2025-02-01,2025-12-31,False,False,S,S,,False,PIEDRAS
+LineaA,Piedras,LineaA_Piedras_S_Turn02,23981,487404,2025-01-01,2025-12-31,False,False,S,S,,False,PIEDRAS
+LineaA,Piedras,LineaA_Piedras_S_Turn03,23413,390686,2025-01-01,2025-12-31,False,False,S,S,,False,PIEDRAS
+LineaA,Piedras,NULL,1875,29958,2025-01-01,2025-01-31,False,False,,,,False,PIEDRAS
+LineaA,Plaza Miserere,LineaA_Miserere_Q_HALL_Turn01,20303,116652,2025-02-01,2025-12-31,False,False,HALL,HALL,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_Q_HALL_Turn02,20393,101282,2025-01-01,2025-12-31,False,False,HALL,HALL,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_Q_HALL_Turn03,16698,96785,2025-01-01,2025-12-31,False,False,HALL,HALL,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_Q_HALL_Turn04,22545,403727,2025-01-01,2025-12-31,False,False,HALL,HALL,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_Q_HALL_Turn05,23674,524462,2025-01-01,2025-12-31,False,False,HALL,HALL,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_Q_HALL_Turn06,21478,308698,2025-01-01,2025-12-31,False,False,HALL,HALL,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_Q_NE_Turn01,14084,32260,2025-02-01,2025-12-31,False,False,NE,NE,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_Q_NE_Turn02,15680,43662,2025-01-01,2025-12-31,False,False,NE,NE,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_Q_NE_Turn03,19033,87598,2025-01-01,2025-12-31,False,False,NE,NE,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_Q_NE_Turn04,22994,201292,2025-01-01,2025-12-31,False,False,NE,NE,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_S_Turn01,24746,145122,2025-02-01,2025-12-31,False,False,S,S,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_S_Turn02,23943,305246,2025-01-01,2025-12-31,False,False,S,S,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,LineaA_Miserere_S_Turn03,24260,323235,2025-01-01,2025-12-31,False,False,S,S,,False,PLAZA MISERERE
+LineaA,Plaza Miserere,NULL,1975,23074,2025-01-01,2025-01-31,False,False,,,,False,PLAZA MISERERE
+LineaA,Plaza de Mayo,LineaA_PMayo_E_Turn01,26603,591017,2025-02-01,2025-12-31,False,False,E,E,,False,PLAZA DE MAYO
+LineaA,Plaza de Mayo,LineaA_PMayo_E_Turn02,24088,502020,2025-01-01,2025-12-31,False,False,E,E,,False,PLAZA DE MAYO
+LineaA,Plaza de Mayo,LineaA_PMayo_E_Turn03,24086,579394,2025-01-01,2025-12-31,False,False,E,E,,False,PLAZA DE MAYO
+LineaA,Plaza de Mayo,LineaA_PMayo_E_Turn04,24128,601446,2025-01-01,2025-12-31,False,False,E,E,,False,PLAZA DE MAYO
+LineaA,Plaza de Mayo,LineaA_PMayo_O_Turn01,17501,298144,2025-02-01,2025-12-30,False,False,O,O,,False,PLAZA DE MAYO
+LineaA,Plaza de Mayo,LineaA_PMayo_O_Turn02,17069,210172,2025-01-01,2025-12-30,False,False,O,O,,False,PLAZA DE MAYO
+LineaA,Plaza de Mayo,LineaA_PMayo_O_Turn03,17759,334137,2025-01-01,2025-12-30,False,False,O,O,,False,PLAZA DE MAYO
+LineaA,Plaza de Mayo,LineaA_PMayo_O_Turn04,14814,215749,2025-01-01,2025-12-30,False,False,O,O,,False,PLAZA DE MAYO
+LineaA,Plaza de Mayo,NULL,2031,66360,2025-01-01,2025-01-31,False,False,,,,False,PLAZA DE MAYO
+LineaA,Primera Junta,LineaA_PJunta_N_Turn01,20086,413452,2025-02-01,2025-12-30,False,False,N,N,,False,PRIMERA JUNTA
+LineaA,Primera Junta,LineaA_PJunta_N_Turn02,17920,300156,2025-01-01,2025-12-30,False,False,N,N,,False,PRIMERA JUNTA
+LineaA,Primera Junta,LineaA_PJunta_N_Turn03,17584,423157,2025-01-01,2025-12-30,False,False,N,N,,False,PRIMERA JUNTA
+LineaA,Primera Junta,LineaA_PJunta_S_Turn01,27138,369940,2025-02-01,2025-12-31,False,False,S,S,,False,PRIMERA JUNTA
+LineaA,Primera Junta,LineaA_PJunta_S_Turn02,27309,254732,2025-01-01,2025-12-31,False,False,S,S,,False,PRIMERA JUNTA
+LineaA,Primera Junta,LineaA_PJunta_S_Turn03,22353,244029,2025-01-01,2025-12-31,False,False,S,S,,False,PRIMERA JUNTA
+LineaA,Primera Junta,LineaA_PJunta_S_Turn04,23106,263242,2025-01-01,2025-12-31,False,False,S,S,,False,PRIMERA JUNTA
+LineaA,Primera Junta,LineaA_PJunta_S_Turn05,24525,461193,2025-01-01,2025-12-31,False,False,S,S,,False,PRIMERA JUNTA
+LineaA,Primera Junta,NULL,2047,45541,2025-01-01,2025-01-31,False,False,,,,False,PRIMERA JUNTA
+LineaA,Puan,LineaA_Puan_E_Turn01,27049,416943,2025-02-01,2025-12-31,False,False,E,E,,False,PUAN
+LineaA,Puan,LineaA_Puan_E_Turn02,24388,490408,2025-01-01,2025-12-31,False,False,E,E,,False,PUAN
+LineaA,Puan,LineaA_Puan_O_Turn01,26494,246460,2025-01-01,2025-12-31,False,False,O,O,,False,PUAN
+LineaA,Puan,LineaA_Puan_O_Turn02,23223,346611,2025-01-01,2025-12-31,False,False,O,O,,False,PUAN
+LineaA,Puan,NULL,1952,21181,2025-01-01,2025-01-31,False,False,,,,False,PUAN
+LineaA,Rio de Janeiro,LineaA_RJaneiro_N_Turn01,22898,456374,2025-02-01,2025-12-31,False,False,N,N,,False,RIO DE JANEIRO
+LineaA,Rio de Janeiro,LineaA_RJaneiro_N_Turn02,19734,362535,2025-01-01,2025-12-31,False,False,N,N,,False,RIO DE JANEIRO
+LineaA,Rio de Janeiro,LineaA_RJaneiro_N_Turn03,19957,427278,2025-01-01,2025-12-31,False,False,N,N,,False,RIO DE JANEIRO
+LineaA,Rio de Janeiro,LineaA_RJaneiro_S_Turn01,20361,145893,2025-02-01,2025-12-31,False,False,S,S,,False,RIO DE JANEIRO
+LineaA,Rio de Janeiro,LineaA_RJaneiro_S_Turn02,19709,308500,2025-01-01,2025-12-31,False,False,S,S,,False,RIO DE JANEIRO
+LineaA,Rio de Janeiro,NULL,2088,37137,2025-01-01,2025-01-31,False,False,,,,False,RIO DE JANEIRO
+LineaA,Saenz Peña ,LineaA_SnzPena_N_Turn01,22705,142851,2025-02-01,2025-12-31,False,False,N,N,,False,SAENZ PENA
+LineaA,Saenz Peña ,LineaA_SnzPena_N_Turn02,23695,274788,2025-01-01,2025-12-31,False,False,N,N,,False,SAENZ PENA
+LineaA,Saenz Peña ,LineaA_SnzPena_S_Turn01,27632,487206,2025-02-01,2025-12-31,False,False,S,S,,False,SAENZ PENA
+LineaA,Saenz Peña ,LineaA_SnzPena_S_Turn02,24004,372087,2025-01-01,2025-12-31,False,False,S,S,,False,SAENZ PENA
+LineaA,Saenz Peña ,LineaA_SnzPena_S_Turn03,25032,642675,2025-01-01,2025-12-31,False,False,S,S,,False,SAENZ PENA
+LineaA,Saenz Peña ,NULL,2035,34037,2025-01-01,2025-01-31,False,False,,,,False,SAENZ PENA
+LineaA,San Pedrito,LineaA_SanPedrito_Este_Turn01,27205,586049,2025-02-01,2025-12-31,False,False,E,Este,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Este_Turn02,27549,497069,2025-01-01,2025-12-31,False,False,E,Este,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Este_Turn03,22486,632030,2025-01-01,2025-12-31,False,False,E,Este,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Este_Turn04,23805,870874,2025-01-01,2025-12-31,False,False,E,Este,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Este_Turn05,23934,858127,2025-01-01,2025-12-31,False,False,E,Este,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Oeste_Turn01,26284,368304,2025-01-01,2025-12-31,False,False,O,Oeste,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Oeste_Turn02,15933,248362,2025-01-01,2025-12-31,False,False,O,Oeste,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Oeste_Turn03,21659,473319,2025-01-01,2025-12-31,False,False,O,Oeste,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Oeste_Turn04,22108,543767,2025-01-01,2025-12-31,False,False,O,Oeste,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Oeste_Turn05,21442,509995,2025-01-01,2025-12-31,False,False,O,Oeste,,False,SAN PEDRITO
+LineaA,San Pedrito,LineaA_SanPedrito_Oeste_Turn06,22413,609589,2025-01-01,2025-12-31,False,False,O,Oeste,,False,SAN PEDRITO
+LineaA,San Pedrito,NULL,2041,62641,2025-01-01,2025-01-31,False,False,,,,False,SAN PEDRITO
+LineaB,Angel Gallardo,LineaB_Gallardo_N_Turn01,28500,538490,2025-02-01,2025-12-31,False,False,N,N,,False,ANGEL GALLARDO
+LineaB,Angel Gallardo,LineaB_Gallardo_N_Turn02,22913,314387,2025-01-01,2025-12-31,False,False,N,N,,False,ANGEL GALLARDO
+LineaB,Angel Gallardo,LineaB_Gallardo_N_Turn03,24762,655656,2025-01-01,2025-12-31,False,False,N,N,,False,ANGEL GALLARDO
+LineaB,Angel Gallardo,LineaB_Gallardo_N_Turn04,24122,661558,2025-01-01,2025-12-31,False,False,N,N,,False,ANGEL GALLARDO
+LineaB,Angel Gallardo,LineaB_Gallardo_S_Turn01,23465,219708,2025-02-01,2025-12-31,False,False,S,S,,False,ANGEL GALLARDO
+LineaB,Angel Gallardo,LineaB_Gallardo_S_Turn02,25094,446715,2025-01-01,2025-12-31,False,False,S,S,,False,ANGEL GALLARDO
+LineaB,Angel Gallardo,NULL,2065,39869,2025-01-01,2025-01-31,False,False,,,,False,ANGEL GALLARDO
+LineaB,Callao.B,LineaB_CallaoB_N_Asc01,269,339,2025-01-02,2025-12-31,False,False,N,N,B,False,CALLAO
+LineaB,Callao.B,LineaB_CallaoB_N_Turn01,24900,192978,2025-02-01,2025-12-31,False,False,N,N,B,False,CALLAO
+LineaB,Callao.B,LineaB_CallaoB_N_Turn02,23034,234971,2025-01-01,2025-12-31,False,False,N,N,B,False,CALLAO
+LineaB,Callao.B,LineaB_CallaoB_N_Turn03,22718,241104,2025-01-01,2025-12-31,False,False,N,N,B,False,CALLAO
+LineaB,Callao.B,LineaB_CallaoB_S_Asc01,584,645,2025-01-01,2025-12-31,False,False,S,S,B,False,CALLAO
+LineaB,Callao.B,LineaB_CallaoB_S_Turn01,29551,859124,2025-02-01,2025-12-31,False,False,S,S,B,False,CALLAO
+LineaB,Callao.B,LineaB_CallaoB_S_Turn02,25970,1095937,2025-01-01,2025-12-31,False,False,S,S,B,False,CALLAO
+LineaB,Callao.B,LineaB_CallaoB_S_Turn03,25449,873042,2025-01-01,2025-12-31,False,False,S,S,B,False,CALLAO
+LineaB,Callao.B,NULL,2109,39135,2025-01-01,2025-01-31,False,False,,,B,False,CALLAO
+LineaB,Carlos Gardel,LineaB_Gardel_N_Turn01,20784,323424,2025-02-01,2025-12-31,False,False,N,N,,False,CARLOS GARDEL
+LineaB,Carlos Gardel,LineaB_Gardel_N_Turn02,16953,437287,2025-01-01,2025-12-31,False,False,N,N,,False,CARLOS GARDEL
+LineaB,Carlos Gardel,LineaB_Gardel_N_Turn03,16874,427040,2025-01-01,2025-12-31,False,False,N,N,,False,CARLOS GARDEL
+LineaB,Carlos Gardel,LineaB_Gardel_S_Turn01,20998,277309,2025-02-01,2025-12-31,False,False,S,S,,False,CARLOS GARDEL
+LineaB,Carlos Gardel,LineaB_Gardel_S_Turn02,18220,418128,2025-01-01,2025-12-31,False,False,S,S,,False,CARLOS GARDEL
+LineaB,Carlos Gardel,LineaB_Gardel_S_Turn03,18130,363608,2025-01-01,2025-12-31,False,False,S,S,,False,CARLOS GARDEL
+LineaB,Carlos Gardel,NULL,2081,48446,2025-01-01,2025-01-31,False,False,,,,False,CARLOS GARDEL
+LineaB,Carlos Pellegrini,LineaB_Pellegrini_E_Turn01,23626,180227,2025-02-01,2025-12-31,False,False,E,E,,False,CARLOS PELLEGRINI
+LineaB,Carlos Pellegrini,LineaB_Pellegrini_E_Turn02,23684,173904,2025-01-04,2025-12-31,False,False,E,E,,False,CARLOS PELLEGRINI
+LineaB,Carlos Pellegrini,LineaB_Pellegrini_E_Turn03,29889,497429,2025-01-01,2025-12-31,False,False,E,E,,False,CARLOS PELLEGRINI
+LineaB,Carlos Pellegrini,LineaB_Pellegrini_E_Turn04,24612,301643,2025-01-01,2025-12-31,False,False,E,E,,False,CARLOS PELLEGRINI
+LineaB,Carlos Pellegrini,LineaB_Pellegrini_E_Turn05,24950,431004,2025-01-01,2025-12-31,False,False,E,E,,False,CARLOS PELLEGRINI
+LineaB,Carlos Pellegrini,LineaB_Pellegrini_E_Turn06,25778,640720,2025-01-01,2025-12-31,False,False,E,E,,False,CARLOS PELLEGRINI
+LineaB,Carlos Pellegrini,LineaB_Pellegrini_E_Turn07,25549,628699,2025-01-01,2025-12-31,False,False,E,E,,False,CARLOS PELLEGRINI
+LineaB,Carlos Pellegrini,LineaB_Pellegrini_O_Turn01,13106,320659,2025-02-03,2025-12-30,False,False,O,O,,False,CARLOS PELLEGRINI
+LineaB,Carlos Pellegrini,LineaB_Pellegrini_O_Turn02,11411,684653,2025-01-02,2025-12-31,False,False,O,O,,False,CARLOS PELLEGRINI
+LineaB,Carlos Pellegrini,NULL,2120,43999,2025-01-01,2025-01-31,False,False,,,,False,CARLOS PELLEGRINI
+LineaB,Dorrego,LineaB_Dorrego_N_Turn01,28225,384425,2025-02-01,2025-12-31,False,False,N,N,,False,DORREGO
+LineaB,Dorrego,LineaB_Dorrego_N_Turn02,27401,356052,2025-01-01,2025-12-31,False,False,N,N,,False,DORREGO
+LineaB,Dorrego,LineaB_Dorrego_N_Turn03,27556,344283,2025-01-01,2025-12-31,False,False,N,N,,False,DORREGO
+LineaB,Dorrego,LineaB_Dorrego_N_Turn04,23419,332787,2025-01-01,2025-12-31,False,False,N,N,,False,DORREGO
+LineaB,Dorrego,LineaB_Dorrego_N_Turn05,23545,309459,2025-01-01,2025-12-31,False,False,N,N,,False,DORREGO
+LineaB,Dorrego,LineaB_Dorrego_N_Turn06,24464,484287,2025-01-01,2025-12-31,False,False,N,N,,False,DORREGO
+LineaB,Dorrego,LineaB_Dorrego_S_Turn01,22590,90081,2025-02-01,2025-12-31,False,False,S,S,,False,DORREGO
+LineaB,Dorrego,LineaB_Dorrego_S_Turn02,24454,197748,2025-01-01,2025-12-31,False,False,S,S,,False,DORREGO
+LineaB,Dorrego,NULL,2109,29870,2025-01-01,2025-01-31,False,False,,,,False,DORREGO
+LineaB,Echeverria,LineaB_Echeverria_Este_Turn01,21808,134482,2025-02-01,2025-12-31,False,False,E,Este,,False,ECHEVERRIA
+LineaB,Echeverria,LineaB_Echeverria_Este_Turn02,21084,117173,2025-01-01,2025-12-31,False,False,E,Este,,False,ECHEVERRIA
+LineaB,Echeverria,LineaB_Echeverria_Este_Turn03,23055,283617,2025-01-01,2025-12-31,False,False,E,Este,,False,ECHEVERRIA
+LineaB,Echeverria,LineaB_Echeverria_Oeste_Turn01,26285,305090,2025-02-01,2025-12-31,False,False,O,Oeste,,False,ECHEVERRIA
+LineaB,Echeverria,LineaB_Echeverria_Oeste_Turn02,22906,226187,2025-01-01,2025-12-31,False,False,O,Oeste,,False,ECHEVERRIA
+LineaB,Echeverria,LineaB_Echeverria_Oeste_Turn03,22980,256630,2025-01-01,2025-12-31,False,False,O,Oeste,,False,ECHEVERRIA
+LineaB,Echeverria,NULL,1941,21884,2025-01-01,2025-01-31,False,False,,,,False,ECHEVERRIA
+LineaB,Federico Lacroze,LineaB_Lacroze_E_Turn01,23023,146327,2025-02-01,2025-12-31,False,False,E,E,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_E_Turn02,20266,109499,2025-01-01,2025-12-31,False,False,E,E,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_E_Turn03,22571,110564,2025-01-01,2025-12-31,False,False,E,E,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_E_Turn04,22281,244931,2025-01-01,2025-12-31,False,False,E,E,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_E_Turn05,17481,153931,2025-01-01,2025-12-31,False,False,E,E,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_E_Turn06,22169,217761,2025-01-01,2025-12-31,False,False,E,E,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_E_Turn07,23155,319877,2025-01-01,2025-12-31,False,False,E,E,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_O_Turn01,23891,200306,2025-02-01,2025-12-31,False,False,O,O,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_O_Turn02,23853,191267,2025-01-01,2025-12-31,False,False,O,O,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_O_Turn03,23772,173922,2025-01-01,2025-12-31,False,False,O,O,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_O_Turn04,25896,178398,2025-01-01,2025-12-31,False,False,O,O,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_O_Turn05,23907,490869,2025-01-01,2025-12-31,False,False,O,O,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_O_Turn06,23026,481579,2025-01-01,2025-12-31,False,False,O,O,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_O_Turn07,23386,581029,2025-01-01,2025-12-31,False,False,O,O,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_O_Turn08,22951,578862,2025-01-01,2025-12-31,False,False,O,O,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_O_Turn09,23220,665616,2025-01-01,2025-12-31,False,False,O,O,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_S_Turn01,16977,34247,2025-02-01,2025-12-31,False,False,S,S,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_S_Turn02,23395,126969,2025-01-01,2025-12-31,False,False,S,S,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_S_Turn03,8703,13035,2025-02-01,2025-12-31,False,False,S,S,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,LineaB_Lacroze_S_Turn04,20020,75045,2025-01-01,2025-12-31,False,False,S,S,,False,FEDERICO LACROZE
+LineaB,Federico Lacroze,NULL,2098,38126,2025-01-01,2025-01-31,False,False,,,,False,FEDERICO LACROZE
+LineaB,Florida,LineaB_Florida_E_Turn01,16471,245302,2025-02-03,2025-12-30,False,False,E,E,,False,FLORIDA
+LineaB,Florida,LineaB_Florida_E_Turn02,15399,192536,2025-01-02,2025-12-30,False,False,E,E,,False,FLORIDA
+LineaB,Florida,LineaB_Florida_E_Turn03,12740,153481,2025-01-02,2025-12-30,False,False,E,E,,False,FLORIDA
+LineaB,Florida,LineaB_Florida_O_Turn01,25108,403863,2025-02-01,2025-12-31,False,False,O,O,,False,FLORIDA
+LineaB,Florida,LineaB_Florida_O_Turn02,23198,248157,2025-01-01,2025-12-31,False,False,O,O,,False,FLORIDA
+LineaB,Florida,LineaB_Florida_O_Turn03,21672,218017,2025-01-01,2025-12-31,False,False,O,O,,False,FLORIDA
+LineaB,Florida,LineaB_Florida_O_Turn04,23369,577226,2025-01-01,2025-12-31,False,False,O,O,,False,FLORIDA
+LineaB,Florida,LineaB_Florida_O_Turn05,22093,417761,2025-01-01,2025-12-31,False,False,O,O,,False,FLORIDA
+LineaB,Florida,NULL,1940,52454,2025-01-01,2025-01-31,False,False,,,,False,FLORIDA
+LineaB,Leandro N. Alem,LineaB_Alem_N_Turn01,20659,174306,2025-01-01,2025-12-31,False,False,N,N,,False,LEANDRO N ALEM
+LineaB,Leandro N. Alem,LineaB_Alem_N_Turn02,23357,206168,2025-01-01,2025-12-31,False,False,N,N,,False,LEANDRO N ALEM
+LineaB,Leandro N. Alem,LineaB_Alem_N_Turn03,23511,332172,2025-01-01,2025-12-31,False,False,N,N,,False,LEANDRO N ALEM
+LineaB,Leandro N. Alem,LineaB_Alem_N_Turn04,20729,279298,2025-01-01,2025-12-31,False,False,N,N,,False,LEANDRO N ALEM
+LineaB,Leandro N. Alem,LineaB_Alem_S_Turn01,26641,465295,2025-02-01,2025-12-31,False,False,S,S,,False,LEANDRO N ALEM
+LineaB,Leandro N. Alem,LineaB_Alem_S_Turn02,27854,447712,2025-01-01,2025-12-31,False,False,S,S,,False,LEANDRO N ALEM
+LineaB,Leandro N. Alem,LineaB_Alem_S_Turn03,25078,644325,2025-01-01,2025-12-31,False,False,S,S,,False,LEANDRO N ALEM
+LineaB,Leandro N. Alem,LineaB_Alem_S_Turn04,24811,589586,2025-01-01,2025-12-31,False,False,S,S,,False,LEANDRO N ALEM
+LineaB,Leandro N. Alem,LineaB_Alem_S_Turn05,22911,351124,2025-01-01,2025-12-31,False,False,S,S,,False,LEANDRO N ALEM
+LineaB,Leandro N. Alem,NULL,2081,51646,2025-01-01,2025-01-31,False,False,,,,False,LEANDRO N ALEM
+LineaB,Loria,NULL,2,33,2025-01-22,2025-01-22,False,False,,,,False,LORIA
+LineaB,Los Incas,LineaB_LosIncas_Turn01,26111,292975,2025-02-01,2025-12-31,False,False,,LosIncas,,False,DE LOS INCAS PARQUE CHAS
+LineaB,Los Incas,LineaB_LosIncas_Turn02,25707,213495,2025-01-01,2025-12-31,False,False,,LosIncas,,False,DE LOS INCAS PARQUE CHAS
+LineaB,Los Incas,LineaB_LosIncas_Turn03,24417,168795,2025-01-01,2025-12-31,False,False,,LosIncas,,False,DE LOS INCAS PARQUE CHAS
+LineaB,Los Incas,LineaB_LosIncas_Turn04,24613,150492,2025-01-01,2025-12-31,False,False,,LosIncas,,False,DE LOS INCAS PARQUE CHAS
+LineaB,Los Incas,LineaB_LosIncas_Turn05,22735,400866,2025-01-01,2025-12-31,False,False,,LosIncas,,False,DE LOS INCAS PARQUE CHAS
+LineaB,Los Incas,LineaB_LosIncas_Turn06,22488,358699,2025-01-01,2025-12-31,False,False,,LosIncas,,False,DE LOS INCAS PARQUE CHAS
+LineaB,Los Incas,LineaB_LosIncas_Turn07,20047,220540,2025-01-01,2025-12-31,False,False,,LosIncas,,False,DE LOS INCAS PARQUE CHAS
+LineaB,Los Incas,NULL,2007,25870,2025-01-01,2025-01-31,False,False,,,,False,DE LOS INCAS PARQUE CHAS
+LineaB,Malabia,LineaB_Malabia_N_Turn01,23640,447047,2025-02-01,2025-12-08,False,False,N,N,,False,MALABIA
+LineaB,Malabia,LineaB_Malabia_N_Turn02,27341,418351,2025-01-01,2025-12-08,False,False,N,N,,False,MALABIA
+LineaB,Malabia,LineaB_Malabia_N_Turn03,22668,622095,2025-01-01,2025-12-08,False,False,N,N,,False,MALABIA
+LineaB,Malabia,LineaB_Malabia_N_Turn04,21373,331062,2025-01-01,2025-12-08,False,False,N,N,,False,MALABIA
+LineaB,Malabia,LineaB_Malabia_N_Turn05,22782,630934,2025-01-01,2025-12-08,False,False,N,N,,False,MALABIA
+LineaB,Malabia,LineaB_Malabia_S_Turn01,24486,168467,2025-02-01,2025-12-08,False,False,S,S,,False,MALABIA
+LineaB,Malabia,LineaB_Malabia_S_Turn02,23448,385656,2025-01-01,2025-12-08,False,False,S,S,,False,MALABIA
+LineaB,Malabia,NULL,2095,43379,2025-01-01,2025-01-31,False,False,,,,False,MALABIA
+LineaB,Medrano,LineaB_Medrano_N_Turn01,28338,460449,2025-02-01,2025-12-31,False,False,N,N,,False,MEDRANO
+LineaB,Medrano,LineaB_Medrano_N_Turn02,28288,313416,2025-01-01,2025-12-31,False,False,N,N,,False,MEDRANO
+LineaB,Medrano,LineaB_Medrano_N_Turn03,24951,645971,2025-01-01,2025-12-31,False,False,N,N,,False,MEDRANO
+LineaB,Medrano,LineaB_Medrano_N_Turn04,24652,594816,2025-01-01,2025-12-31,False,False,N,N,,False,MEDRANO
+LineaB,Medrano,LineaB_Medrano_S_Turn01,28656,351970,2025-02-01,2025-12-31,False,False,S,S,,False,MEDRANO
+LineaB,Medrano,LineaB_Medrano_S_Turn02,26182,767851,2025-01-01,2025-12-31,False,False,S,S,,False,MEDRANO
+LineaB,Medrano,NULL,2145,43752,2025-01-01,2025-01-31,False,False,,,,False,MEDRANO
+LineaB,Pasteur,LineaB_Pasteur_N_Turn01,22281,141859,2025-02-01,2025-12-31,False,False,N,N,,False,PASTEUR
+LineaB,Pasteur,LineaB_Pasteur_N_Turn02,20825,257412,2025-01-01,2025-12-31,False,False,N,N,,False,PASTEUR
+LineaB,Pasteur,LineaB_Pasteur_N_Turn03,19826,228388,2025-01-01,2025-12-31,False,False,N,N,,False,PASTEUR
+LineaB,Pasteur,LineaB_Pasteur_S_Turn01,27349,451489,2025-02-01,2025-12-31,False,False,S,S,,False,PASTEUR
+LineaB,Pasteur,LineaB_Pasteur_S_Turn02,24721,625124,2025-01-01,2025-12-31,False,False,S,S,,False,PASTEUR
+LineaB,Pasteur,LineaB_Pasteur_S_Turn03,23943,641959,2025-01-01,2025-12-31,False,False,S,S,,False,PASTEUR
+LineaB,Pasteur,NULL,1983,32543,2025-01-01,2025-01-31,False,False,,,,False,PASTEUR
+LineaB,Pueyrredon,LineaB_Pueyr_N_Turn01,5057,36479,2025-08-01,2025-09-30,False,False,N,N,,False,PUEYRREDON
+LineaB,Pueyrredon,LineaB_Pueyr_N_Turn02,4211,20291,2025-01-01,2025-09-30,False,False,N,N,,False,PUEYRREDON
+LineaB,Pueyrredon,LineaB_Pueyr_N_Turn03,15472,287718,2025-01-01,2025-12-31,False,False,N,N,,False,PUEYRREDON
+LineaB,Pueyrredon,LineaB_Pueyr_N_Turn04,12645,137630,2025-01-01,2025-12-31,False,False,N,N,,False,PUEYRREDON
+LineaB,Pueyrredon,LineaB_Pueyr_S_Turn01,5061,37459,2025-08-01,2025-09-30,False,False,S,S,,False,PUEYRREDON
+LineaB,Pueyrredon,LineaB_Pueyr_S_Turn02,5104,35560,2025-01-01,2025-09-30,False,False,S,S,,False,PUEYRREDON
+LineaB,Pueyrredon,LineaB_Pueyr_S_Turn03,15558,319007,2025-01-01,2025-12-31,False,False,S,S,,False,PUEYRREDON
+LineaB,Pueyrredon,LineaB_Pueyr_S_Turn04,15183,343186,2025-01-01,2025-12-31,False,False,S,S,,False,PUEYRREDON
+LineaB,Pueyrredon,NULL,324,2325,2025-01-01,2025-01-06,False,False,,,,False,PUEYRREDON
+LineaB,Pueyrredon.B,LineaB_Pueyr_N_Turn01,13924,90269,2025-04-20,2025-12-31,False,False,N,N,B,False,PUEYRREDON
+LineaB,Pueyrredon.B,LineaB_Pueyr_N_Turn02,10668,41011,2025-04-21,2025-12-31,False,False,N,N,B,False,PUEYRREDON
+LineaB,Pueyrredon.B,LineaB_Pueyr_N_Turn03,2020,35748,2025-07-01,2025-07-31,False,False,N,N,B,False,PUEYRREDON
+LineaB,Pueyrredon.B,LineaB_Pueyr_N_Turn04,1729,18848,2025-07-01,2025-07-31,False,False,N,N,B,False,PUEYRREDON
+LineaB,Pueyrredon.B,LineaB_Pueyr_S_Turn01,14718,109985,2025-04-21,2025-12-31,False,False,S,S,B,False,PUEYRREDON
+LineaB,Pueyrredon.B,LineaB_Pueyr_S_Turn02,13837,78745,2025-04-21,2025-12-31,False,False,S,S,B,False,PUEYRREDON
+LineaB,Pueyrredon.B,LineaB_Pueyr_S_Turn03,2114,42726,2025-07-01,2025-07-31,False,False,S,S,B,False,PUEYRREDON
+LineaB,Pueyrredon.B,LineaB_Pueyr_S_Turn04,2024,44945,2025-07-01,2025-07-31,False,False,S,S,B,False,PUEYRREDON
+LineaB,Rosas,LineaB_JMRosas_Este_Turn01,27737,621808,2025-02-01,2025-12-31,False,False,E,Este,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Este_Turn02,24111,530081,2025-01-01,2025-12-31,False,False,E,Este,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Este_Turn03,24596,789152,2025-01-01,2025-12-31,False,False,E,Este,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Este_Turn04,2463,23926,2025-11-21,2025-12-31,False,False,E,Este,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Oeste_Turn01,28357,512669,2025-02-01,2025-12-31,False,False,O,Oeste,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Oeste_Turn02,27068,328831,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Oeste_Turn03,25363,321866,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Oeste_Turn04,23670,246331,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Oeste_Turn05,19296,465046,2025-01-02,2025-12-31,False,False,O,Oeste,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Oeste_Turn06,21689,668896,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Oeste_Turn07,21901,656828,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,LineaB_JMRosas_Oeste_Turn08,23224,541654,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JUAN MANUEL DE ROSAS
+LineaB,Rosas,NULL,2114,83991,2025-01-01,2025-01-31,False,False,,,,False,JUAN MANUEL DE ROSAS
+LineaB,Tronador,LineaB_Tronador_Turn01,27439,409468,2025-02-01,2025-12-31,False,False,,Tronador,,False,TRONADOR VILLA ORTUZAR
+LineaB,Tronador,LineaB_Tronador_Turn02,23795,346411,2025-01-01,2025-12-31,False,False,,Tronador,,False,TRONADOR VILLA ORTUZAR
+LineaB,Tronador,LineaB_Tronador_Turn03,22563,369370,2025-01-01,2025-12-31,False,False,,Tronador,,False,TRONADOR VILLA ORTUZAR
+LineaB,Tronador,NULL,1894,16570,2025-01-01,2025-01-31,False,False,,,,False,TRONADOR VILLA ORTUZAR
+LineaB,Uruguay,LineaB_Uruguay_N_Asc01,595,760,2025-01-02,2025-08-22,False,False,N,N,,False,URUGUAY
+LineaB,Uruguay,LineaB_Uruguay_N_Turn01,15302,79363,2025-02-01,2025-09-14,False,False,N,N,,False,URUGUAY
+LineaB,Uruguay,LineaB_Uruguay_N_Turn02,14708,103870,2025-01-01,2025-09-14,False,False,N,N,,False,URUGUAY
+LineaB,Uruguay,LineaB_Uruguay_N_Turn03,13302,97686,2025-01-01,2025-09-14,False,False,N,N,,False,URUGUAY
+LineaB,Uruguay,LineaB_Uruguay_S_Asc01,956,1213,2025-01-03,2025-09-12,False,False,S,S,,False,URUGUAY
+LineaB,Uruguay,LineaB_Uruguay_S_Turn01,19753,284220,2025-02-01,2025-09-12,False,False,S,S,,False,URUGUAY
+LineaB,Uruguay,LineaB_Uruguay_S_Turn02,20958,226746,2025-01-01,2025-09-14,False,False,S,S,,False,URUGUAY
+LineaB,Uruguay,LineaB_Uruguay_S_Turn03,17003,488321,2025-01-01,2025-09-14,False,False,S,S,,False,URUGUAY
+LineaB,Uruguay,LineaB_Uruguay_S_Turn04,16736,387219,2025-01-01,2025-09-14,False,False,S,S,,False,URUGUAY
+LineaB,Uruguay,NULL,2057,36386,2025-01-01,2025-01-31,False,False,,,,False,URUGUAY
+LineaC,Avenida de Mayo,LineaC_AVMayo_N_Turn01,18782,84624,2025-02-01,2025-12-31,False,False,N,N,,False,AVENIDA DE MAYO
+LineaC,Avenida de Mayo,LineaC_AVMayo_N_Turn02,21948,211368,2025-01-01,2025-12-31,False,False,N,N,,False,AVENIDA DE MAYO
+LineaC,Avenida de Mayo,LineaC_AVMayo_N_Turn03,14011,57873,2025-01-01,2025-12-31,False,False,N,N,,False,AVENIDA DE MAYO
+LineaC,Avenida de Mayo,LineaC_AVMayo_S_Turn01,21809,103192,2025-02-01,2025-12-31,False,False,S,S,,False,AVENIDA DE MAYO
+LineaC,Avenida de Mayo,LineaC_AVMayo_S_Turn02,22940,176485,2025-01-01,2025-12-31,False,False,S,S,,False,AVENIDA DE MAYO
+LineaC,Avenida de Mayo,LineaC_AVMayo_S_Turn03,21557,144016,2025-01-01,2025-12-31,False,False,S,S,,False,AVENIDA DE MAYO
+LineaC,Avenida de Mayo,NULL,1711,9551,2025-01-01,2025-01-31,False,False,,,,False,AVENIDA DE MAYO
+LineaC,Constitucion,LineaC_Constitucion_Plaza_Turn04,20920,310652,2025-01-01,2025-12-31,False,False,,Plaza,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Plaza_Turn05,21628,392916,2025-01-01,2025-12-31,False,False,,Plaza,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Plaza_Turn06,5497,77585,2025-01-01,2025-04-09,False,False,,Plaza,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Plaza_Turn07,6275,62249,2025-01-01,2025-12-31,False,False,,Plaza,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Plaza_Turn08,20413,456442,2025-01-01,2025-12-31,False,False,,Plaza,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Plaza_Turn09,23520,884447,2025-01-01,2025-12-31,False,False,,Plaza,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Plaza_Turn10,6348,211830,2025-01-01,2025-04-09,False,False,,Plaza,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Plaza_Turn11,20016,112098,2025-03-29,2025-12-31,False,False,,Plaza,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Plaza_TurnEMV+QR,24417,195400,2025-02-01,2025-12-31,False,False,,Plaza,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn09,20239,205396,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn10,20212,361705,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn11,19605,193468,2025-01-02,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn12,26402,508398,2025-02-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn13,21821,596847,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn14,22971,810409,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn15,23348,952674,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn16,22224,674180,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn17,21071,869714,2025-01-01,2025-12-17,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn18,21650,833710,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn19,17771,319101,2025-01-02,2025-12-30,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn20,14689,986142,2025-01-02,2025-12-30,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn21,13160,918670,2025-01-02,2025-12-30,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn22,14654,1076110,2025-01-02,2025-12-30,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn23,26620,323576,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn24,23377,1112116,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn25,22789,1188067,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn26,23870,1173624,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn27,20067,136318,2025-01-01,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn28,25188,271615,2025-01-02,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,LineaC_Constitucion_Turn29,21213,209843,2025-01-02,2025-12-31,False,False,,Constitucion,,False,CONSTITUCION
+LineaC,Constitucion,NULL,2077,66362,2025-01-01,2025-01-31,False,False,,,,False,CONSTITUCION
+LineaC,Diagonal Norte,LineaC_DNorte_N_ASC01,12,12,2025-01-09,2025-08-05,False,False,N,N,,False,DIAGONAL NORTE
+LineaC,Diagonal Norte,LineaC_DNorte_N_Turn00-EMV+QR,3888,22730,2025-02-01,2025-04-30,False,False,N,N,,False,DIAGONAL NORTE
+LineaC,Diagonal Norte,LineaC_DNorte_N_Turn01-EMV+QR,15109,98416,2025-05-01,2025-12-31,False,False,N,N,,False,DIAGONAL NORTE
+LineaC,Diagonal Norte,LineaC_DNorte_N_Turn02,19421,142469,2025-01-01,2025-12-31,False,False,N,N,,False,DIAGONAL NORTE
+LineaC,Diagonal Norte,LineaC_DNorte_N_Turn03,18711,159788,2025-01-01,2025-12-31,False,False,N,N,,False,DIAGONAL NORTE
+LineaC,Diagonal Norte,LineaC_DNorte_S_Turn00-EMV+QR,4680,37772,2025-02-01,2025-04-30,False,False,S,S,,False,DIAGONAL NORTE
+LineaC,Diagonal Norte,LineaC_DNorte_S_Turn01-EMV+QR,18153,169605,2025-05-01,2025-12-31,False,False,S,S,,False,DIAGONAL NORTE
+LineaC,Diagonal Norte,LineaC_DNorte_S_Turn02,24038,427349,2025-01-01,2025-12-31,False,False,S,S,,False,DIAGONAL NORTE
+LineaC,Diagonal Norte,NULL,1622,14627,2025-01-01,2025-01-31,False,False,,,,False,DIAGONAL NORTE
+LineaC,General San Martin,LineaC_SanMartin_N_Turn01,23992,219909,2025-02-01,2025-12-31,False,False,N,N,,False,GENERAL SAN MARTIN
+LineaC,General San Martin,LineaC_SanMartin_N_Turn02,21494,182094,2025-01-01,2025-12-31,False,False,N,N,,False,GENERAL SAN MARTIN
+LineaC,General San Martin,LineaC_SanMartin_N_Turn03,22901,399124,2025-01-01,2025-12-31,False,False,N,N,,False,GENERAL SAN MARTIN
+LineaC,General San Martin,LineaC_SanMartin_N_Turn04,15702,158717,2025-01-01,2025-12-31,False,False,N,N,,False,GENERAL SAN MARTIN
+LineaC,General San Martin,LineaC_SanMartin_S_Turn01,6181,10360,2025-02-01,2025-12-31,False,False,S,S,,False,GENERAL SAN MARTIN
+LineaC,General San Martin,LineaC_SanMartin_S_Turn02,13461,39398,2025-01-01,2025-12-31,False,False,S,S,,False,GENERAL SAN MARTIN
+LineaC,General San Martin,NULL,1635,12704,2025-01-01,2025-01-31,False,False,,,,False,GENERAL SAN MARTIN
+LineaC,Independencia,LineaC_Indepen_Turn00-EMV+QR,2030,29850,2025-03-01,2025-03-31,False,False,,Indepen,,False,INDEPENDENCIA
+LineaC,Independencia,LineaC_Indepen_Turn01,5333,61204,2025-08-01,2025-09-30,False,False,,Indepen,,False,INDEPENDENCIA
+LineaC,Independencia,LineaC_Indepen_Turn02,11194,131834,2025-01-01,2025-09-30,False,False,,Indepen,,False,INDEPENDENCIA
+LineaC,Independencia,LineaC_Indepen_Turn03,22821,452232,2025-01-01,2025-12-31,False,False,,Indepen,,False,INDEPENDENCIA
+LineaC,Independencia,LineaC_Indepen_Turn04,21885,315627,2025-01-01,2025-12-31,False,False,,Indepen,,False,INDEPENDENCIA
+LineaC,Independencia,LineaC_Indepen_Turn05-EMV+QR,138,519,2025-03-28,2025-03-31,False,False,,Indepen,,False,INDEPENDENCIA
+LineaC,Independencia,NULL,1917,14333,2025-01-01,2025-01-31,False,False,,,,False,INDEPENDENCIA
+LineaC,Independencia.C,LineaC_Indepen_Turn00-EMV+QR,3628,41576,2025-02-01,2025-04-30,False,False,,Indepen,C,False,INDEPENDENCIA
+LineaC,Independencia.C,LineaC_Indepen_Turn01,14604,132621,2025-05-02,2025-12-31,False,False,,Indepen,C,False,INDEPENDENCIA
+LineaC,Independencia.C,LineaC_Indepen_Turn02,15256,137546,2025-05-01,2025-12-31,False,False,,Indepen,C,False,INDEPENDENCIA
+LineaC,Independencia.C,LineaC_Indepen_Turn03,2171,41463,2025-07-01,2025-07-31,False,False,,Indepen,C,False,INDEPENDENCIA
+LineaC,Independencia.C,LineaC_Indepen_Turn04,2106,29224,2025-07-01,2025-07-31,False,False,,Indepen,C,False,INDEPENDENCIA
+LineaC,Independencia.C,LineaC_Indepen_Turn05-EMV+QR,1692,10729,2025-04-01,2025-04-30,False,False,,Indepen,C,False,INDEPENDENCIA
+LineaC,Lavalle,LineaC_Lavalle_N_Turn01,14407,152259,2025-02-03,2025-12-30,False,False,N,N,,False,LAVALLE
+LineaC,Lavalle,LineaC_Lavalle_N_Turn02,12287,169413,2025-01-02,2025-12-30,False,False,N,N,,False,LAVALLE
+LineaC,Lavalle,LineaC_Lavalle_N_Turn03,12766,171780,2025-01-02,2025-12-30,False,False,N,N,,False,LAVALLE
+LineaC,Lavalle,LineaC_Lavalle_S_Turn01,24279,185346,2025-02-01,2025-12-31,False,False,S,S,,False,LAVALLE
+LineaC,Lavalle,LineaC_Lavalle_S_Turn02,24203,333476,2025-01-01,2025-12-31,False,False,S,S,,False,LAVALLE
+LineaC,Lavalle,LineaC_Lavalle_S_Turn03,22527,281028,2025-01-01,2025-12-31,False,False,S,S,,False,LAVALLE
+LineaC,Lavalle,NULL,1748,17235,2025-01-01,2025-01-31,False,False,,,,False,LAVALLE
+LineaC,Loria,NULL,2,3,2025-01-22,2025-01-22,False,False,,,,False,LORIA
+LineaC,Mariano Moreno,LineaC_Moreno_N_Turn01,15851,69037,2025-02-01,2025-12-31,False,False,N,N,,False,MORENO
+LineaC,Mariano Moreno,LineaC_Moreno_N_Turn02,19975,138289,2025-01-01,2025-12-31,False,False,N,N,,False,MORENO
+LineaC,Mariano Moreno,LineaC_Moreno_N_Turn03,17264,99156,2025-01-01,2025-12-31,False,False,N,N,,False,MORENO
+LineaC,Mariano Moreno,LineaC_Moreno_S_Turn01,24238,282673,2025-02-01,2025-12-31,False,False,S,S,,False,MORENO
+LineaC,Mariano Moreno,LineaC_Moreno_S_Turn02,22715,226614,2025-01-01,2025-12-31,False,False,S,S,,False,MORENO
+LineaC,Mariano Moreno,LineaC_Moreno_S_Turn03,21127,210698,2025-01-01,2025-12-31,False,False,S,S,,False,MORENO
+LineaC,Mariano Moreno,NULL,1696,18783,2025-01-01,2025-01-31,False,False,,,,False,MORENO
+LineaC,Retiro,LineaC_Retiro_Turn01,5601,46654,2025-03-01,2025-09-30,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn02,6019,24740,2025-01-01,2025-09-30,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn03,6751,29312,2025-01-01,2025-09-30,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn04,8206,47286,2025-01-01,2025-09-30,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn05,9595,71251,2025-01-01,2025-09-30,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn06,10703,114874,2025-01-01,2025-09-30,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn07,20655,404802,2025-01-01,2025-12-31,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn08,19760,435294,2025-01-01,2025-12-31,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn09,18971,645496,2025-01-02,2025-12-31,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn10,17986,688172,2025-01-01,2025-12-31,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn11,20000,887937,2025-01-01,2025-12-31,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,LineaC_Retiro_Turn12,22754,1052247,2025-01-01,2025-12-31,False,False,,Retiro,,False,RETIRO
+LineaC,Retiro,NULL,2028,32131,2025-01-01,2025-01-31,False,False,,,,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn01,15104,115814,2025-02-01,2025-12-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn02,10358,39089,2025-02-14,2025-12-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn03,10447,45237,2025-04-01,2025-12-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn04,13094,73417,2025-04-01,2025-12-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn05,15265,106556,2025-04-01,2025-12-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn06,16613,145825,2025-04-01,2025-12-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn07,2558,50593,2025-04-01,2025-07-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn08,1936,48478,2025-07-01,2025-07-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn09,2131,84726,2025-07-01,2025-07-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn10,1146,41603,2025-07-01,2025-07-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn11,2142,100803,2025-07-01,2025-07-31,False,False,,Retiro,C,False,RETIRO
+LineaC,Retiro.C,LineaC_Retiro_Turn12,2118,101340,2025-07-01,2025-07-31,False,False,,Retiro,C,False,RETIRO
+LineaC,San Juan,LineaC_SanJuan_Turn01,27465,315722,2025-02-01,2025-12-31,False,False,,SanJuan,,False,SAN JUAN
+LineaC,San Juan,LineaC_SanJuan_Turn02,24950,450737,2025-01-01,2025-12-31,False,False,,SanJuan,,False,SAN JUAN
+LineaC,San Juan,LineaC_SanJuan_Turn03,22445,214496,2025-01-01,2025-12-31,False,False,,SanJuan,,False,SAN JUAN
+LineaC,San Juan,NULL,1942,12742,2025-01-01,2025-01-31,False,False,,,,False,SAN JUAN
+LineaD,9 de Julio,NULL,1604,10955,2025-01-01,2025-01-31,False,False,,,,False,9 DE JULIO
+LineaD,9 de julio,LineaD_9Julio_SO_Turn01,12679,167132,2025-02-03,2025-12-30,False,False,SO,SO,,False,9 DE JULIO
+LineaD,9 de julio,LineaD_9Julio_SO_Turn02,11238,445926,2025-01-02,2025-12-30,False,False,SO,SO,,False,9 DE JULIO
+LineaD,9 de julio,LineaD_9Julio_S_Turn01,22907,116401,2025-02-01,2025-12-31,False,False,S,S,,False,9 DE JULIO
+LineaD,9 de julio,LineaD_9Julio_S_Turn02,24335,204680,2025-01-01,2025-12-31,False,False,S,S,,False,9 DE JULIO
+LineaD,9 de julio,LineaD_9Julio_S_Turn03,13013,38074,2025-01-01,2025-12-31,False,False,S,S,,False,9 DE JULIO
+LineaD,Agüero,LineaD_Aguero_Turn01,19616,295664,2025-02-01,2025-08-31,False,False,,Aguero,,False,AGUERO
+LineaD,Agüero,LineaD_Aguero_Turn02,20584,230890,2025-01-01,2025-08-31,False,False,,Aguero,,False,AGUERO
+LineaD,Agüero,LineaD_Aguero_Turn03,16126,366188,2025-01-01,2025-08-31,False,False,,Aguero,,False,AGUERO
+LineaD,Agüero,LineaD_Aguero_Turn04,15457,287779,2025-01-01,2025-08-31,False,False,,Aguero,,False,AGUERO
+LineaD,Agüero,NULL,1996,26814,2025-01-01,2025-01-31,False,False,,,,False,AGUERO
+LineaD,Bulnes,LineaD_Bulnes_N_Turn01,26408,422732,2025-02-01,2025-12-31,False,False,N,N,,False,BULNES
+LineaD,Bulnes,LineaD_Bulnes_N_Turn02,24128,542794,2025-01-01,2025-12-31,False,False,N,N,,False,BULNES
+LineaD,Bulnes,LineaD_Bulnes_N_Turn03,28633,383805,2025-01-01,2025-12-31,False,False,N,N,,False,BULNES
+LineaD,Bulnes,LineaD_Bulnes_N_Turn04,24589,715047,2025-01-01,2025-12-31,False,False,N,N,,False,BULNES
+LineaD,Bulnes,LineaD_Bulnes_S_Turn01,27410,440448,2025-02-01,2025-12-31,False,False,S,S,,False,BULNES
+LineaD,Bulnes,LineaD_Bulnes_S_Turn02,25055,730861,2025-01-01,2025-12-31,False,False,S,S,,False,BULNES
+LineaD,Bulnes,NULL,2103,51890,2025-01-01,2025-01-31,False,False,,,,False,BULNES
+LineaD,Callao,LineaD_CallaoD_E_Asc01,3423,5146,2025-01-02,2025-12-25,False,False,E,E,,False,CALLAO
+LineaD,Callao,LineaD_CallaoD_E_Turn01,7239,97667,2025-03-01,2025-09-30,False,False,E,E,,False,CALLAO
+LineaD,Callao,LineaD_CallaoD_E_Turn02,22245,492224,2025-01-01,2025-12-31,False,False,E,E,,False,CALLAO
+LineaD,Callao,LineaD_CallaoD_N_Turn01,6070,42067,2025-03-01,2025-09-30,False,False,N,N,,False,CALLAO
+LineaD,Callao,LineaD_CallaoD_N_Turn02,20457,282278,2025-01-01,2025-12-31,False,False,N,N,,False,CALLAO
+LineaD,Callao,LineaD_CallaoD_S_Turn01,7872,118433,2025-03-01,2025-09-30,False,False,S,S,,False,CALLAO
+LineaD,Callao,LineaD_CallaoD_S_Turn02,23291,734546,2025-01-01,2025-12-31,False,False,S,S,,False,CALLAO
+LineaD,Callao,NULL,2042,31716,2025-01-01,2025-01-31,False,False,,,,False,CALLAO
+LineaD,Callao.D,LineaD_CallaoD_E_Asc01,423,637,2025-07-01,2025-07-31,False,False,E,E,D,False,CALLAO
+LineaD,Callao.D,LineaD_CallaoD_E_Turn01,18774,263464,2025-02-01,2025-12-31,False,False,E,E,D,False,CALLAO
+LineaD,Callao.D,LineaD_CallaoD_E_Turn02,2038,45785,2025-07-01,2025-07-31,False,False,E,E,D,False,CALLAO
+LineaD,Callao.D,LineaD_CallaoD_N_Turn01,15834,110570,2025-02-01,2025-12-31,False,False,N,N,D,False,CALLAO
+LineaD,Callao.D,LineaD_CallaoD_N_Turn02,1937,27692,2025-07-01,2025-07-31,False,False,N,N,D,False,CALLAO
+LineaD,Callao.D,LineaD_CallaoD_S_Turn01,19888,306513,2025-02-01,2025-12-31,False,False,S,S,D,False,CALLAO
+LineaD,Callao.D,LineaD_CallaoD_S_Turn02,2182,71265,2025-07-01,2025-07-31,False,False,S,S,D,False,CALLAO
+LineaD,Catedral,LineaD_Catedral_E_Asc01,7071,10962,2025-01-02,2025-12-31,False,False,E,E,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_E_Turn01,25487,555309,2025-02-01,2025-12-31,False,False,E,E,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_E_Turn02,25210,438427,2025-01-01,2025-12-31,False,False,E,E,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_E_Turn03,23284,492700,2025-01-01,2025-12-31,False,False,E,E,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_E_Turn04,24194,536094,2025-01-01,2025-12-31,False,False,E,E,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_E_Turn05,21773,365097,2025-01-01,2025-12-31,False,False,E,E,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_O_Turn01,25667,502011,2025-02-01,2025-12-31,False,False,O,O,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_O_Turn02,23711,331483,2025-01-01,2025-12-31,False,False,O,O,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_O_Turn03,22252,337786,2025-01-01,2025-12-31,False,False,O,O,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_O_Turn04,18417,195995,2025-01-01,2025-12-31,False,False,O,O,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_O_Turn05,18761,189004,2025-01-01,2025-12-31,False,False,O,O,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_O_Turn06,15104,119696,2025-01-01,2025-12-31,False,False,O,O,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_O_Turn07,12869,79475,2025-01-01,2025-12-31,False,False,O,O,,False,CATEDRAL
+LineaD,Catedral,LineaD_Catedral_O_Turn08,16835,97651,2025-01-01,2025-12-31,False,False,O,O,,False,CATEDRAL
+LineaD,Catedral,NULL,2035,92227,2025-01-01,2025-01-31,False,False,,,,False,CATEDRAL
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_C_Turn01,23727,177788,2025-01-01,2025-12-31,False,False,C,C,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_C_Turn02,22997,340503,2025-01-01,2025-12-31,False,False,C,C,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_N_Turn01,27353,390464,2025-01-01,2025-12-31,False,False,N,N,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_N_Turn02,22769,254952,2025-01-01,2025-12-31,False,False,N,N,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_N_Turn03,23995,507553,2025-01-01,2025-12-31,False,False,N,N,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_O_Turn01,25908,573414,2025-02-01,2025-12-31,False,False,O,O,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_O_Turn02,26901,410312,2025-01-01,2025-12-31,False,False,O,O,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_O_Turn03,22238,666987,2025-01-01,2025-12-31,False,False,O,O,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_O_Turn04,23017,632277,2025-01-01,2025-12-31,False,False,O,O,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_O_Turn05,18671,306698,2025-01-01,2025-12-31,False,False,O,O,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_O_Turn06,24347,173332,2025-01-01,2025-12-31,False,False,O,O,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_O_Turn07,23380,144447,2025-01-01,2025-12-31,False,False,O,O,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_O_Turn08,22931,374211,2025-01-01,2025-12-31,False,False,O,O,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_S_Turn01,25592,220216,2025-01-01,2025-12-31,False,False,S,S,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_S_Turn02,26019,230256,2025-01-01,2025-12-31,False,False,S,S,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_S_Turn03,22858,333760,2025-01-01,2025-12-31,False,False,S,S,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,LineaD_CongresoTuc_S_Turn04,23296,390643,2025-01-01,2025-12-31,False,False,S,S,,False,CONGRESO DE TUCUMAN
+LineaD,Congreso de Tucuman,NULL,2033,69152,2025-01-01,2025-01-31,False,False,,,,False,CONGRESO DE TUCUMAN
+LineaD,Facultad de Medicina,LineaD_FMedicina_N_Asc01,3268,5430,2025-01-01,2025-12-22,False,False,N,N,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,LineaD_FMedicina_N_Turn01,24727,279484,2025-02-01,2025-12-31,False,False,N,N,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,LineaD_FMedicina_N_Turn02,22255,177593,2025-01-01,2025-12-31,False,False,N,N,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,LineaD_FMedicina_N_Turn03,22833,463964,2025-01-01,2025-12-31,False,False,N,N,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,LineaD_FMedicina_N_Turn04,16657,241644,2025-01-01,2025-12-31,False,False,N,N,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,LineaD_FMedicina_S_Asc01,5931,8824,2025-01-01,2025-12-31,False,False,S,S,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,LineaD_FMedicina_S_Turn01,27174,468559,2025-02-01,2025-12-31,False,False,S,S,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,LineaD_FMedicina_S_Turn02,27801,370023,2025-01-01,2025-12-31,False,False,S,S,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,LineaD_FMedicina_S_Turn03,24003,607362,2025-01-01,2025-12-31,False,False,S,S,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,LineaD_FMedicina_S_Turn04,22972,564202,2025-01-01,2025-12-31,False,False,S,S,,False,FACULTAD DE MEDICINA
+LineaD,Facultad de Medicina,NULL,2028,29847,2025-01-01,2025-01-31,False,False,,,,False,FACULTAD DE MEDICINA
+LineaD,Jose Hernandez,LineaD_J_Hernandez_Este_Turn01,28336,330486,2025-01-01,2025-12-31,False,False,E,Este,,False,JOSE HERNANDEZ
+LineaD,Jose Hernandez,LineaD_J_Hernandez_Este_Turn02,26702,251510,2025-01-01,2025-12-31,False,False,E,Este,,False,JOSE HERNANDEZ
+LineaD,Jose Hernandez,LineaD_J_Hernandez_Este_Turn03,22385,421982,2025-01-01,2025-12-31,False,False,E,Este,,False,JOSE HERNANDEZ
+LineaD,Jose Hernandez,LineaD_J_Hernandez_Este_Turn04,22912,504335,2025-01-01,2025-12-31,False,False,E,Este,,False,JOSE HERNANDEZ
+LineaD,Jose Hernandez,LineaD_J_Hernandez_Oeste_Turn01,25030,277495,2025-02-01,2025-12-31,False,False,O,Oeste,,False,JOSE HERNANDEZ
+LineaD,Jose Hernandez,LineaD_J_Hernandez_Oeste_Turn02,23189,132207,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JOSE HERNANDEZ
+LineaD,Jose Hernandez,LineaD_J_Hernandez_Oeste_Turn03,22355,112621,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JOSE HERNANDEZ
+LineaD,Jose Hernandez,LineaD_J_Hernandez_Oeste_Turn04,23723,391342,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JOSE HERNANDEZ
+LineaD,Jose Hernandez,NULL,2012,27750,2025-01-01,2025-01-31,False,False,,,,False,JOSE HERNANDEZ
+LineaD,Juramento,LineaD_Juramento_Este_Turn01,25851,258775,2025-02-01,2025-12-31,False,False,E,Este,,False,JURAMENTO
+LineaD,Juramento,LineaD_Juramento_Este_Turn02,25200,204037,2025-01-02,2025-12-31,False,False,E,Este,,False,JURAMENTO
+LineaD,Juramento,LineaD_Juramento_Este_Turn03,24215,661638,2025-01-01,2025-12-31,False,False,E,Este,,False,JURAMENTO
+LineaD,Juramento,LineaD_Juramento_Oeste_Turn01,27258,578791,2025-02-01,2025-12-31,False,False,O,Oeste,,False,JURAMENTO
+LineaD,Juramento,LineaD_Juramento_Oeste_Turn02,29111,463024,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JURAMENTO
+LineaD,Juramento,LineaD_Juramento_Oeste_Turn03,24086,696667,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JURAMENTO
+LineaD,Juramento,LineaD_Juramento_Oeste_Turn04,24191,771658,2025-01-01,2025-12-31,False,False,O,Oeste,,False,JURAMENTO
+LineaD,Juramento,NULL,2032,50744,2025-01-01,2025-01-31,False,False,,,,False,JURAMENTO
+LineaD,Loria,NULL,2,14,2025-01-22,2025-01-22,False,False,,,,False,LORIA
+LineaD,Ministro Carranza,LineaD_Carranza_Turn01,27631,465857,2025-02-01,2025-12-31,False,False,,Carranza,,False,MINISTRO CARRANZA
+LineaD,Ministro Carranza,LineaD_Carranza_Turn02,27445,280266,2025-01-01,2025-12-31,False,False,,Carranza,,False,MINISTRO CARRANZA
+LineaD,Ministro Carranza,LineaD_Carranza_Turn03,26840,275703,2025-01-01,2025-12-31,False,False,,Carranza,,False,MINISTRO CARRANZA
+LineaD,Ministro Carranza,LineaD_Carranza_Turn04,23529,423804,2025-01-01,2025-12-31,False,False,,Carranza,,False,MINISTRO CARRANZA
+LineaD,Ministro Carranza,LineaD_Carranza_Turn05,23178,435130,2025-01-01,2025-12-31,False,False,,Carranza,,False,MINISTRO CARRANZA
+LineaD,Ministro Carranza,LineaD_Carranza_Turn06,23650,491905,2025-01-01,2025-12-31,False,False,,Carranza,,False,MINISTRO CARRANZA
+LineaD,Ministro Carranza,NULL,2046,38377,2025-01-01,2025-01-31,False,False,,,,False,MINISTRO CARRANZA
+LineaD,Olleros,LineaD_Olleros_Este_Turn01,28819,374065,2025-01-01,2025-12-31,False,False,E,Este,,False,OLLEROS
+LineaD,Olleros,LineaD_Olleros_Este_Turn02,26680,245440,2025-01-01,2025-12-31,False,False,E,Este,,False,OLLEROS
+LineaD,Olleros,LineaD_Olleros_Este_Turn03,23018,447307,2025-01-01,2025-12-31,False,False,E,Este,,False,OLLEROS
+LineaD,Olleros,LineaD_Olleros_Este_Turn04,23589,475884,2025-01-01,2025-12-31,False,False,E,Este,,False,OLLEROS
+LineaD,Olleros,LineaD_Olleros_Oeste_Turn01,24876,262987,2025-02-01,2025-12-31,False,False,O,Oeste,,False,OLLEROS
+LineaD,Olleros,LineaD_Olleros_Oeste_Turn02,22341,114128,2025-01-01,2025-12-31,False,False,O,Oeste,,False,OLLEROS
+LineaD,Olleros,LineaD_Olleros_Oeste_Turn03,23344,115844,2025-01-01,2025-12-31,False,False,O,Oeste,,False,OLLEROS
+LineaD,Olleros,LineaD_Olleros_Oeste_Turn04,23561,340874,2025-01-01,2025-12-31,False,False,O,Oeste,,False,OLLEROS
+LineaD,Olleros,NULL,1995,28819,2025-01-01,2025-01-31,False,False,,,,False,OLLEROS
+LineaD,Palermo,LineaD_Palermo_Turn01,23987,451964,2025-03-25,2025-12-31,False,False,,Palermo,,False,PALERMO
+LineaD,Palermo,LineaD_Palermo_Turn02,23305,320547,2025-03-25,2025-12-31,False,False,,Palermo,,False,PALERMO
+LineaD,Palermo,LineaD_Palermo_Turn03,22694,237868,2025-03-25,2025-12-31,False,False,,Palermo,,False,PALERMO
+LineaD,Palermo,LineaD_Palermo_Turn04,19263,823540,2025-02-05,2025-12-31,False,False,,Palermo,,False,PALERMO
+LineaD,Palermo,LineaD_Palermo_Turn05,19105,688577,2025-03-17,2025-12-31,False,False,,Palermo,,False,PALERMO
+LineaD,Palermo,LineaD_Palermo_Turn06,18300,450920,2025-03-17,2025-12-31,False,False,,Palermo,,False,PALERMO
+LineaD,Plaza Italia,LineaD_Pitalia_E_Turn02,1272,39374,2025-01-01,2025-01-19,False,False,E,E,,False,PLAZA ITALIA
+LineaD,Plaza Italia,LineaD_Pitalia_O_Turn01,16694,406805,2025-02-01,2025-08-10,False,False,O,O,,False,PLAZA ITALIA
+LineaD,Plaza Italia,LineaD_Pitalia_O_Turn02,14793,595588,2025-01-01,2025-08-10,False,False,O,O,,False,PLAZA ITALIA
+LineaD,Plaza Italia,LineaD_Pitalia_O_Turn03,15065,583699,2025-01-01,2025-08-10,False,False,O,O,,False,PLAZA ITALIA
+LineaD,Plaza Italia,NULL,2086,50287,2025-01-01,2025-01-31,False,False,,,,False,PLAZA ITALIA
+LineaD,Pueyrredon.D,LineaD_Pueyrredon_Aliv_Turn01,18214,231589,2025-02-03,2025-12-30,False,False,ALIV,Aliv,D,False,PUEYRREDON
+LineaD,Pueyrredon.D,LineaD_Pueyrredon_Aliv_Turn02,15428,114233,2025-01-02,2025-12-30,False,False,ALIV,Aliv,D,False,PUEYRREDON
+LineaD,Pueyrredon.D,LineaD_Pueyrredon_Aliv_Turn03,16089,183096,2025-01-02,2025-12-30,False,False,ALIV,Aliv,D,False,PUEYRREDON
+LineaD,Pueyrredon.D,LineaD_Pueyrredon_Turn01,27459,429671,2025-02-01,2025-12-31,False,False,,Pueyrredon,D,False,PUEYRREDON
+LineaD,Pueyrredon.D,LineaD_Pueyrredon_Turn02,24061,332862,2025-01-01,2025-12-31,False,False,,Pueyrredon,D,False,PUEYRREDON
+LineaD,Pueyrredon.D,LineaD_Pueyrredon_Turn03,23239,396169,2025-01-01,2025-12-31,False,False,,Pueyrredon,D,False,PUEYRREDON
+LineaD,Pueyrredon.D,NULL,1946,25245,2025-01-01,2025-01-31,False,False,,,D,False,PUEYRREDON
+LineaD,Scalabrini Ortiz,LineaD_Scal_Ortiz_Norte_Turn01,26425,615255,2025-02-24,2025-12-31,False,False,N,Norte,,False,SCALABRINI ORTIZ
+LineaD,Scalabrini Ortiz,LineaD_Scal_Ortiz_Norte_Turn02,20698,515627,2025-02-24,2025-12-31,False,False,N,Norte,,False,SCALABRINI ORTIZ
+LineaD,Scalabrini Ortiz,LineaD_Scal_Ortiz_Norte_Turn03,20380,563999,2025-02-24,2025-12-31,False,False,N,Norte,,False,SCALABRINI ORTIZ
+LineaD,Scalabrini Ortiz,LineaD_Scal_Ortiz_Sur_Turn01,24505,236144,2025-02-24,2025-12-31,False,False,S,Sur,,False,SCALABRINI ORTIZ
+LineaD,Scalabrini Ortiz,LineaD_Scal_Ortiz_Sur_Turn02,21120,378576,2025-02-21,2025-12-31,False,False,S,Sur,,False,SCALABRINI ORTIZ
+LineaD,Tribunales,LineaD_Tribuna_E_Turn01,3033,56593,2025-02-03,2025-04-28,False,False,E,E,,False,TRIBUNALES
+LineaD,Tribunales,LineaD_Tribuna_E_Turn02,4144,50272,2025-01-02,2025-04-28,False,False,E,E,,False,TRIBUNALES
+LineaD,Tribunales,LineaD_Tribuna_E_Turn03,4181,60712,2025-01-02,2025-04-28,False,False,E,E,,False,TRIBUNALES
+LineaD,Tribunales,LineaD_Tribuna_E_Turn04,3691,49418,2025-01-02,2025-04-28,False,False,E,E,,False,TRIBUNALES
+LineaD,Tribunales,LineaD_Tribuna_O_Asc01,6304,10488,2025-01-01,2025-12-23,False,False,O,O,,False,TRIBUNALES
+LineaD,Tribunales,LineaD_Tribuna_O_Turn01,26243,470263,2025-02-01,2025-12-31,False,False,O,O,,False,TRIBUNALES
+LineaD,Tribunales,LineaD_Tribuna_O_Turn02,26996,420981,2025-01-01,2025-12-31,False,False,O,O,,False,TRIBUNALES
+LineaD,Tribunales,LineaD_Tribuna_O_Turn03,23236,468553,2025-01-01,2025-12-31,False,False,O,O,,False,TRIBUNALES
+LineaD,Tribunales,LineaD_Tribuna_O_Turn04,24591,688612,2025-01-01,2025-12-31,False,False,O,O,,False,TRIBUNALES
+LineaD,Tribunales,NULL,1991,34335,2025-01-01,2025-01-31,False,False,,,,False,TRIBUNALES
+LineaE,Avenida La Plata,LineaE_LaPlata_Turn01,28159,483332,2025-02-01,2025-12-31,False,False,,LaPlata,,False,LA PLATA
+LineaE,Avenida La Plata,LineaE_LaPlata_Turn02,24149,402081,2025-01-01,2025-12-31,False,False,,LaPlata,,False,LA PLATA
+LineaE,Avenida La Plata,LineaE_LaPlata_Turn03,24212,402969,2025-01-01,2025-12-31,False,False,,LaPlata,,False,LA PLATA
+LineaE,Avenida La Plata,NULL,2026,22803,2025-01-01,2025-01-31,False,False,,,,False,LA PLATA
+LineaE,Boedo,LineaE_Boedo_Turn01,28179,409746,2025-02-01,2025-12-31,False,False,,Boedo,,False,BOEDO
+LineaE,Boedo,LineaE_Boedo_Turn02,24816,460234,2025-01-01,2025-12-31,False,False,,Boedo,,False,BOEDO
+LineaE,Boedo,LineaE_Boedo_Turn03,24139,400963,2025-01-01,2025-12-31,False,False,,Boedo,,False,BOEDO
+LineaE,Boedo,NULL,2024,20222,2025-01-01,2025-01-31,False,False,,,,False,BOEDO
+LineaE,Bolivar,LineaE_Bolivar_N_Turn01,25543,320478,2025-02-01,2025-12-31,False,False,N,N,,False,BOLIVAR
+LineaE,Bolivar,LineaE_Bolivar_N_Turn02,22238,187554,2025-01-01,2025-12-31,False,False,N,N,,False,BOLIVAR
+LineaE,Bolivar,LineaE_Bolivar_N_Turn03,20298,154546,2025-01-01,2025-12-31,False,False,N,N,,False,BOLIVAR
+LineaE,Bolivar,LineaE_Bolivar_N_Turn04,23384,457220,2025-01-01,2025-12-31,False,False,N,N,,False,BOLIVAR
+LineaE,Bolivar,LineaE_Bolivar_N_Turn05,22103,353913,2025-01-01,2025-12-31,False,False,N,N,,False,BOLIVAR
+LineaE,Bolivar,LineaE_Bolivar_S_Turn00-EMV+QR,3565,62659,2025-02-03,2025-04-30,False,False,S,S,,False,BOLIVAR
+LineaE,Bolivar,LineaE_Bolivar_S_Turn02,14807,177027,2025-01-02,2025-12-30,False,False,S,S,,False,BOLIVAR
+LineaE,Bolivar,LineaE_Bolivar_S_Turn03,15363,187401,2025-01-02,2025-12-30,False,False,S,S,,False,BOLIVAR
+LineaE,Bolivar,LineaE_Bolivar_S_Turn11-EMV+QR,13354,209734,2025-05-05,2025-12-30,False,False,S,S,,False,BOLIVAR
+LineaE,Bolivar,NULL,1949,46467,2025-01-01,2025-01-31,False,False,,,,False,BOLIVAR
+LineaE,Catalinas,LineaE_Catalinas_N_Turn01,19782,199263,2025-02-01,2025-12-31,False,False,N,N,,False,CATALINAS
+LineaE,Catalinas,LineaE_Catalinas_N_Turn02,14603,84483,2025-01-01,2025-12-31,False,False,N,N,,False,CATALINAS
+LineaE,Catalinas,LineaE_Catalinas_N_Turn03,13446,84537,2025-01-01,2025-12-31,False,False,N,N,,False,CATALINAS
+LineaE,Catalinas,LineaE_Catalinas_N_Turn04,14276,103881,2025-01-01,2025-12-31,False,False,N,N,,False,CATALINAS
+LineaE,Catalinas,LineaE_Catalinas_N_Turn05,14115,99817,2025-01-01,2025-12-31,False,False,N,N,,False,CATALINAS
+LineaE,Catalinas,LineaE_Catalinas_N_Turn06,17130,159096,2025-01-01,2025-12-31,False,False,N,N,,False,CATALINAS
+LineaE,Catalinas,LineaE_Catalinas_N_Turn07,20013,281114,2025-01-01,2025-12-31,False,False,N,N,,False,CATALINAS
+LineaE,Catalinas,LineaE_Catalinas_S_Turn01,9545,40772,2025-01-01,2025-12-31,False,False,S,S,,False,CATALINAS
+LineaE,Catalinas,LineaE_Catalinas_S_Turn02,9617,29129,2025-01-01,2025-12-31,False,False,S,S,,False,CATALINAS
+LineaE,Catalinas,LineaE_Catalinas_S_Turn03,14088,61186,2025-01-01,2025-12-31,False,False,S,S,,False,CATALINAS
+LineaE,Catalinas,NULL,1690,26315,2025-01-01,2025-01-31,False,False,,,,False,CATALINAS
+LineaE,Correo Central,LineaE_CCentral_N_Turn01,15708,147085,2025-02-01,2025-12-30,False,False,N,N,,False,CORREO CENTRAL
+LineaE,Correo Central,LineaE_CCentral_N_Turn02,13174,105129,2025-01-02,2025-12-30,False,False,N,N,,False,CORREO CENTRAL
+LineaE,Correo Central,LineaE_CCentral_N_Turn03,14919,110395,2025-01-01,2025-12-30,False,False,N,N,,False,CORREO CENTRAL
+LineaE,Correo Central,LineaE_CCentral_N_Turn04,15862,198209,2025-01-01,2025-12-30,False,False,N,N,,False,CORREO CENTRAL
+LineaE,Correo Central,LineaE_CCentral_N_Turn05,10179,69297,2025-01-01,2025-12-30,False,False,N,N,,False,CORREO CENTRAL
+LineaE,Correo Central,LineaE_CCentral_S_Turn01,19538,145533,2025-02-01,2025-12-31,False,False,S,S,,False,CORREO CENTRAL
+LineaE,Correo Central,LineaE_CCentral_S_Turn02,19024,103568,2025-01-01,2025-12-31,False,False,S,S,,False,CORREO CENTRAL
+LineaE,Correo Central,LineaE_CCentral_S_Turn03,21242,102883,2025-01-01,2025-12-31,False,False,S,S,,False,CORREO CENTRAL
+LineaE,Correo Central,LineaE_CCentral_S_Turn04,21450,240423,2025-01-01,2025-12-31,False,False,S,S,,False,CORREO CENTRAL
+LineaE,Correo Central,LineaE_CCentral_S_Turn05,23872,262471,2025-01-01,2025-12-31,False,False,S,S,,False,CORREO CENTRAL
+LineaE,Correo Central,NULL,1886,28993,2025-01-01,2025-01-31,False,False,,,,False,CORREO CENTRAL
+LineaE,Emilio Mitre,LineaE_EMitre_Turn01,27574,455744,2025-02-01,2025-12-31,False,False,,EMitre,,False,EMILIO MITRE
+LineaE,Emilio Mitre,LineaE_EMitre_Turn02,24631,657409,2025-01-01,2025-12-31,False,False,,EMitre,,False,EMILIO MITRE
+LineaE,Emilio Mitre,NULL,1973,23240,2025-01-01,2025-01-31,False,False,,,,False,EMILIO MITRE
+LineaE,Entre Rios,LineaE_ERios_Turn01,27437,277317,2025-02-01,2025-12-31,False,False,,ERios,,False,ENTRE RIOS
+LineaE,Entre Rios,LineaE_ERios_Turn02,24654,352809,2025-01-01,2025-12-31,False,False,,ERios,,False,ENTRE RIOS
+LineaE,Entre Rios,LineaE_ERios_Turn03,24310,343592,2025-01-01,2025-12-31,False,False,,ERios,,False,ENTRE RIOS
+LineaE,Entre Rios,NULL,1866,12718,2025-01-01,2025-01-31,False,False,,,,False,ENTRE RIOS
+LineaE,General Belgrano,LineaE_Belgrano_Turn01,25936,332054,2025-02-01,2025-12-31,False,False,,Belgrano,,False,BELGRANO
+LineaE,General Belgrano,LineaE_Belgrano_Turn02,24831,518876,2025-01-01,2025-12-31,False,False,,Belgrano,,False,BELGRANO
+LineaE,General Belgrano,NULL,1791,17891,2025-01-01,2025-01-31,False,False,,,,False,BELGRANO
+LineaE,Independencia.E,LineaE_Indepen_Turn01,4599,72968,2025-02-01,2025-07-31,False,False,,Indepen,E,False,INDEPENDENCIA
+LineaE,Independencia.E,LineaE_Indepen_Turn02,2542,55059,2025-04-01,2025-07-31,False,False,,Indepen,E,False,INDEPENDENCIA
+LineaE,Independencia.E,LineaE_Indepen_Turn03,16742,282979,2025-04-11,2025-12-31,False,False,,Indepen,E,False,INDEPENDENCIA
+LineaE,Independencia.E,LineaE_Indepen_Turn04,14842,257346,2025-04-11,2025-12-31,False,False,,Indepen,E,False,INDEPENDENCIA
+LineaE,Independencia.E,LineaE_Indepen_Turn05,2780,31025,2025-11-13,2025-12-31,False,False,,Indepen,E,False,INDEPENDENCIA
+LineaE,Independencia.H,LineaE_Indepen_Turn01,17594,465659,2025-03-01,2025-12-31,False,False,,Indepen,H,True,INDEPENDENCIA
+LineaE,Independencia.H,LineaE_Indepen_Turn02,21722,642716,2025-01-01,2025-12-31,False,False,,Indepen,H,True,INDEPENDENCIA
+LineaE,Independencia.H,LineaE_Indepen_Turn03,12030,244177,2025-01-01,2025-09-30,False,False,,Indepen,H,True,INDEPENDENCIA
+LineaE,Independencia.H,LineaE_Indepen_Turn04,8460,158076,2025-01-01,2025-09-30,False,False,,Indepen,H,True,INDEPENDENCIA
+LineaE,Independencia.H,NULL,1945,11972,2025-01-01,2025-01-31,False,False,,,H,True,INDEPENDENCIA
+LineaE,Jose Maria Moreno,LineaE_Moreno_Turn01,26811,414920,2025-02-01,2025-12-31,False,False,,Moreno,,False,JOSE MARIA MORENO
+LineaE,Jose Maria Moreno,LineaE_Moreno_Turn02,24933,628883,2025-01-01,2025-12-31,False,False,,Moreno,,False,JOSE MARIA MORENO
+LineaE,Jose Maria Moreno,NULL,1959,18829,2025-01-01,2025-01-31,False,False,,,,False,JOSE MARIA MORENO
+LineaE,Jujuy,LineaE_Jujuy_Turn01,27274,230275,2025-02-01,2025-12-31,False,False,,Jujuy,,False,JUJUY
+LineaE,Jujuy,LineaE_Jujuy_Turn02,24042,216974,2025-01-01,2025-12-31,False,False,,Jujuy,,False,JUJUY
+LineaE,Jujuy,LineaE_Jujuy_Turn03,23994,243697,2025-01-01,2025-12-31,False,False,,Jujuy,,False,JUJUY
+LineaE,Jujuy,NULL,1922,11800,2025-01-01,2025-01-31,False,False,,,,False,JUJUY
+LineaE,Loria,NULL,2,12,2025-01-22,2025-01-22,False,False,,,,False,LORIA
+LineaE,Medalla Milagrosa,LineaE_Medalla_Turn01,25186,199379,2025-02-01,2025-12-31,False,False,,Medalla,,False,MEDALLA MILAGROSA
+LineaE,Medalla Milagrosa,LineaE_Medalla_Turn02,23356,204852,2025-01-01,2025-12-31,False,False,,Medalla,,False,MEDALLA MILAGROSA
+LineaE,Medalla Milagrosa,LineaE_Medalla_Turn03,19827,118150,2025-01-01,2025-12-31,False,False,,Medalla,,False,MEDALLA MILAGROSA
+LineaE,Medalla Milagrosa,NULL,1729,8919,2025-01-01,2025-01-31,False,False,,,,False,MEDALLA MILAGROSA
+LineaE,Pichincha,LineaE_Pichin_Turn01,26310,199670,2025-02-01,2025-12-31,False,False,,Pichin,,False,PICHINCHA
+LineaE,Pichincha,LineaE_Pichin_Turn02,23953,200638,2025-01-01,2025-12-31,False,False,,Pichin,,False,PICHINCHA
+LineaE,Pichincha,LineaE_Pichin_Turn03,23821,230418,2025-01-01,2025-12-31,False,False,,Pichin,,False,PICHINCHA
+LineaE,Pichincha,NULL,1890,10422,2025-01-01,2025-01-31,False,False,,,,False,PICHINCHA
+LineaE,Pza. de los Virreyes,LineaE_Virreyes_E_Turn01,24529,280939,2025-02-01,2025-12-31,False,False,E,E,,False,PLAZA DE LOS VIRREYES
+LineaE,Pza. de los Virreyes,LineaE_Virreyes_E_Turn02,26207,274020,2025-01-01,2025-12-31,False,False,E,E,,False,PLAZA DE LOS VIRREYES
+LineaE,Pza. de los Virreyes,LineaE_Virreyes_E_Turn03,23905,669476,2025-01-01,2025-12-31,False,False,E,E,,False,PLAZA DE LOS VIRREYES
+LineaE,Pza. de los Virreyes,LineaE_Virreyes_E_Turn04,24003,868106,2025-01-01,2025-12-31,False,False,E,E,,False,PLAZA DE LOS VIRREYES
+LineaE,Pza. de los Virreyes,LineaE_Virreyes_Turn01,6086,17300,2025-02-01,2025-07-31,False,False,,Virreyes,,False,PLAZA DE LOS VIRREYES
+LineaE,Pza. de los Virreyes,LineaE_Virreyes_Turn02,63,85,2025-03-29,2025-04-09,False,False,,Virreyes,,False,PLAZA DE LOS VIRREYES
+LineaE,Pza. de los Virreyes,NULL,1956,25310,2025-01-01,2025-01-31,False,False,,,,False,PLAZA DE LOS VIRREYES
+LineaE,Retiro E,LineaE_RetiroE_N_Turn01,5676,15314,2025-01-01,2025-09-30,False,False,N,N,E,False,RETIRO
+LineaE,Retiro E,LineaE_RetiroE_N_Turn02,6677,23659,2025-01-01,2025-09-30,False,False,N,N,E,False,RETIRO
+LineaE,Retiro E,LineaE_RetiroE_N_Turn03,9297,33671,2025-01-01,2025-12-31,False,False,N,N,E,False,RETIRO
+LineaE,Retiro E,LineaE_RetiroE_N_Turn04,8576,24910,2025-01-01,2025-09-30,False,False,N,N,E,False,RETIRO
+LineaE,Retiro E,LineaE_RetiroE_N_Turn05,19028,112854,2025-01-01,2025-12-31,False,False,N,N,E,False,RETIRO
+LineaE,Retiro E,LineaE_RetiroE_S_Turn01,5894,42892,2025-03-01,2025-09-30,False,False,S,S,E,False,RETIRO
+LineaE,Retiro E,LineaE_RetiroE_S_Turn02,8854,64218,2025-01-01,2025-09-30,False,False,S,S,E,False,RETIRO
+LineaE,Retiro E,LineaE_RetiroE_S_Turn03,14855,142736,2025-01-01,2025-12-31,False,False,S,S,E,False,RETIRO
+LineaE,Retiro E,LineaE_RetiroE_S_Turn04,9045,47055,2025-01-01,2025-09-30,False,False,S,S,E,False,RETIRO
+LineaE,Retiro E,LineaE_RetiroE_S_Turn05,20631,219801,2025-01-01,2025-12-31,False,False,S,S,E,False,RETIRO
+LineaE,Retiro E,NULL,1853,15723,2025-01-01,2025-01-31,False,False,,,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_N_Turn01,8026,21847,2025-04-01,2025-12-31,False,False,N,N,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_N_Turn02,7631,19753,2025-04-01,2025-12-31,False,False,N,N,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_N_Turn03,2991,6705,2025-04-01,2025-07-31,False,False,N,N,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_N_Turn04,4732,12169,2025-04-01,2025-12-31,False,False,N,N,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_N_Turn05,1870,11908,2025-07-01,2025-07-31,False,False,N,N,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_S_Turn01,15339,102921,2025-02-01,2025-12-31,False,False,S,S,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_S_Turn02,10047,37518,2025-04-01,2025-12-31,False,False,S,S,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_S_Turn03,5667,15405,2025-04-01,2025-07-31,False,False,S,S,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_S_Turn04,5264,21230,2025-04-01,2025-12-31,False,False,S,S,E,False,RETIRO
+LineaE,Retiro.E,LineaE_RetiroE_S_Turn05,2045,27286,2025-07-01,2025-07-31,False,False,S,S,E,False,RETIRO
+LineaE,San Jose,LineaE_SanJose_Turn01,26373,222232,2025-02-01,2025-12-31,False,False,,SanJose,,False,SAN JOSE
+LineaE,San Jose,LineaE_SanJose_Turn02,25159,467603,2025-01-01,2025-12-31,False,False,,SanJose,,False,SAN JOSE
+LineaE,San Jose,NULL,1796,7842,2025-01-01,2025-01-31,False,False,,,,False,SAN JOSE
+LineaE,Urquiza,LineaE_Urquiza_Turn01,26927,312467,2025-02-01,2025-12-31,False,False,,Urquiza,,False,GENERAL URQUIZA
+LineaE,Urquiza,LineaE_Urquiza_Turn02,24387,342914,2025-01-01,2025-12-31,False,False,,Urquiza,,False,GENERAL URQUIZA
+LineaE,Urquiza,LineaE_Urquiza_Turn03,23026,238572,2025-01-01,2025-12-31,False,False,,Urquiza,,False,GENERAL URQUIZA
+LineaE,Urquiza,NULL,1885,13587,2025-01-01,2025-01-31,False,False,,,,False,GENERAL URQUIZA
+LineaE,Varela,LineaE_Varela_Turn01,24778,207589,2025-02-01,2025-12-31,False,False,,Varela,,False,VARELA
+LineaE,Varela,LineaE_Varela_Turn02,24217,381941,2025-01-01,2025-12-31,False,False,,Varela,,False,VARELA
+LineaE,Varela,NULL,1674,9148,2025-01-01,2025-01-31,False,False,,,,False,VARELA
+LineaH,#N/D,LineaH_Validador_Central_Turn01,6,8,2025-09-01,2025-12-01,True,False,,Central,,False,N D
+LineaH,Caseros,LineaH_Caseros_Norte_Turn01,26618,196722,2025-01-01,2025-12-31,False,False,N,Norte,,False,CASEROS
+LineaH,Caseros,LineaH_Caseros_Norte_Turn02,23902,331392,2025-01-01,2025-12-31,False,False,N,Norte,,False,CASEROS
+LineaH,Caseros,LineaH_Caseros_Sur_Turn01,28191,423974,2025-02-01,2025-12-31,False,False,S,Sur,,False,CASEROS
+LineaH,Caseros,LineaH_Caseros_Sur_Turn02,25358,630531,2025-01-01,2025-12-31,False,False,S,Sur,,False,CASEROS
+LineaH,Caseros,NULL,1961,20591,2025-01-01,2025-01-31,False,False,,,,False,CASEROS
+LineaH,Cordoba,LineaH_Cordoba_Turn02,24500,474101,2025-01-01,2025-12-31,False,False,,Cordoba,,False,CORDOBA
+LineaH,Cordoba,LineaH_Cordoba_Turn03,24466,553840,2025-01-01,2025-12-31,False,False,,Cordoba,,False,CORDOBA
+LineaH,Cordoba,LineaH_Cordoba_Turn04,28596,607902,2025-02-01,2025-12-31,False,False,,Cordoba,,False,CORDOBA
+LineaH,Cordoba,NULL,2026,22891,2025-01-01,2025-01-31,False,False,,,,False,CORDOBA
+LineaH,Corrientes,LineaH_Corrientes_Norte_Turn01,24785,130483,2025-01-01,2025-12-31,False,False,N,Norte,,False,CORRIENTES
+LineaH,Corrientes,LineaH_Corrientes_Norte_Turn02,20550,133551,2025-01-01,2025-12-31,False,False,N,Norte,,False,CORRIENTES
+LineaH,Corrientes,LineaH_Corrientes_Norte_Turn03,15570,68473,2025-01-01,2025-12-31,False,False,N,Norte,,False,CORRIENTES
+LineaH,Corrientes,LineaH_Corrientes_Sur_Turn01,26028,228578,2025-02-01,2025-12-31,False,False,S,Sur,,False,CORRIENTES
+LineaH,Corrientes,LineaH_Corrientes_Sur_Turn02,25836,197015,2025-01-01,2025-12-31,False,False,S,Sur,,False,CORRIENTES
+LineaH,Corrientes,LineaH_Corrientes_Sur_Turn03,20771,301608,2025-01-01,2025-12-31,False,False,S,Sur,,False,CORRIENTES
+LineaH,Corrientes,LineaH_Corrientes_Sur_Turn04,21125,249883,2025-01-01,2025-12-31,False,False,S,Sur,,False,CORRIENTES
+LineaH,Corrientes,NULL,1907,17479,2025-01-01,2025-01-31,False,False,,,,False,CORRIENTES
+LineaH,Facultad de Derecho,LineaH_FDerecho_Norte_Turn03,15753,85269,2025-01-01,2025-12-31,False,False,N,Norte,,False,FACULTAD DE DERECHO
+LineaH,Facultad de Derecho,LineaH_FDerecho_Norte_Turn04,9432,25800,2025-01-01,2025-12-31,False,False,N,Norte,,False,FACULTAD DE DERECHO
+LineaH,Facultad de Derecho,LineaH_FDerecho_Norte_Turn05,8797,21687,2025-01-01,2025-12-29,False,False,N,Norte,,False,FACULTAD DE DERECHO
+LineaH,Facultad de Derecho,LineaH_FDerecho_Norte_Turn06,6183,15788,2025-01-01,2025-12-31,False,False,N,Norte,,False,FACULTAD DE DERECHO
+LineaH,Facultad de Derecho,LineaH_FDerecho_Sur_Turn03,22387,422790,2025-01-01,2025-12-31,False,False,S,Sur,,False,FACULTAD DE DERECHO
+LineaH,Facultad de Derecho,LineaH_FDerecho_Sur_Turn04,21727,390890,2025-01-01,2025-12-31,False,False,S,Sur,,False,FACULTAD DE DERECHO
+LineaH,Facultad de Derecho,LineaH_FDerecho_Sur_Turn05,23668,242877,2025-01-01,2025-12-31,False,False,S,Sur,,False,FACULTAD DE DERECHO
+LineaH,Facultad de Derecho,LineaH_FDerecho_Sur_Turn06,22682,263847,2025-02-01,2025-12-31,False,False,S,Sur,,False,FACULTAD DE DERECHO
+LineaH,Facultad de Derecho,NULL,1714,9412,2025-01-01,2025-01-31,False,False,,,,False,FACULTAD DE DERECHO
+LineaH,Hospitales,LineaH_Hospitales_Norte_Turn01,27416,409532,2025-02-01,2025-12-31,False,False,N,Norte,,False,HOSPITALES
+LineaH,Hospitales,LineaH_Hospitales_Norte_Turn02,23127,581205,2025-01-01,2025-12-31,False,False,N,Norte,,False,HOSPITALES
+LineaH,Hospitales,LineaH_Hospitales_Norte_Turn03,23808,761852,2025-01-01,2025-12-31,False,False,N,Norte,,False,HOSPITALES
+LineaH,Hospitales,LineaH_Hospitales_Sur_Turn01,28236,368163,2025-01-01,2025-12-31,False,False,S,Sur,,False,HOSPITALES
+LineaH,Hospitales,LineaH_Hospitales_Sur_Turn02,23568,605983,2025-01-01,2025-12-31,False,False,S,Sur,,False,HOSPITALES
+LineaH,Hospitales,LineaH_Hospitales_Sur_Turn03,23239,619588,2025-01-01,2025-12-31,False,False,S,Sur,,False,HOSPITALES
+LineaH,Hospitales,NULL,1954,24511,2025-01-01,2025-01-31,False,False,,,,False,HOSPITALES
+LineaH,Humberto I,LineaH_HPrimo_Norte_Turn01,16807,197914,2025-02-03,2025-12-30,False,False,N,Norte,,False,HUMBERTO 1
+LineaH,Humberto I,LineaH_HPrimo_Norte_Turn02,14996,331969,2025-01-02,2025-12-31,False,False,N,Norte,,False,HUMBERTO 1
+LineaH,Humberto I,LineaH_HPrimo_Sur_Turn01,28517,288035,2025-02-01,2025-12-31,False,False,S,Sur,,False,HUMBERTO 1
+LineaH,Humberto I,LineaH_HPrimo_Sur_Turn02,25810,497988,2025-01-01,2025-12-31,False,False,S,Sur,,False,HUMBERTO 1
+LineaH,Humberto I,NULL,2036,20686,2025-01-01,2025-01-31,False,False,,,,False,HUMBERTO 1
+LineaH,Inclan,LineaH_Inclan_Norte_Turn01,28315,252804,2025-02-01,2025-12-31,False,False,N,Norte,,False,INCLAN
+LineaH,Inclan,LineaH_Inclan_Norte_Turn02,25537,427461,2025-01-01,2025-12-31,False,False,N,Norte,,False,INCLAN
+LineaH,Inclan,LineaH_Inclan_Sur_Turn01,16857,209225,2025-02-03,2025-12-30,False,False,S,Sur,,False,INCLAN
+LineaH,Inclan,LineaH_Inclan_Sur_Turn02,14977,320564,2025-01-02,2025-12-30,False,False,S,Sur,,False,INCLAN
+LineaH,Inclan,NULL,2036,21730,2025-01-01,2025-01-31,False,False,,,,False,INCLAN
+LineaH,Las Heras,LineaH_LasHeras_Turn02,26907,404163,2025-01-01,2025-12-31,False,False,,LasHeras,,False,LAS HERAS
+LineaH,Las Heras,LineaH_LasHeras_Turn03,24096,691608,2025-01-01,2025-12-31,False,False,,LasHeras,,False,LAS HERAS
+LineaH,Las Heras,LineaH_LasHeras_Turn04,52023,1163233,2025-01-01,2025-12-31,False,False,,LasHeras,,False,LAS HERAS
+LineaH,Las Heras,NULL,2051,23626,2025-01-01,2025-01-31,False,False,,,,False,LAS HERAS
+LineaH,Loria,NULL,2,18,2025-01-22,2025-01-22,False,False,,,,False,LORIA
+LineaH,NULL,LineaH_Validador_Central_Turn01,1,1,2025-07-30,2025-07-30,True,False,,Central,,False,NULL
+LineaH,Once,LineaH_Once_Norte_Turn01,24713,162414,2025-02-01,2025-12-31,False,False,N,Norte,,False,ONCE
+LineaH,Once,LineaH_Once_Norte_Turn02,22555,134094,2025-01-01,2025-12-31,False,False,N,Norte,,False,ONCE
+LineaH,Once,LineaH_Once_Norte_Turn03,23619,381699,2025-01-01,2025-12-31,False,False,N,Norte,,False,ONCE
+LineaH,Once,LineaH_Once_Norte_Turn04,22053,260075,2025-01-01,2025-12-31,False,False,N,Norte,,False,ONCE
+LineaH,Once,LineaH_Once_Sur_Turn01,27823,198279,2025-01-01,2025-12-31,False,False,S,Sur,,False,ONCE
+LineaH,Once,LineaH_Once_Sur_Turn02,25474,188898,2025-01-01,2025-12-31,False,False,S,Sur,,False,ONCE
+LineaH,Once,LineaH_Once_Sur_Turn03,23826,594382,2025-01-01,2025-12-31,False,False,S,Sur,,False,ONCE
+LineaH,Once,LineaH_Once_Sur_Turn04,25176,819299,2025-01-01,2025-12-31,False,False,S,Sur,,False,ONCE
+LineaH,Once,NULL,1957,16575,2025-01-01,2025-01-31,False,False,,,,False,ONCE
+LineaH,Patricios,LineaH_Patricios_Turn01,28301,414880,2025-02-01,2025-12-30,False,False,,Patricios,,False,PARQUE PATRICIOS
+LineaH,Patricios,LineaH_Patricios_Turn02,29247,387853,2025-01-01,2025-12-31,False,False,,Patricios,,False,PARQUE PATRICIOS
+LineaH,Patricios,LineaH_Patricios_Turn03,24488,628631,2025-01-01,2025-12-31,False,False,,Patricios,,False,PARQUE PATRICIOS
+LineaH,Patricios,LineaH_Patricios_Turn04,23819,556359,2025-01-01,2025-12-31,False,False,,Patricios,,False,PARQUE PATRICIOS
+LineaH,Patricios,LineaH_Patricios_Turn05,22071,448789,2025-01-01,2025-12-31,False,False,,Patricios,,False,PARQUE PATRICIOS
+LineaH,Patricios,NULL,1967,23347,2025-01-01,2025-01-31,False,False,,,,False,PARQUE PATRICIOS
+LineaH,Santa Fe,LineaH_SantaFe_Asc_Turn01,5127,7811,2025-01-02,2025-12-31,False,False,,Asc,,False,SANTA FE
+LineaH,Santa Fe,LineaH_SantaFe_Norte_Turn01,27686,382881,2025-02-01,2025-12-31,False,False,N,Norte,,False,SANTA FE
+LineaH,Santa Fe,LineaH_SantaFe_Norte_Turn02,24877,219898,2025-01-01,2025-12-31,False,False,N,Norte,,False,SANTA FE
+LineaH,Santa Fe,LineaH_SantaFe_Norte_Turn03,24620,225270,2025-01-01,2025-12-31,False,False,N,Norte,,False,SANTA FE
+LineaH,Santa Fe,LineaH_SantaFe_Norte_Turn04,23719,562792,2025-01-01,2025-12-31,False,False,N,Norte,,False,SANTA FE
+LineaH,Santa Fe,LineaH_SantaFe_Norte_Turn05,19829,329686,2025-01-01,2025-12-31,False,False,N,Norte,,False,SANTA FE
+LineaH,Santa Fe,LineaH_SantaFe_Sur_Turn01,24975,173258,2025-02-01,2025-12-31,False,False,S,Sur,,False,SANTA FE
+LineaH,Santa Fe,LineaH_SantaFe_Sur_Turn02,23050,126660,2025-01-01,2025-12-30,False,False,S,Sur,,False,SANTA FE
+LineaH,Santa Fe,LineaH_SantaFe_Sur_Turn03,22726,232785,2025-01-01,2025-12-31,False,False,S,Sur,,False,SANTA FE
+LineaH,Santa Fe,LineaH_SantaFe_Sur_Turn04,17250,115887,2025-01-01,2025-12-31,False,False,S,Sur,,False,SANTA FE
+LineaH,Santa Fe,NULL,2073,36178,2025-01-01,2025-01-31,False,False,,,,False,SANTA FE
+LineaH,Venezuela,LineaH_Venezuela_Norte_Turn01,27510,250738,2025-02-01,2025-12-31,False,False,N,Norte,,False,VENEZUELA
+LineaH,Venezuela,LineaH_Venezuela_Norte_Turn02,24513,324637,2025-01-01,2025-12-31,False,False,N,Norte,,False,VENEZUELA
+LineaH,Venezuela,LineaH_Venezuela_Sur_Turn01,30354,398263,2025-01-01,2025-12-31,False,False,S,Sur,,False,VENEZUELA
+LineaH,Venezuela,LineaH_Venezuela_Sur_Turn02,25333,719404,2025-01-01,2025-12-31,False,False,S,Sur,,False,VENEZUELA
+LineaH,Venezuela,NULL,1885,13038,2025-01-01,2025-01-31,False,False,,,,False,VENEZUELA
+LineaPM,CochePM,LineaPrem_Coche11_Val1,1031,3579,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche11_Val2,678,1984,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche12_Val1,971,2848,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche12_Val2,878,2529,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche13_Val1,918,2714,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche13_Val2,1014,3079,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche14_Val1,729,1906,2025-06-05,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche14_Val2,735,2097,2025-06-06,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche17_Val1,824,2484,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche17_Val2,698,2028,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche1_Val1,844,2051,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche1_Val2,873,2096,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche21_Val1,822,2518,2025-06-02,2025-07-16,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche21_Val2,839,2307,2025-06-02,2025-07-16,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche2_Val1,725,2151,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche2_Val2,717,2152,2025-06-01,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche5_Val1,676,2138,2025-06-02,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche5_Val2,637,1948,2025-06-02,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche7_Val1,91,894,2025-07-04,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,CochePM,LineaPrem_Coche7_Val2,45,377,2025-07-16,2025-07-31,False,True,,,,False,COCHEPM
+LineaPM,Saguier,LineaPrem_Saguier_N_Turn01,954,1385,2025-06-01,2025-07-31,False,True,N,N,,False,SAGUIER
+LineaPM,Saguier,LineaPrem_Saguier_N_Turn02,3268,19972,2025-06-01,2025-07-31,False,True,N,N,,False,SAGUIER
+LineaPM,Saguier,LineaPrem_Saguier_N_Turn03,3210,22369,2025-06-01,2025-07-31,False,True,N,N,,False,SAGUIER
+LineaPM,Saguier,LineaPrem_Saguier_O_Turn01,727,1549,2025-07-01,2025-07-31,False,True,O,O,,False,SAGUIER
+LineaPM,Saguier,LineaPrem_Saguier_O_Turn02,2595,15037,2025-06-01,2025-07-31,False,True,O,O,,False,SAGUIER
+LineaPM,Saguier,LineaPrem_Saguier_O_Turn03,2620,15919,2025-06-01,2025-07-31,False,True,O,O,,False,SAGUIER
+LineaPM,Saguier,LineaPrem_Saguier_O_Turn04,2099,9752,2025-06-01,2025-07-31,False,True,O,O,,False,SAGUIER
+LineaPM,Saguier,LineaPrem_Saguier_S_Turn01,739,1009,2025-06-01,2025-07-31,False,True,S,S,,False,SAGUIER
+LineaPM,Saguier,LineaPrem_Saguier_S_Turn02,2673,14999,2025-06-01,2025-07-31,False,True,S,S,,False,SAGUIER
+LineaPM,Saguier,LineaPrem_Saguier_S_Turn03,2320,11464,2025-06-01,2025-07-31,False,True,S,S,,False,SAGUIER
+Prueba,Prueba,Prueba,1,1,2025-06-18,2025-06-18,True,False,,,,False,PRUEBA

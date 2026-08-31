@@ -1,4 +1,4 @@
-# Paso 1 — Tabla maestra de estaciones
+# Paso 1: Tabla maestra de estaciones
 
 Generado por `src/01_tabla_maestra_estaciones.py`. Fuente de demanda: `molinetes-2025.zip`. Fuente de topologia: GTFS.
 

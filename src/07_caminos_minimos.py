@@ -8,7 +8,7 @@ aristas y volver a correr esto).
 
 Es una asignacion todo-o-nada: cada par O-D manda todo su flujo por un unico
 camino. Es una simplificacion fuerte y este reporte la mide en vez de
-declararla nada mas — la seccion 3 cuenta cuantos pares tienen un segundo
+declararla nada mas, la seccion 3 cuenta cuantos pares tienen un segundo
 camino practicamente empatado.
 
 Salidas en data/processed/:
@@ -42,7 +42,7 @@ REPORTES = RAIZ / "reports"
 #
 # El valor base sale de los despachos medidos en el paso 4: en hora pico los
 # intervalos van de 3,15 min (C) a 5,22 min (E), de modo que la espera esperada
-# —la mitad del intervalo— cae entre 95 y 157 s. 120 s queda en el medio. **No
+# (la mitad del intervalo) cae entre 95 y 157 s. 120 s queda en el medio. **No
 # es un dato**, es un supuesto, y por eso se recorre el rango completo.
 PENALIZACION_BASE_S = 120.0
 PENALIZACIONES_S = [0.0, 60.0, 120.0, 180.0, 300.0]
@@ -212,7 +212,7 @@ def contrastar_lineas(base: pd.DataFrame, m: pd.DataFrame,
       fuente, independiente del dataset O-D. Su sesgo conocido es que mide la
       estacion **de ingreso**, no la linea de ascenso: quien entra por un
       molinete y camina hasta el anden de la otra linea queda mal atribuido. Es
-      el mismo sesgo que la decision D5 declara para el contraste por anden.
+      el mismo sesgo que declaramos para el contraste por anden.
     - **`linea_etapa`** del dataset O-D, que si es la linea del molinete que
       registro la transaccion. Su defecto es otro: en dos complejos el dataset
       colapsa todos los ascensos sobre una sola linea (ver el reporte).
@@ -259,7 +259,7 @@ def contrastar_lineas(base: pd.DataFrame, m: pd.DataFrame,
 def escribir_reporte(base, sens, brechas, reparto, cat, nombre, m) -> None:
     L: list[str] = []
     A = L.append
-    A("# Paso 6 — Caminos minimos con penalizacion por transbordo\n")
+    A("# Paso 6, Caminos minimos con penalizacion por transbordo\n")
     A("Generado por `src/07_caminos_minimos.py`, con `src/lib_caminos.py`. Precalcula el "
       "camino de menor tiempo percibido para cada par ordenado de complejos, sobre el "
       "grafo dirigido del paso 2.\n")
@@ -270,8 +270,8 @@ def escribir_reporte(base, sens, brechas, reparto, cat, nombre, m) -> None:
       "  + min_transfer_time de cada transbordo\n  + P por cada transbordo\n```\n")
     A("Los 24 s son la detencion de diseno del GTFS, que el paso 2 mostro constante en "
       "toda parada de toda linea. **Van por parada intermedia, no por tramo recorrido**: "
-      "el que asciende no espera la detencion de su estacion de ascenso —esa es su "
-      "ventana de abordaje— y el que desciende tampoco espera la de la suya. Contarlas "
+      "el que asciende no espera la detencion de su estacion de ascenso (esa es su "
+      "ventana de abordaje) y el que desciende tampoco espera la de la suya. Contarlas "
       "por tramo abarataria en terminos relativos los caminos con muchas paradas, que es "
       "justo el error que un grafo de subte no puede darse.\n")
     A("**El acceso y el egreso dentro de un complejo valen cero.** El pasajero entra al "
@@ -283,7 +283,7 @@ def escribir_reporte(base, sens, brechas, reparto, cat, nombre, m) -> None:
     A(f"**La penalizacion P es un supuesto, no un dato.** El valor base es "
       f"**{int(PENALIZACION_BASE_S)} s** y sale de los despachos del paso 4: en hora pico "
       "los intervalos van de 3,15 min (C) a 5,22 min (E), de modo que la espera esperada "
-      "—la mitad del intervalo— cae entre 95 y 157 s. Por eso la seccion 4 recorre el "
+      "(la mitad del intervalo) cae entre 95 y 157 s. Por eso la seccion 4 recorre el "
       "rango completo en lugar de fijar el valor.\n")
 
     A("## 2. La tabla\n")
@@ -342,7 +342,7 @@ def escribir_reporte(base, sens, brechas, reparto, cat, nombre, m) -> None:
     A("- **Molinetes** del 16/10/2024, por estacion del complejo. Es una tercera fuente, "
       "independiente del dataset O-D. Su sesgo: mide la estacion **de ingreso**, no la "
       "linea de ascenso, asi que quien entra por un molinete y camina hasta el anden de "
-      "la otra linea queda mal atribuido. Es el mismo sesgo que D5 declara para el "
+      "la otra linea queda mal atribuido. Es el mismo sesgo que declaramos para el "
       "contraste por anden.")
     A("- **`linea_etapa`** del dataset O-D, que si es la linea del molinete que registro "
       "la transaccion. Su defecto es otro y aparece abajo.\n")
@@ -364,16 +364,16 @@ def escribir_reporte(base, sens, brechas, reparto, cat, nombre, m) -> None:
     entre_fuentes = (sano.p_molinetes - sano.p_od).abs().mean()
     A("> **Las dos fuentes observadas coinciden entre si donde ninguna esta rota**: en "
       f"los ocho complejos sanos difieren en promedio {dec(entre_fuentes * 100, 2)} p.p. "
-      "Son fuentes independientes —una es el conteo de molinetes, la otra la "
-      "reconstruccion de viajes a partir de transacciones SUBE— y que se corroboren da "
+      "Son fuentes independientes (una es el conteo de molinetes, la otra la "
+      "reconstruccion de viajes a partir de transacciones SUBE) y que se corroboren da "
       "piso al contraste. Donde discrepan fuerte, discrepan por una razon identificable, "
       "que es de lo que tratan las dos secciones que siguen.\n")
 
     A("### 5.1 Dos complejos donde el dataset O-D esta roto, y molinetes lo demuestra\n")
     deg = sorted(reparto[reparto.od_degenerado].complejo_nombre.unique())
     A("En " + " y en ".join(f"**{d}**" for d in deg) + " el dataset O-D atribuye el "
-      "100 % de los ascensos a una sola linea. Ya lo teniamos anotado —9 de "
-      "Julio [D], Diagonal Norte [C] e Independencia [C] no aparecen nunca como origen— "
+      "100 % de los ascensos a una sola linea. Ya lo teniamos anotado (9 de "
+      "Julio [D], Diagonal Norte [C] e Independencia [C] no aparecen nunca como origen) "
       "y aca se ve el efecto.\n")
     A("**Molinetes le da la razon al modelo, no al dataset.** En 9 de Julio / Carlos "
       "Pellegrini / Diagonal Norte los molinetes reparten 62,8 / 18,6 / 18,6 entre B, C y "
@@ -392,14 +392,14 @@ def escribir_reporte(base, sens, brechas, reparto, cat, nombre, m) -> None:
     if len(ret):
         c = ret[ret.linea == "LineaC"].iloc[0]
         A(f"Es el unico desajuste grande que **no** es defecto de fuente: las dos fuentes "
-          f"coinciden —molinetes {pc(c.p_molinetes, 1)} por la C, `linea_etapa` "
-          f"{pc(c.p_od, 1)}— y la ruta predice {pc(c.p_predicho, 1)}. Sobreasigna a la "
+          f"coinciden (molinetes {pc(c.p_molinetes, 1)} por la C, `linea_etapa` "
+          f"{pc(c.p_od, 1)}) y la ruta predice {pc(c.p_predicho, 1)}. Sobreasigna a la "
           "Linea E.\n")
     A("Se probaron dos explicaciones y **las dos quedaron descartadas**:\n")
-    A("1. **El reparo de la Linea E (decision D6).** Se regenero el grafo con "
+    A("1. **El reparo de la Linea E.** Se regenero el grafo con "
       "`REPARAR_LINEA_E = False` y se recalcularon los caminos: cambian **58 pares de "
       "6.006 (1,0 %)** y 18 cambian de linea de ascenso. El reparto de Retiro **no se "
-      "mueve**. El reparo importa poco para la asignacion; D6 sigue abierta pero no es "
+      "mueve**. El reparo importa poco para la asignacion; sigue abierto pero no es "
       "la causa de esto.")
     A("2. **Que la penalizacion sea uniforme y no distinga frecuencias.** Se probo "
       "reemplazarla por la espera esperada de cada linea, calculada como la mitad del "
@@ -414,7 +414,7 @@ def escribir_reporte(base, sens, brechas, reparto, cat, nombre, m) -> None:
       "justo en esa direccion.\n")
 
     A("### 5.3 Que puede y que no puede este contraste\n")
-    A("Es **parcial y sesgado por construccion**, igual que el de anden de D5: cubre "
+    A("Es **parcial y sesgado por construccion**, igual que el de anden: cubre "
       "diez complejos y compara un reparto todo-o-nada contra uno observado que por "
       "definicion esta repartido. Un par que la ruta manda entero por una linea nunca va "
       "a reproducir un 60/40 observado. **Sirve para detectar que la asignacion mande "

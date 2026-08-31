@@ -1,8 +1,8 @@
-# Paso 10 — Calibracion de la penalizacion por transbordo (D9)
+# Paso 10: Calibracion de la penalizacion por transbordo
 
 El paso 6 fijo la penalizacion en **120 s** por un argumento indirecto: en hora 
 pico los intervalos entre despachos van de 3,15 a 5,22 min, asi que la espera 
-esperada —la mitad del intervalo— cae entre 95 y 157 s. Era un supuesto sin nada 
+esperada (la mitad del intervalo) cae entre 95 y 157 s. Era un supuesto sin nada 
 contra que medirse. Los perfiles de carga que entrego SBASE (paso 9) dan por 
 primera vez un observado por tramo, y con eso el valor se puede elegir midiendo.
 
@@ -98,7 +98,7 @@ por defecto:
 - cae dentro de la zona plana, donde el observado no discrimina;
 - esta muy por encima de la cota inferior de 30 s, que es lo unico que el dato fija;
 - coincide con el argumento fisico del paso 6, que es la mitad del intervalo 
-  medido en hora pico (95–157 s), y ese argumento es el que corresponde usar 
+  medido en hora pico (95-157 s), y ese argumento es el que corresponde usar 
   cuando el ajuste no discrimina.
 
 Rinde 6,54 % de WAPE en calibracion y 8,40 % fuera 
@@ -108,7 +108,7 @@ estaba calculada con este valor y queda vigente tal cual.
 
 **Lo que cambia no es el numero sino su estatus.** Deja de ser un supuesto 
 declarado y pasa a ser un parametro cuyo rango admisible se midio, con la 
-salvedad —que hay que escribir en el informe— de que **el indicador central es 
+salvedad (que hay que escribir en el informe) de que **el indicador central es 
 poco sensible a el**. Eso es un resultado, no una limitacion: significa que la 
 carga por tramo que produzca el modelo no depende de la parte mas discutible de 
 la asignacion.

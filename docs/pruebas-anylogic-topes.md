@@ -5,7 +5,7 @@
 >
 > Son tres pruebas descartables, ~30 minutos en total. **Las tres cambian decisiones
 > de diseño del modelo**, así que se corren antes de escribir nada y antes de registrar
-> las decisiones D10 y D11 en `contexto-del-proyecto.md`, sección 7.
+> las decisiones sobre la unidad de demanda y la biblioteca en `contexto-del-proyecto.md`, sección 7.
 >
 > Anotar los resultados en la sección 5 de este mismo archivo.
 
@@ -33,7 +33,7 @@ coinciden, no de la página leída directamente. **No hace falta resolverlo para
 
 1. Que la exención de PML sea real, y no solo lo que dice la documentación. Todo el
    diseño se apoya en eso: el día de servicio son ~19 h contra un tope de 5.
-2. Si el tope de 50.000 cuenta **creaciones** o **entidades vivas** — de lo que depende
+2. Si el tope de 50.000 cuenta **creaciones** o **entidades vivas**, de lo que depende
    que sirva reciclar una población, y con ella la posibilidad de bajar el tamaño de
    grupo `k` y ganar fidelidad visual.
 3. Si la máquina banca 40.000 agentes en tiempo de reloj razonable. El tope de licencia
@@ -44,8 +44,8 @@ coinciden, no de la página leída directamente. **No hace falta resolverlo para
 ## 1. Los tres modelos ya estan generados
 
 **No hay que construir nada en la interfaz.** `src/08_generar_pruebas_anylogic.py`
-genera los tres `.alp` en `anylogic/pruebas/`, partiendo de `MM1.alp` del TP 3 —que ya
-se sabe que compila y corre— y cambiandole solo los parametros que cada prueba
+genera los tres `.alp` en `anylogic/pruebas/`, partiendo de `MM1.alp` del TP 3 (que ya
+se sabe que compila y corre) y cambiandole solo los parametros que cada prueba
 necesita. Los tres son `Source -> Queue -> Delay -> Sink` de Process Modeling Library.
 
 **Instrucciones de corrida en `anylogic/pruebas/LEEME.md`**, con la tabla de como leer
@@ -70,8 +70,8 @@ grupo `k`, y cuanto mas chico `k`, mas figuras se ven.
 ## 2. Lo que dejo de ser decisivo
 
 El plan original incluia probar si un modelo **sin ninguna biblioteca** queda alcanzado
-por el tope de 5 h. **Ya no hace falta**: las tres arquitecturas candidatas —grupos de
-pasajeros, pasajeros como cantidades con trenes como agentes, e hibrido por corredor—
+por el tope de 5 h. **Ya no hace falta**: las tres arquitecturas candidatas (grupos de
+pasajeros, pasajeros como cantidades con trenes como agentes, e hibrido por corredor)
 se pueden construir **todas dentro de PML**, que es la unica exenta. La pregunta quedo
 sin consecuencia practica y se saca del protocolo.
 
@@ -84,7 +84,7 @@ AnyLogic 8.9.9 trae un **API de diseño en Python** en
 crear **marcacion espacial por codigo**: caminos, nodos, redes, vias de tren, andenes,
 escaleras, paredes.
 
-**No sirve para estas pruebas** —no crea bloques de flowchart ni eventos— pero **si
+**No sirve para estas pruebas** (no crea bloques de flowchart ni eventos) pero **si
 sirve para el modelo**: la marcacion de las 90 estaciones y el agregado de la Linea F
 se pueden dibujar desde `grafo_nodos.csv` y `grafo_aristas.csv` en vez de a mano. Va
 justo en la direccion que impone el tope de **200 bloques por tipo de agente**, que ya
@@ -103,7 +103,7 @@ y ese resultado no se traslada entre equipos.
 
 ---
 
-## 5. Resultados — corridas del 25/08/2026
+## 5. Resultados: corridas del 25/08/2026
 
 **Máquina:** la de trabajo, `C:\Program Files\AnyLogic 8.9 Personal Learning Edition\`.
 **Versión:** AnyLogic 8.9.9 Personal Learning Edition.
@@ -113,10 +113,10 @@ y ese resultado no se traslada entre equipos.
 | **A** | **734** | ~720 si corre 20 h, ~180 si corta a las 5 h | **PML corre las 20 h.** El tope de 5 h no la alcanza |
 | **B** | **50.027** | ~72.000 si cuenta vivas, ~50.000 si cuenta creaciones | **El tope cuenta creaciones**, con un solo agente vivo |
 | **C** | **39.773** | ~40.014 | Configuración correcta: contenido del `delay` = **1.137** contra 1.170 previstos |
-| **D** | 31, con `poblacion [60000]` viva | — | **Las poblaciones declaradas NO cuentan** contra el tope |
-| **E** | 31, con `poblacion [25000]` viva | — | **Entra, y `Replicas10` completó las 10 iteraciones sin OOM** |
+| **D** | 31, con `poblacion [60000]` viva | - | **Las poblaciones declaradas NO cuentan** contra el tope |
+| **E** | 31, con `poblacion [25000]` viva | - | **Entra, y `Replicas10` completó las 10 iteraciones sin OOM** |
 
-### 5.1 A — Process Modeling Library está exenta del tope de 5 h
+### 5.1 A: Process Modeling Library está exenta del tope de 5 h
 
 734 llegadas con media de 100 s son 73.400 s de reloj de modelo: **corrió las 20 horas
 completas**. Si el tope de 5 h la hubiera alcanzado, el contador se habría quedado en
@@ -126,7 +126,7 @@ completas**. Si el tope de 5 h la hubiera alcanzado, el contador se habría qued
 confirmada como la base obligada del modelo. El supuesto sobre el que se apoyaba todo
 el diseño resultó cierto.
 
-### 5.2 B — El tope de 50.000 cuenta creaciones acumuladas, no entidades vivas
+### 5.2 B: El tope de 50.000 cuenta creaciones acumuladas, no entidades vivas
 
 El modelo se detuvo en **50.027 creaciones** teniendo **un solo agente vivo**
 (contenido del `delay` = 1). Los dos números están separados por cuatro órdenes de
@@ -135,7 +135,7 @@ la coexistencia**.
 
 **Consecuencia:** el presupuesto de agentes de una corrida es un recurso que se gasta y
 no se recupera al destruir entidades. Reciclar en vez de crear y destruir **podría** ser
-una salida — eso es lo que mide la prueba D.
+una salida, eso es lo que mide la prueba D.
 
 ### 5.3 Hallazgo no buscado: el tope se reinicia entre replicaciones
 
@@ -153,13 +153,13 @@ que el TPI se comprometió a correr **no compiten por el mismo presupuesto**. Ca
 corrida arranca con sus 50.000. El plan de replicaciones no estaba en riesgo.
 
 > **Matiz operativo que conviene recordar.** Al tocar el tope, la corrida simple
-> **degrada con elegancia** —el `source` deja de crear y el modelo sigue hasta el final,
-> como se ve en B: `sink` = 50.026 y el reloj llegó a 72.000 s— pero en un experimento
+> **degrada con elegancia** (el `source` deja de crear y el modelo sigue hasta el final,
+> como se ve en B: `sink` = 50.026 y el reloj llegó a 72.000 s) pero en un experimento
 > de variación de parámetros **lanza excepción y aborta**. O sea: un modelo que roza el
 > tope puede parecer que anda en corrida simple y romperse recién al replicar. Hay que
 > dejar margen, no quedarse al borde.
 
-### 5.4 C — El rendimiento no es un problema
+### 5.4 C: El rendimiento no es un problema
 
 39.773 agentes creados, **1.137 vivos a la vez**, 19 h simuladas. Y la corrida previa
 mal configurada, con **~39.768 agentes vivos simultáneamente**, también terminó casi
@@ -172,10 +172,10 @@ diez iteraciones ya acota el orden de magnitud.*
 
 ---
 
-## 6. D — Las poblaciones declaradas no cuentan, y el límite se mudó de lugar
+## 6. D: Las poblaciones declaradas no cuentan, y el límite se mudó de lugar
 
 **El modelo corrió.** Con `poblacion [60000]` instanciada y el flowchart funcionando
-—31 llegadas en la hora simulada, contra ~36 esperadas—, **sin un solo error de
+(31 llegadas en la hora simulada, contra ~36 esperadas), **sin un solo error de
 licencia**. La conclusión es directa: **el tope de 50.000 alcanza solo a los agentes
 creados dinámicamente, no a los declarados en la inicialización**.
 
@@ -200,8 +200,8 @@ Acá está el punto que cambia el diseño. **Lo que rompe el tope de 50.000 no e
 cantidad de gente simultánea sino el acumulado del día.** Son dos números muy
 distintos, y hasta ahora los estábamos tratando como uno solo.
 
-Con el tiempo de viaje medio ponderado por la demanda real —**910 s**, de
-`caminos_minimos.csv`— más unos 120 s de espera de andén, la permanencia media en el
+Con el tiempo de viaje medio ponderado por la demanda real (**910 s**, de
+`caminos_minimos.csv`) más unos 120 s de espera de andén, la permanencia media en el
 sistema es de **1.030 s ≈ 17 minutos**. Por la ley de Little, sobre la hora pico de
 72.396 etapas:
 
@@ -212,7 +212,7 @@ sistema es de **1.030 s ≈ 17 minutos**. Por la ley de Little, sobre la hora pi
 | 10 | 7.239 | 2.072 | 74.056 |
 | 25 | 2.895 | 828 | 29.622 |
 
-**A k = 1 —un agente, un pasajero— la concurrencia máxima es de 20.722.** Está muy por
+**A k = 1 (un agente, un pasajero) la concurrencia máxima es de 20.722.** Está muy por
 debajo de los 50.000. Lo único que impedía k=1 eran las **740.568 creaciones**, y las
 poblaciones declaradas no cuentan.
 
@@ -222,11 +222,11 @@ poblaciones declaradas no cuentan.
 
 ---
 
-## 7. E — El pool reciclado es viable
+## 7. E: El pool reciclado es viable
 
 **Pasó las dos corridas.** La simple instanció `poblacion [25000]` con el flowchart
 funcionando, y el **`Replicas10` completó las diez iteraciones sin `OutOfMemoryError`**,
-con `L = 0,109` — exactamente lo que predice su configuración (0,01 llegadas/s por 10 s
+con `L = 0,109`: exactamente lo que predice su configuración (0,01 llegadas/s por 10 s
 de retardo medio). El resultado es consistente, no es casualidad.
 
 Lo que mató a la prueba D no era el diseño sino el dimensionamiento: **60.000 era casi
@@ -274,7 +274,7 @@ la primera corrida.
 - **Arquitectura**: PML, día completo, pool declarado de pasajeros con `Enter`/`Exit`.
 - **`k` es un parámetro**, y el objetivo es **k = 1**: un agente, un pasajero.
 - **Plan B, ya verificado**: si el modelo real resulta más pesado de lo previsto,
-  k = 25 con `Source`/`Sink` funciona sin reciclado — 29.622 creaciones contra un tope
+  k = 25 con `Source`/`Sink` funciona sin reciclado, 29.622 creaciones contra un tope
   de 50.000.
 - **La fidelidad visual de detalle** sigue yendo al submodelo peatonal de Constitución
   en hora pico (9.951 ingresos, 1 persona = 1 persona), que entra holgado en ambos topes.

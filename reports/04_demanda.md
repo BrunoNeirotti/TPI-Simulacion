@@ -1,4 +1,4 @@
-# Paso 3 — Demanda por estación, franja de 15 min y tipo de día
+# Paso 3: Demanda por estación, franja de 15 min y tipo de día
 
 Generado por `src/04_demanda_molinetes.py` sobre `data/raw/molinetes-2025.zip`. Salidas: `demanda_estacion_franja.csv`, `demanda_diaria.csv`, `concentracion_horaria.csv` y `demanda_anden.csv` en `data/processed/`.
 
@@ -81,7 +81,7 @@ Días hábiles por debajo del 80 % de la mediana de los hábiles del mismo mes. 
 | 2025-12-30 | martes | 523.682 | 0,73 |
 | 2025-12-29 | lunes | 555.125 | 0,77 |
 
-> **Esta lista hay que contrastarla contra el calendario oficial de feriados de 2025.** El método detecta anomalías, no feriados: un paro, un corte de servicio o un día de lluvia extraordinaria aparecen igual. La forma de la lista es compatible con el calendario —1/1, 1/5, 25/12, el 24 y el 31, los lunes de carnaval y los puentes— pero **compatible no es verificado**. Los días atípicos quedan fuera del perfil de día hábil y **no se reasignan a domingo**, que sería un supuesto sin sustento.
+> **Esta lista hay que contrastarla contra el calendario oficial de feriados de 2025.** El método detecta anomalías, no feriados: un paro, un corte de servicio o un día de lluvia extraordinaria aparecen igual. La forma de la lista es compatible con el calendario (1/1, 1/5, 25/12, el 24 y el 31, los lunes de carnaval y los puentes) pero **compatible no es verificado**. Los días atípicos quedan fuera del perfil de día hábil y **no se reasignan a domingo**, que sería un supuesto sin sustento.
 
 ### 2.4 El viernes 8 de agosto de 2025 queda cerrado
 
@@ -99,9 +99,9 @@ El paso 1 lo dejó anotado: tras reconstruir las fechas quedaba con 38.454 filas
 
 > **La menor cantidad de filas no era menor demanda.** Agosto es uno de los dos archivos con fechas `d/m/Y` y `m/d/Y` mezcladas, y el conteo de filas por día quedaba distorsionado por esa reconstrucción. Los pasajeros por día no se apartan. El pendiente del paso 1 se cierra sin corrección: **no hay nada que corregir**. Lo que sí queda marcado como anómalo en agosto es el viernes 15 (razón 0,51) y el viernes 1.º (0,70).
 
-## 3. Concentración horaria — el control que quedaba pendiente
+## 3. Concentración horaria: el control que quedaba pendiente
 
-La pregunta es si dos cifras de la Línea F son conciliables entre sí: los **≈73.900 ascensos en hora pico** que suman las tablas de SBASE del EsIA (46.713 hacia Palermo más 27.163 hacia Brandsen, misma hora pico de la mañana) y los **270.000–300.000 pasajeros diarios** anunciados. Para que lo fueran, la hora pico tendría que concentrar cerca del **25 %** de la demanda diaria.
+La pregunta es si dos cifras de la Línea F son conciliables entre sí: los **≈73.900 ascensos en hora pico** que suman las tablas de SBASE del EsIA (46.713 hacia Palermo más 27.163 hacia Brandsen, misma hora pico de la mañana) y los **270.000-300.000 pasajeros diarios** anunciados. Para que lo fueran, la hora pico tendría que concentrar cerca del **25 %** de la demanda diaria.
 
 La hora pico se busca como la ventana móvil de 60 min de mayor ingreso, no se fija de antemano: fijarla sería suponer el resultado.
 
@@ -110,8 +110,8 @@ La hora pico se busca como la ventana móvil de 60 min de mayor ingreso, no se f
 | Métrica | Media | Desvío | Mínimo | Máximo |
 |---|---:|---:|---:|---:|
 | Hora pico móvil de 60 min | **9,9 %** | 0,43 % | 8,7 % | 12,0 % |
-| Hora 8:00–9:00 | **9,2 %** | 0,53 % | 7,6 % | 10,9 % |
-| Hora 17:00–18:00 | **9,9 %** | 0,44 % | 8,3 % | 12,0 % |
+| Hora 8:00-9:00 | **9,2 %** | 0,53 % | 7,6 % | 10,9 % |
+| Hora 17:00-18:00 | **9,9 %** | 0,44 % | 8,3 % | 12,0 % |
 | Franja pico de 15 min | **2,8 %** | 0,13 % | 2,4 % | 3,4 % |
 
 La ventana pico arranca con más frecuencia a las **17:00** (126 de 235 días). El doble pico que el dataset O-D detecta a las 8 y a las 17 aparece también acá, y la tarde gana.
@@ -158,35 +158,35 @@ Y los nodos de transferencia ferroviaria en particular:
 
 **La red concentra el 9,9 % de sus ingresos diarios en la hora pico, y ninguna de las seis líneas pasa del 12,0 %** (la E). La comparación pertinente es la de línea, porque la cifra de SBASE es de línea.
 
-A nivel de estación individual sí hay casos que superan el 25 %: Catalinas [E] llega al 30,0 %. Pero son estaciones chicas y de uso casi monopropósito —Catalinas tiene 4.646 ingresos diarios, el 0,6 % de la red— donde entra personal de oficinas a la mañana y sale a la tarde. **Una línea entera de doce estaciones no se comporta como una estación de oficinas.**
+A nivel de estación individual sí hay casos que superan el 25 %: Catalinas [E] llega al 30,0 %. Pero son estaciones chicas y de uso casi monopropósito (Catalinas tiene 4.646 ingresos diarios, el 0,6 % de la red) donde entra personal de oficinas a la mañana y sale a la tarde. **Una línea entera de doce estaciones no se comporta como una estación de oficinas.**
 
 El contraste más directo disponible es **Constitución**, que es el nodo de carga máxima de la Línea F según SBASE y hoy ya existe como estación de la Línea C, alimentada por el mismo ferrocarril Roca:
 
 - Constitución [C] recibe hoy **57.010 ingresos diarios** y concentra el 17,5 % en su hora pico, es decir unos **9.950 ingresos en la hora pico**.
 - SBASE proyecta para Constitución de la Línea F **32.640 ascensos en la hora pico de la mañana** en un solo sentido: 3,3 veces el ingreso de hora pico que la estación tiene hoy en la Línea C, y el 57,3 % de todo su ingreso diario actual.
 
-Los transbordos desde el ferrocarril **sí pasan por molinete** —son sistemas tarifarios distintos—, así que están contados en esos 57.010 ingresos. La comparación no está subestimando la demanda ferroviaria.
+Los transbordos desde el ferrocarril **sí pasan por molinete** (son sistemas tarifarios distintos), así que están contados en esos 57.010 ingresos. La comparación no está subestimando la demanda ferroviaria.
 
 De ahí salen dos lecturas del mismo hecho, y conviene decir las dos:
 
-1. **Si la Línea F se pareciera a la red actual**, sus 73.900 ascensos de hora pico implicarían del orden de **743.000 pasajeros diarios**, entre 2 y 3 veces la cifra anunciada de 270.000–300.000.
+1. **Si la Línea F se pareciera a la red actual**, sus 73.900 ascensos de hora pico implicarían del orden de **743.000 pasajeros diarios**, entre 2 y 3 veces la cifra anunciada de 270.000-300.000.
 2. **Si la cifra anunciada fuese correcta**, la Línea F tendría que concentrar cerca del 25 % de su demanda diaria en una hora: 2,5 veces la concentración de la red actual y 2,1 veces la de la línea más apuntada, la E.
 
 > **Las dos cifras no son conciliables entre sí.** Al menos una está mal, y el trabajo no puede decidir cuál con la información disponible.
 
 **Tres salvedades, que acotan el alcance sin cambiar la conclusión:**
 
-1. **Unidades.** Los molinetes miden ingresos a la red; los ascensos de SBASE incluyen además los transbordos desde las otras seis líneas de subte. Los ascensos son necesariamente más que los ingresos —en la red actual el 48,8 % de las etapas termina en una línea distinta de la de ascenso—, así que la cifra diaria implicada del punto 1 es una **cota superior**. La comparación de *concentración*, que es una proporción, no se ve afectada por el nivel.
+1. **Unidades.** Los molinetes miden ingresos a la red; los ascensos de SBASE incluyen además los transbordos desde las otras seis líneas de subte. Los ascensos son necesariamente más que los ingresos (en la red actual el 48,8 % de las etapas termina en una línea distinta de la de ascenso), así que la cifra diaria implicada del punto 1 es una **cota superior**. La comparación de *concentración*, que es una proporción, no se ve afectada por el nivel.
 2. **La hora pico de SBASE es la de la línea, no la de la red.** Una línea puede tener su pico desplazado respecto del pico agregado, lo que aumentaría su concentración propia. La sección 3.2 muestra que entre líneas la dispersión es chica: del 9,0 % al 12,0 %.
-3. **Los 270.000–300.000 no tienen fuente documental.** No aparecen en ninguna pieza del expediente ni de la licitación. Que no cierren contra el perfil de SBASE es una razón más para no usarlos como insumo, que es lo que el trabajo ya venía haciendo.
+3. **Los 270.000-300.000 no tienen fuente documental.** No aparecen en ninguna pieza del expediente ni de la licitación. Que no cierren contra el perfil de SBASE es una razón más para no usarlos como insumo, que es lo que el trabajo ya venía haciendo.
 
-## 4. Reparto por andén — el contraste que reserva D5
+## 4. Reparto por andén: el contraste que queda como reserva
 
 - Ingresos con sentido de circulación identificable: **145.556.349 de 206.458.952, o sea 70,5 %**. Reproduce el 70,5 % que midió el paso 1.
 - Estaciones con algún ingreso atribuible: **62 de 90**. Las 28 restantes no tienen el campo en ningún molinete.
 - De esas 62, cobertura mediana 98,6 %; 10 superan el 99 % y 1 quedan por debajo del 50 %.
 
-**El faltante no está repartido al azar**, y por eso D5 decidió modelar la demanda por estación: hay 28 estaciones enteras sin el dato. Lo que queda es un contraste **parcial y sesgado por construcción** del reparto entre andenes que produzca el modelo, útil solo donde el dato existe.
+**El faltante no está repartido al azar**, y por eso decidimos modelar la demanda por estación: hay 28 estaciones enteras sin el dato. Lo que queda es un contraste **parcial y sesgado por construcción** del reparto entre andenes que produzca el modelo, útil solo donde el dato existe.
 
 Las diez estaciones de mayor ingreso con cobertura por encima del 99 %:
 
@@ -210,4 +210,4 @@ Las diez estaciones de mayor ingreso con cobertura por encima del 99 %:
 - **El pendiente del viernes 08/08/2025 se cierra sin corrección** (sección 2.4): era un artefacto del conteo de filas, no un faltante de demanda.
 - **Aparece un día sin servicio** (sección 2.1): el 10/04/2025, verificado como paro general contra el dataset de despachos. Hay que declararlo y excluirlo.
 - **Los días atípicos quedaron verificados en el paso 4** contra el calendario `Tipo Día` del propio operador: 11 de 11 feriados hábiles detectados, 6 más corroborados como servicio de sábado, 4 sin datos de despachos y 4 sin explicación. Ver `reports/05_despachos.md`, sección 5.
-- **D4 queda en condiciones de decidirse**: la tabla diaria da los candidatos a ventana de ajuste y de validación, ambos posteriores a diciembre de 2024, sin días atípicos y con estacionalidad comparable.
+- **Ya se pueden elegir los períodos de ajuste y validación**: la tabla diaria da los candidatos a ventana de ajuste y de validación, ambos posteriores a diciembre de 2024, sin días atípicos y con estacionalidad comparable.

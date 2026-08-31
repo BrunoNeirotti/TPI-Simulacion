@@ -339,7 +339,7 @@ def escribir_reporte(nodos, tramos, transbordos, tramos_pm, transbordos_pm,
     L: list[str] = []
     w = L.append
 
-    w("# Paso 2 — Grafo de la red\n")
+    w("# Paso 2, Grafo de la red\n")
     w("Generado por `src/03_grafo_red.py`. Fuente: GTFS de Subte "
       "(`data/raw/gtfs/`). Salidas: `data/processed/grafo_nodos.csv` y "
       "`data/processed/grafo_aristas.csv`.\n")
@@ -378,7 +378,7 @@ def escribir_reporte(nodos, tramos, transbordos, tramos_pm, transbordos_pm,
     w(f"El feed declara **{det.min():.0f} s de detención en toda parada de toda "
       f"línea, sin una sola excepción** ({len(det)} tramos, desvío "
       f"{det.std():.1f}). No hay diferencia entre Constitución y Pasco, ni entre "
-      "hora pico y valle —el GTFS no tiene bandas horarias—, ni entre cabecera y "
+      "hora pico y valle (el GTFS no tiene bandas horarias), ni entre cabecera y "
       "estación intermedia.\n")
     w("> **Consecuencia.** Los 24 s son un **valor nominal de diseño del "
       "horario**, no una detención observada. Los teníamos anotados como tiempo de "
@@ -426,7 +426,7 @@ def escribir_reporte(nodos, tramos, transbordos, tramos_pm, transbordos_pm,
         w("La correlación de 0,010 dice que el sentido 1 de la E está "
           "**desacoplado de su propia geometría**: no es que las distancias "
           "estén mal y los tiempos bien, están mal las dos columnas. El total "
-          "sí cierra —11,71 km y 29 min 28 s en los dos sentidos—, así que el "
+          "sí cierra (11,71 km y 29 min 28 s en los dos sentidos), así que el "
           "defecto es de reparto interno y pasa desapercibido en cualquier "
           "control agregado.\n")
         peores = comparacion_e.assign(
@@ -451,10 +451,10 @@ def escribir_reporte(nodos, tramos, transbordos, tramos_pm, transbordos_pm,
     w(f"{len(transbordos)} aristas dirigidas construidas sobre "
       f"{int(transbordos.n_pares_anden.sum())} pares de andenes. El tiempo de "
       "nodo a nodo es la **mediana** de los pares de andén del complejo, porque "
-      "la demanda se modela por estación (decisión D5) y el andén de origen es "
+      "la demanda se modela por estación y el andén de origen es "
       "resultado de la asignación de ruta, no un dato de entrada. El mínimo y el "
       "máximo quedan en el CSV para el análisis de sensibilidad.\n")
-    w(f"Rango sobre pares de andén: {transbordos.t_min_s.min()}–"
+    w(f"Rango sobre pares de andén: {transbordos.t_min_s.min()}-"
       f"{transbordos.t_max_s.max()} s. Mediana de las medianas: "
       f"{transbordos.t_transbordo_s.median():.0f} s.\n")
     w("**Los tiempos son direccionales**, y la diferencia no es despreciable:\n")

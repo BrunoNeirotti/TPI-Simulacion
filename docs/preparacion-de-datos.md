@@ -1,4 +1,4 @@
-# Preparación de datos — bitácora
+# Preparación de datos: bitácora
 
 Documento de trabajo del pipeline de datos del TPI. Es aparte de `main.tex`: acá
 va el detalle técnico y los hallazgos de calidad de datos, y de acá se toma
@@ -66,7 +66,7 @@ Decodificar todo como UTF-8 corrompe las eñes y parte `Saenz Peña` en dos
 estaciones distintas, una de ellas con la mitad de la demanda.
 
 **c) La fecha mezcla `d/m/Y` y `m/d/Y`.** Los dos archivos de **agosto de 2025**
-—y solo esos— traen ambas convenciones conviviendo, para los mismos días:
+(y solo esos) traen ambas convenciones conviviendo, para los mismos días:
 881.538 filas en `d/m` y 443.923 en `m/d`. Es recuperable sin pérdida porque el
 mes lo fija el nombre del archivo: se verificó que **ningún registro de esos
 archivos cae fuera de agosto**, así que el día es el componente que no es 8. La
@@ -101,7 +101,7 @@ declara a mano en `src/lib_normalizacion.py`, con su justificación.
 2. **Sufijo de línea**: molinetes desambigua los complejos de combinación
    agregando la línea al nombre (`Callao.B` contra `Callao.D`, `Pueyrredon.B`
    contra `Pueyrredon.D`). Como el cruce ya se hace dentro de cada línea, el
-   sufijo se quita — y se reporta cuando no coincide con la línea del registro.
+   sufijo se quita, y se reporta cuando no coincide con la línea del registro.
 3. **Tabla de alias**: 12 equivalencias explícitas.
 
 Las 12 equivalencias se dividen en tres clases:
@@ -127,12 +127,12 @@ E`/`Retiro.E`. Si no se consolidan, la demanda de cada una queda partida en dos.
 
 ### 1.3 Salidas
 
-- `data/processed/tabla_maestra_estaciones.csv` — 90 filas: línea, `stop_id`,
+- `data/processed/tabla_maestra_estaciones.csv`: 90 filas: línea, `stop_id`,
   nombre GTFS, coordenadas, cantidad de andenes, nombres en molinetes,
   molinetes, registros y pasajeros 2025.
-- `data/processed/molinetes_inventario.csv` — 794 filas, un molinete por fila,
+- `data/processed/molinetes_inventario.csv` ( 794 filas, un molinete por fila,
   con su sentido normalizado y sus banderas de control.
-- `reports/01_tabla_maestra.md` — reporte de control completo.
+- `reports/01_tabla_maestra.md` ) reporte de control completo.
 
 ### 1.4 Hallazgo que afecta una decisión de modelado
 
@@ -153,12 +153,12 @@ caso mayoritario) y `Linea_Estacion_Zona_Sentido_Aparato` (ej.
 `LineaA_Miserere_Q_NE_Turn01`).
 
 **Consecuencia: casi el 30 % de la demanda no es atribuible a un andén.** El
-faltante no está repartido al azar: estaciones enteras —Alberti, Pasco, Los
-Incas— no tienen el campo. Modelar la demanda por andén exigiría inventar un
+faltante no está repartido al azar: estaciones enteras (Alberti, Pasco, Los
+Incas) no tienen el campo. Modelar la demanda por andén exigiría inventar un
 criterio de reparto para ese 30 %, que es exactamente el tipo de supuesto que el
 trabajo viene evitando.
 
-> **Decisión D5, tomada el 05/08/2026** (ver `contexto-del-proyecto.md`, sección 7). La demanda se
+> **Decisión tomada el 05/08/2026** (ver `contexto-del-proyecto.md`, sección 7). La demanda se
 > modela **a nivel de estación** y el reparto entre andenes queda como resultado
 > de la asignación de ruta. El 70,5 % con andén identificable se reserva como
 > **contraste independiente de ese reparto**, en las estaciones donde el dato
@@ -169,8 +169,8 @@ trabajo viene evitando.
 ### 1.5 Dos contrastes de consistencia que salieron bien
 
 **Reparto por línea contra el dataset O-D.** Son dos fuentes independientes
-—molinetes 2025 registra ingresos, el dataset de viajes y etapas del AMBA
-imputa etapas de un día de octubre de 2024— y coinciden en el ordenamiento y
+(molinetes 2025 registra ingresos, el dataset de viajes y etapas del AMBA
+imputa etapas de un día de octubre de 2024) y coinciden en el ordenamiento y
 muy de cerca en los pesos:
 
 | Línea | Molinetes 2025 | Etapas O-D 2024 |
@@ -194,7 +194,7 @@ el EsIA de la Línea F sobre el peso del nodo.
 
 - ~~Redescargar `viajes_anual.csv`.~~ **Cerrado el 05/08/2026: el recurso está
   discontinuado.** Se redescargó del dataset Subte: Estaciones y trae exactamente
-  lo mismo que la copia vieja: 48 filas, 2013–2020. La API del portal lo confirma:
+  lo mismo que la copia vieja: 48 filas, 2013-2020. La API del portal lo confirma:
   `last_modified = 2020-09-07`. El "Desde junio 2013" del título del recurso y la
   fecha de actualización que muestra la página web corresponden al **dataset**, no
   al archivo. **No volver a intentarlo.**
@@ -232,8 +232,8 @@ dos nodos unidos por una arista de 90/112 s, no un mismo lugar.
 
 El feed declara **exactamente 24 s de detencion en toda parada de toda linea**,
 sin una sola excepcion sobre 166 tramos, desvio 0,0. No distingue Constitucion de
-Pasco, ni cabecera de estacion intermedia, ni hora pico de valle —el GTFS no
-tiene bandas horarias.
+Pasco, ni cabecera de estacion intermedia, ni hora pico de valle, porque el GTFS
+no tiene bandas horarias.
 
 Los teniamos anotados como "tiempo de detencion (~24 s)" salido de
 `stop_times.txt`, y lo son, pero conviene precisar de que clase de dato se trata:
@@ -275,11 +275,11 @@ marcha y distancia, tramo a tramo:
 
 La correlacion de 0,010 dice que el sentido 1 de la E esta **desacoplado de su
 propia geometria**: estan mal las dos columnas, no una sola. El total si cierra
-—11,71 km y 29 min 28 s en ambos sentidos—, asi que el defecto es de reparto
+(11,71 km y 29 min 28 s en ambos sentidos), asi que el defecto es de reparto
 interno y **pasa desapercibido en cualquier control agregado**. En los peores
 tramos la diferencia llega a 61 s sobre 121 (San Jose-Independencia).
 
-> **Reparo aplicado, a confirmar (decision D6).** El sentido 1 de la E se
+> **Reparo aplicado, a confirmar.** El sentido 1 de la E se
 > reemplaza por el espejo del sentido 0, que es lo que hacen las otras cinco
 > lineas: de 81 tramos emparejados entre sentidos, 64 tienen diferencia exacta
 > cero y los 17 restantes son todos de la E. Interruptor `REPARAR_LINEA_E` en
@@ -288,7 +288,7 @@ tramos la diferencia llega a 61 s sobre 121 (San Jose-Independencia).
 ### 2.5 Los transbordos dejan de ser un parametro declarado
 
 28 aristas dirigidas sobre 104 pares de anden. El tiempo de nodo a nodo es la
-**mediana** de los pares de anden del complejo, coherente con D5: el anden de
+**mediana** de los pares de anden del complejo, coherente con modelar la demanda por estacion: el anden de
 origen es resultado de la asignacion de ruta, no dato de entrada. Minimo y maximo
 quedan en el CSV para sensibilidad.
 
@@ -299,7 +299,7 @@ Leandro N. Alem [B] con Correo Central [E] (58 s).
 
 ### 2.6 Pendientes que este paso deja abiertos
 
-- **Confirmar el reparo de la Linea E** (decision D6).
+- **Confirmar el reparo de la Linea E**.
 - **La detencion endogena** en el modelo, con 24 s de piso.
 - El GTFS tiene **un unico perfil de marcha nominal**. Si la marcha se degrada en
   hora pico, el grafo no lo sabe: lo tiene que producir el modelo. El paso 4
@@ -316,7 +316,7 @@ Leandro N. Alem [B] con Correo Central [E] (58 s).
 Paso 3 del plan, sobre molinetes 2025. **13.196.766 filas, 206.616.377
 pasajeros**, que cierra contra los 206,5 millones del paso 1. La lectura sigue
 siendo en streaming, pero todo se vuelca en una **matriz densa día × franja ×
-estación** de 366×96×90 enteros —unos 12 MB—, así que alcanza con una sola pasada
+estación** de 366×96×90 enteros (unos 12 MB), así que alcanza con una sola pasada
 y quedan disponibles los totales por día, por línea y por estación sin
 reprocesar.
 
@@ -341,7 +341,7 @@ primera versión del paso los promediaba y daba 687.125 pas./día en lugar de
 
 **66 pasajeros en todo el día y 31 de 90 estaciones con algún registro.** No es
 un día sin servicio: es un faltante del publicador. Queda excluido de todos los
-perfiles y **no se rellena** —interpolar demanda es inventar dato—, pero hay que
+perfiles y **no se rellena** (interpolar demanda es inventar dato), pero hay que
 declararlo.
 
 Es un defecto más de los no documentados del dataset, y se suma a los cinco que
@@ -366,8 +366,8 @@ Definición: día hábil por debajo del 80 % de la mediana de los hábiles del
 **mismo mes**. El criterio es intramensual porque la estacionalidad es fuerte;
 contra la mediana anual saldría enero entero.
 
-La forma de la lista es compatible con el calendario de feriados —1/1, 1/5,
-25/12, el 24 y el 31, los lunes de carnaval, los puentes— **pero compatible no es
+La forma de la lista es compatible con el calendario de feriados (1/1, 1/5,
+25/12, el 24 y el 31, los lunes de carnaval, los puentes) **pero compatible no es
 verificado**. El método detecta anomalías, no feriados: un paro o un corte de
 servicio aparece igual. **Es el único pendiente de verificación externa que este
 paso deja.** Los días atípicos quedan fuera del perfil de día hábil y no se
@@ -388,7 +388,7 @@ de antemano sería suponer el resultado.
 | Estación más apuntada (Catalinas [E]) | 30,0 %, con 4.646 ingresos/día |
 
 Para que los ≈73.900 ascensos de hora pico de SBASE fueran compatibles con los
-270.000–300.000 pasajeros diarios anunciados, la Línea F tendría que concentrar
+270.000-300.000 pasajeros diarios anunciados, la Línea F tendría que concentrar
 cerca del **25 %** de su demanda diaria en una hora. Dos lecturas del mismo
 hecho:
 
@@ -406,8 +406,8 @@ la Línea F según SBASE y hoy ya existe en la Línea C alimentada por el mismo
 ferrocarril Roca: recibe 57.010 ingresos diarios y concentra 17,5 % en hora pico,
 o sea unos 9.950 ingresos. SBASE proyecta **32.640 ascensos de hora pico en un
 solo sentido**, 3,3 veces eso y el 57,3 % de todo el ingreso diario actual de la
-estación. Los transbordos del ferrocarril **sí pasan por molinete** —son sistemas
-tarifarios distintos—, así que están contados: la comparación no subestima la
+estación. Los transbordos del ferrocarril **sí pasan por molinete** (son sistemas
+tarifarios distintos), así que están contados: la comparación no subestima la
 demanda ferroviaria.
 
 Salvedad de unidades, que acota sin cambiar la conclusión: los molinetes miden
@@ -423,7 +423,7 @@ el mismo número que midió el paso 1 por otra vía. Hay **62 estaciones de 90**
 algún ingreso atribuible; entre ellas la cobertura mediana es 98,6 %. Las 28
 restantes no tienen el campo en ningún molinete.
 
-Confirma la decisión D5: el faltante no está repartido al azar, son estaciones
+Confirma la decisión de modelar la demanda por estación: el faltante no está repartido al azar, son estaciones
 enteras. El contraste que queda es **parcial y sesgado por construcción**, útil
 solo donde el dato existe.
 
@@ -435,7 +435,7 @@ solo donde el dato existe.
   defectos del dataset.
 - **Llevar al documento el resultado de 3.5.** Es hallazgo propio y toca dos
   afirmaciones que el documento ya hace sobre la demanda de la Línea F.
-- **D4 queda en condiciones de decidirse**: la tabla diaria da los candidatos a
+- **Ya se pueden elegir los períodos de ajuste y validación**: la tabla diaria da los candidatos a
   ventana de ajuste y de validación.
 
 ---
@@ -448,9 +448,9 @@ solo donde el dato existe.
 
 ### 4.1 El recurso agregado del portal no sirve
 
-Teníamos anotado usar **«Formaciones despachadas - Total» (CSV,
-2015 a la actualidad, archivo único)** y que *«su historia desde 2015 es
-homogénea»*. **Las dos cosas son falsas**, verificado el 18/08/2026 sobre la copia
+Teníamos anotado usar **"Formaciones despachadas - Total" (CSV,
+2015 a la actualidad, archivo único)** y que *"su historia desde 2015 es
+homogénea"*. **Las dos cosas son falsas**, verificado el 18/08/2026 sobre la copia
 local y contra la API del portal:
 
 - El contenido **termina el 22/10/2021**; el metadato dice
@@ -468,15 +468,15 @@ Se descargaron `formaciones-despachadas-2025.csv` (45 MB) y
 
 El esquema anual es mejor que el del archivo Total: nombres legibles, causas en
 texto y una columna **`Tipo Día`** con los valores `Habil`, `Sabado`, `Domingo` y
-**`Feriado`** — el calendario operativo del propio operador.
+**`Feriado`**, el calendario operativo del propio operador.
 
 ### 4.2 Defectos de formato, resueltos en `lib_despachos.py`
 
 Cuatro, todos no documentados por el publicador. **Usar siempre la librería.**
 
 1. **Tres formatos de fecha en el archivo de 2025**: `d/m/aaaa` (75.535 filas),
-   `dd/mm/aa` (395.488) y vacío. Ninguno es ambiguo —el componente de día llega a
-   31 en los dos— pero el corte entre formatos **no es el mismo para todas las
+   `dd/mm/aa` (395.488) y vacío. Ninguno es ambiguo (el componente de día llega a
+   31 en los dos) pero el corte entre formatos **no es el mismo para todas las
    líneas** y hay dos pares (fecha, línea) presentes en los dos. Se verificó que
    no son duplicados sino partes distintas del mismo día: los números de orden no
    se solapan.
@@ -484,7 +484,7 @@ Cuatro, todos no documentados por el publicador. **Usar siempre la librería.**
    archivo es internamente consistente. Se prueba UTF-8 estricto y se cae a
    Latin-1.
 3. **24.696 filas completamente vacías** en 2025, en las veinte columnas.
-4. **Causas con relleno de espacios**: sin recortar, «Falta de custodia policial»
+4. **Causas con relleno de espacios**: sin recortar, "Falta de custodia policial"
    aparece como dos categorías distintas.
 
 ### 4.3 Intervalos en día hábil típico
@@ -493,7 +493,7 @@ Medidos **en cabecera**, sobre 663.709 intervalos de días hábiles completos, s
 despachos con causa. El intervalo que ve un pasajero en estación intermedia puede
 degradarse por acumulación: eso es salida del modelo, no entrada.
 
-| Línea | Pico (7–9 y 17–19) | Valle (11–15) | Trenes/h por sentido en pico |
+| Línea | Pico (7-9 y 17-19) | Valle (11-15) | Trenes/h por sentido en pico |
 |---|---:|---:|---:|
 | C | 3,15 min | 4,28 min | 19,0 |
 | A | 3,17 min | 3,82 min | 18,9 |
@@ -505,7 +505,7 @@ degradarse por acumulación: eso es salida del modelo, no entrada.
 **Contraste con la Línea F.** El EsIA le fija un headway de **1,5 min, 40 trenes
 por sentido y hora**. La mejor línea actual en hora pico es la C con 3,15 min:
 **el diseño de la F supone despachar 2,1 veces más seguido que lo que hoy logra
-la mejor línea de la red**. No es imposible —línea nueva, señalamiento nuevo— pero
+la mejor línea de la red**. No es imposible (línea nueva, señalamiento nuevo) pero
 es un supuesto fuerte del escenario futuro y **va como variable de escenario, no
 como dato**. El documento ya declara 1,5 min como cota superior; esto le da la
 magnitud.
@@ -520,12 +520,12 @@ obra de modernización (1.631).
 > **Trampa metodológica que conviene no repetir.** La primera versión de este paso
 > filtraba los servicios no prestados antes de mirar las causas. El resultado era
 > que las causas visibles eran las de los servicios **que sí se hicieron**, y un
-> paro —que por definición cancela— desaparecía: la tabla mostraba 12 despachos
+> paro (que por definición cancela) desaparecía: la tabla mostraba 12 despachos
 > gremiales en lugar de 5.060.
 
 Las causas gremiales explican **5.060 servicios cancelados en 100 días**, el
 25,2 % de todo el servicio no prestado del año. **Esos días no pueden entrar en
-las ventanas de ajuste ni de validación** (D4).
+las ventanas de ajuste ni de validación**.
 
 ### 4.5 Marzo de 2025 no está
 
@@ -533,7 +533,7 @@ Faltan 30 de sus 31 días de despachos; solo sobrevive el 08/03. **Es un faltant
 del publicador, no un mes sin servicio**: los molinetes registran demanda normal
 en todo marzo (media de 710.875 pas./día en los hábiles no atípicos, razón 1,011
 contra su propia mediana mensual), así que los trenes circularon. Marzo queda
-fuera de cualquier ventana de D4 y deja sin verificar los cuatro días atípicos que
+fuera de cualquier ventana de ajuste o validación y deja sin verificar los cuatro días atípicos que
 el paso 3 detectó ahí.
 
 ### 4.6 Dos correcciones cruzadas entre pasos
@@ -550,14 +550,14 @@ con servicio declarado normal (01/08, 26/12, 29/12, 30/12).
 clasificado como hueco de datos del publicador, con 66 pasajeros y 31 de 90
 estaciones. **No lo era: fue un paro general.** Ese día hay 3.122 servicios
 programados y **ninguno prestado**, todos con causa *Huelga / Paro General*. Dos
-fuentes independientes que coinciden. El tratamiento no cambia —se excluye por no
-ser representativo— pero la caracterización pasó de supuesta a verificada.
+fuentes independientes que coinciden. El tratamiento no cambia (se excluye por no
+ser representativo) pero la caracterización pasó de supuesta a verificada.
 
 ### 4.7 Coches por formación
 
 Insumo directo de la capacidad del modelo: A y C y E despachan 5 coches (C y E con
-algún 6), y B, D y H despachan 6. La capacidad por coche no sale de acá —depende
-del modelo de material rodante— pero la cantidad sí.
+algún 6), y B, D y H despachan 6. La capacidad por coche no sale de acá (depende
+del modelo de material rodante) pero la cantidad sí.
 
 ### 4.8 Pendientes que este paso deja abiertos
 
@@ -568,7 +568,7 @@ del modelo de material rodante— pero la cantidad sí.
   despachos, no tiempos de recorrido; el GTFS da un perfil de marcha nominal
   único. El contraste completo necesita el modelo.
 - Está descargado 2026 hasta el 30/06 y sin usar: sirve como segunda ventana si
-  D4 la necesita.
+  la elección de períodos la necesita.
 
 
 ---
@@ -597,10 +597,10 @@ cercanía: Correo Central [E], Corrientes [H] y Santa Fe [H] no aparecen nunca, 
 transbordos del paso 2; las estaciones que se confunden son exactamente las que
 el complejo agrupa. Y es la unidad correcta desde el modelo: el pasajero entra y
 sale de un lugar físico, y por qué línea circula es resultado de la asignación
-de ruta. Es el mismo criterio de D5 sobre andenes.
+de ruta. Es el mismo criterio que usamos con los andenes.
 
 Los 89 centroides h3 se asignan al complejo del **nodo más cercano**. Mediana
-47 m, máximo 183 m, y —el control que importa— **margen mínimo de 89 m** contra
+47 m, máximo 183 m, y (el control que importa) **margen mínimo de 89 m** contra
 el complejo distinto más próximo.
 
 > **Detalle que no es cosmético.** Matchear contra el centroide promedio del
@@ -623,7 +623,7 @@ sale de otro organismo y otra metodología.
 Aun así la línea de ascenso **no entra como insumo del modelo**: fijarla sería
 fijar parte de la ruta, que es lo que la simulación tiene que producir. Queda
 como contraste del reparto por línea que produzca el modelo, en paralelo exacto
-con el contraste por andén de D5.
+con el contraste por andén.
 
 ### 5.3 El contraste se hace contra el mismo día, no contra 2025
 
@@ -661,7 +661,7 @@ Federico Lacroze 1,066, contra 1,015 de las estaciones simples. Concentran el
 17,5 % de los ingresos del día.
 
 Eso explica el único desvío de línea de la sección 4.1 del reporte: la **Línea C
-con 1,263** contra 1,005–1,031 de las otras cinco. **El escalado por línea es,
+con 1,263** contra 1,005-1,031 de las otras cinco. **El escalado por línea es,
 en realidad, el escalado de los nodos ferroviarios visto de lejos.**
 
 Es consistente con que el dataset reconstruya el viaje desde la transacción SUBE
@@ -672,11 +672,11 @@ en la Línea C combinan con el ferrocarril.
 
 ### 5.6 Pendientes que este paso deja abiertos
 
-- **D2 queda en condiciones de decidirse**, con la evidencia de la sección 5 del
+- **Ya se puede decidir cuál es la matriz del modelo**, con la evidencia de la sección 5 del
   reporte. Lo que el paso resuelve: el escalado **por franja horaria queda
   descartado** (factor entre 1,035 y 1,082 de 6 a 22 h, sin forma sistemática).
   Lo que no resuelve: si corregir por categoría de nodo o por complejo.
-- **D1 queda en condiciones de decidirse midiendo**: `matriz_od.csv` trae
+- **Lo de las etapas incompletas se puede decidir midiendo**: `matriz_od.csv` trae
   `expandidas` y `expandidas_completas` en columnas separadas. Las
   `viaje_incompleto` son 24.057 etapas (4,1 %) que expanden a 30.491 (4,1 %).
 - **Qué hacer con el par San Pedrito / San José de Flores.** Es defecto conocido
@@ -703,14 +703,14 @@ con uno, 30,5 % con dos. Media 1,08.
 
 Es el detalle que decide la corrección del costo. `t_s` del GTFS es marcha pura y
 la detención de 24 s es columna aparte. El que asciende no espera la detención de
-su estación de ascenso —esa es su ventana de abordaje— y el que desciende tampoco
+su estación de ascenso (esa es su ventana de abordaje) y el que desciende tampoco
 espera la de la suya. **Contarlas por tramo abarataría en términos relativos los
 caminos con muchas paradas**, que es justo el error que un grafo de subte no puede
 darse.
 
 Se implementa cargándole la detención a la arista de tramo y descontándosela a la
 de transbordo. Para un camino cualquiera eso da el tiempo real más 24 s exactos
-—la detención de la estación de descenso final—, que es **la misma constante para
+(la detención de la estación de descenso final), que es **la misma constante para
 todo camino** y por lo tanto no altera el ordenamiento. Los pesos quedan todos
 positivos porque el `min_transfer_time` más chico de la red es 58 s.
 
@@ -732,7 +732,7 @@ El valor base de **120 s** sale de los despachos del paso 4: en hora pico los
 intervalos van de 3,15 min (C) a 5,22 min (E), así que la espera esperada cae entre
 95 y 157 s. Recorriendo de 0 a 300 s, los transbordos medios por camino van de 1,166
 a 1,041 y cambian de camino hasta 495 pares (8,2 %) en el extremo. Es la decisión
-**D9**.
+**la penalización por transbordo**.
 
 ### 6.4 El contraste del reparto por línea, contra dos fuentes
 
@@ -760,13 +760,13 @@ hubiera usado, el defecto entraba directo a la entrada del modelo.
 
 ### 6.5 Retiro: la única discrepancia real, con dos hipótesis descartadas
 
-Las dos fuentes coinciden —85,5 % por la C en molinetes, 83,9 % en `linea_etapa`—
+Las dos fuentes coinciden (85,5 % por la C en molinetes, 83,9 % en `linea_etapa`)
 y la ruta predice 69,8 %. Se probaron dos explicaciones y las dos fallaron:
 
-1. **El reparo de la Línea E (D6).** Se regeneró el grafo con `REPARAR_LINEA_E =
+1. **El reparo de la Línea E.** Se regeneró el grafo con `REPARAR_LINEA_E =
    False`, con respaldo y verificación de restauración byte a byte. Cambian **58
    pares de 6.006 (1,0 %)** y 18 cambian de línea de ascenso; **el reparto de Retiro
-   no se mueve**. Dato útil para D6 por sí solo: el reparo importa poco para la
+   no se mueve**. Dato útil por sí solo: el reparo importa poco para la
    asignación.
 2. **Penalización uniforme que no distingue frecuencias.** Se probó reemplazarla por
    la espera esperada de cada línea (mitad del intervalo de hora pico del paso 4: A y
@@ -780,11 +780,11 @@ ruta contra una fuente cuyo sesgo apunta justo en esa dirección.
 
 ### 6.6 Pendientes que este paso deja abiertos
 
-- **D9**: valor de la penalización y aceptación de la asignación todo-o-nada.
+- **Penalización por transbordo**: su valor y la aceptación de la asignación todo-o-nada.
 - La asignación es **todo-o-nada**: cada par manda todo su flujo por un camino.
   Está medido cuánto pesa: **50 pares** tienen una alternativa por otra línea a menos
   de 60 s, que es 0,8 % del total pero **6,5 % de los 770 pares que realmente tienen
-  elección** —en los otros 5.236 el complejo de origen tiene una sola línea—. Sigue
+  elección** (en los otros 5.236 el complejo de origen tiene una sola línea). Sigue
   siendo una simplificación declarada.
 - **La discrepancia de Retiro** queda abierta y declarada.
 - El paso 6 es **verificación, no validación**: comprueba una tabla precalculada
@@ -812,8 +812,8 @@ no se pueden volver a descargar.
 ### 7.2 Dos mapas de identificador que no son el mismo
 
 Los dos libros numeran las 90 estaciones de 1 a 90. **Coinciden hasta el id 75 y
-difieren en los quince últimos**: la matriz O-D ubica la cola de la Línea E —Correo
-Central, Catalinas, Retiro E— al final de todo, después de la Línea H, y el perfil de
+difieren en los quince últimos**: la matriz O-D ubica la cola de la Línea E (Correo
+Central, Catalinas, Retiro E) al final de todo, después de la Línea H, y el perfil de
 carga la ubica antes. Usar el mapa de un libro con los datos del otro corre quince
 estaciones y **no produce ningún error**: los totales cierran igual y el defecto solo
 se ve mirando qué estación quedó dónde. `lib_sbase` tiene un lector de ids por libro y
@@ -861,8 +861,8 @@ cabecera** que encabeza cada bloque.
 
 ### 7.6 Lo que este paso deja abierto
 
-- **D2 se reformula**: hay dos matrices y hay que decidir cuál es la del modelo.
-- **D9 gana función objetivo**: recorrer la penalización midiendo el error de carga.
+- **La pregunta por la matriz se reformula**: hay dos matrices y hay que decidir cuál es la del modelo.
+- **La penalización gana función objetivo**: recorrer la penalización midiendo el error de carga.
 - **La discrepancia de Retiro deja de ser una discrepancia entre fuentes** y pasa a
   ser un error del modelo, con tres fuentes coincidiendo en contra.
 - Los perfiles son **solo de hora pico**; el resto del día de servicio sigue sin
@@ -897,10 +897,10 @@ Se conservan los **120 s** del paso 6, ahora por una razón medida y no por defe
 
 `src/11_demanda_modelo.py`; reporte en `reports/11_demanda_modelo.md`; salidas
 `demanda_modelo_od_hora.csv` y `demanda_modelo_intrahorario.csv`. Implementa la
-decisión D2.
+decisión sobre la matriz del modelo.
 
 Cuatro piezas, cada una de la fuente que mejor la mide: el **nivel y la distribución
-espacial** de la matriz diaria de SBASE; las **horas 8–9 y 17–18** ancladas a las
+espacial** de la matriz diaria de SBASE; las **horas 8-9 y 17-18** ancladas a las
 matrices de hora pico de SBASE sin modificarlas; el **resto del día** desagregado con el
 perfil horario por par del paso 5, reescalado para que el total del par cierre; y los
 **bloques de 15 minutos** desde molinetes, que entran solo como forma.

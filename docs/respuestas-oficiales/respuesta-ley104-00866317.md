@@ -22,23 +22,23 @@ Copia local de los tres PDF en este mismo directorio.
 
 ---
 
-## 1. SBASE — matriz origen-destino de la red y perfiles de carga
+## 1. SBASE: matriz origen-destino de la red y perfiles de carga
 
 Firmado por German Bussi, Gerente. Es la pieza que cierra el hueco más grande
 del trabajo.
 
 ### 1.1 Qué entregó
 
-**`matrices-od-sbase-emova-2024.xlsx`** — matriz origen-destino de **90 × 90
+**`matrices-od-sbase-emova-2024.xlsx`**, matriz origen-destino de **90 × 90
 estaciones**, en tres hojas:
 
 | Hoja | Período | Pares con flujo | Viajes |
 |---|---|---:|---:|
 | `Diaria` | día hábil representativo | 7.699 de 8.010 | 827.976 |
-| `HPM` | hora pico mañana, 8–9 h | 4.812 | 74.351 |
-| `HPT` | hora pico tarde, 17–18 h | 5.868 | 80.197 |
+| `HPM` | hora pico mañana, 8-9 h | 4.812 | 74.351 |
+| `HPT` | hora pico tarde, 17-18 h | 5.868 | 80.197 |
 
-**`perfil-carga-2024-lineas-actuales.xlsx`** — por cada una de las seis líneas,
+**`perfil-carga-2024-lineas-actuales.xlsx`**, por cada una de las seis líneas,
 los dos sentidos y las dos horas pico: **suben, bajan y pasajeros a bordo** en
 el tramo que sale de cada estación. 360 filas.
 
@@ -59,7 +59,7 @@ el tramo que sale de cada estación. 360 filas.
 
 > **Esto confirma, desde la fuente, la decisión de fondo del paso 5.** La matriz
 > del trabajo se construyó sobre el 16/10/2024 justamente para no cruzar la
-> apertura de medios de pago. SBASE eligió septiembre–octubre de 2024 por la
+> apertura de medios de pago. SBASE eligió septiembre-octubre de 2024 por la
 > misma razón y con las mismas palabras.
 
 ### 1.3 La trampa de los dos mapas de identificador
@@ -80,7 +80,7 @@ declarado a mano en la tabla `ALIAS` de `lib_sbase.py`, sin comparación difusa.
 
 ---
 
-## 2. MMIGC — parámetros y trazado de la Línea F
+## 2. MMIGC: parámetros y trazado de la Línea F
 
 Firmado por Sergio Fernando Sour, Asesor Técnico. Referencia
 `RE-2026-35400191-GCABA-DGAIGA`.
@@ -89,17 +89,17 @@ Firmado por Sergio Fernando Sour, Asesor Técnico. Referencia
 
 | Tramo | Metros | Progresiva acumulada |
 |---|---:|---:|
-| Brandsen – Constitución | 1.300 | 1.300 |
-| Constitución – Cochabamba | 1.500 | 2.800 |
-| Cochabamba – Chile | 700 | 3.500 |
-| Chile – Congreso | 800 | 4.300 |
-| Congreso – Corrientes | 600 | 4.900 |
-| Corrientes – Pizzurno | 600 | 5.500 |
-| Pizzurno – Junín | 800 | 6.300 |
-| Junín – Pueyrredón | 700 | 7.000 |
-| Pueyrredón – Parque Las Heras | 1.000 | 8.000 |
-| Parque Las Heras – Ecoparque | 1.000 | 9.000 |
-| Ecoparque – Palermo / Pacífico | 800 | **9.800** |
+| Brandsen - Constitución | 1.300 | 1.300 |
+| Constitución - Cochabamba | 1.500 | 2.800 |
+| Cochabamba - Chile | 700 | 3.500 |
+| Chile - Congreso | 800 | 4.300 |
+| Congreso - Corrientes | 600 | 4.900 |
+| Corrientes - Pizzurno | 600 | 5.500 |
+| Pizzurno - Junín | 800 | 6.300 |
+| Junín - Pueyrredón | 700 | 7.000 |
+| Pueyrredón - Parque Las Heras | 1.000 | 8.000 |
+| Parque Las Heras - Ecoparque | 1.000 | 9.000 |
+| Ecoparque - Palermo / Pacífico | 800 | **9.800** |
 
 **La suma da 9.800 m exactos**, que es la longitud de línea comercial del
 pliego. Cierra la cuestión de las tres longitudes: 9,8 km es la línea, 10,9 km
@@ -150,7 +150,7 @@ esta respuesta es sobre **habilitación al servicio**: se construye por tramos,
 se abre de una sola vez.
 
 > **Afecta al documento.** `docs/definitivo-main.tex`, en Resultados esperados,
-> habla del *"primer tramo"* Brandsen–Pizzurno como un escenario. Con esta
+> habla del *"primer tramo"* Brandsen-Pizzurno como un escenario. Con esta
 > respuesta ese escenario deja de tener sentido operativo: no va a haber
 > servicio parcial. Hay que decidir si se quita, si se reformula como análisis
 > de sensibilidad sobre la traza, o si se mantiene declarando esta cita.
@@ -168,7 +168,7 @@ existen.
 
 ---
 
-## 3. DGDPM — estudio de demanda y escenarios con y sin proyecto
+## 3. DGDPM: estudio de demanda y escenarios con y sin proyecto
 
 Firmado por Martín Álvarez del Rivero, Director General. Es el apartado que
 menos se contestó.
@@ -182,9 +182,9 @@ menos se contestó.
   andenes**, no demanda de viajes (ver `docs/pliego-licitacion-linea-f.md`,
   sección 7).
 - **Describe el análisis comparativo, pero sin una sola cifra.** Declara tres
-  niveles de análisis —área de influencia de las estaciones proyectadas, red de
+  niveles de análisis (área de influencia de las estaciones proyectadas, red de
   subtes (derivación de etapas actuales y etapas nuevas sin cobertura previa) y
-  la futura extensión del FFCC Belgrano Sur hasta Constitución— y dice que la
+  la futura extensión del FFCC Belgrano Sur hasta Constitución) y dice que la
   comparación se hizo *"a partir de la situación actual y extrapolados al año
   2019, tomado como referencia por tratarse de un período previo a la pandemia
   con un mayor nivel de demanda"*.
@@ -231,7 +231,7 @@ menos se contestó.
 `borrador-reclamo-ogdai.md` estaba pensado para cubrir las dos solicitudes con
 un solo reclamo. Ya no corresponde en esos términos: esta solicitud se contestó
 sustantivamente. Lo que queda es un reclamo mucho más chico y mejor fundado,
-acotado a los apartados 3 y 4 —el estudio de demanda y los resultados numéricos
-de los escenarios—, y con un argumento nuevo: la propia DGDPM describe un
+acotado a los apartados 3 y 4 (el estudio de demanda y los resultados numéricos
+de los escenarios), y con un argumento nuevo: la propia DGDPM describe un
 análisis comparativo que hizo y cuyos valores no entrega. **Es una decisión del
 grupo, no una tarea automática.**

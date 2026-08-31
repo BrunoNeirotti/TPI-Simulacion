@@ -170,25 +170,25 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
     w = L.append
     cab = cabeceras().set_index("linea")
 
-    w("# Paso 4 — Intervalos entre despachos\n")
+    w("# Paso 4, Intervalos entre despachos\n")
     w("Generado por `src/05_despachos.py` sobre "
       f"`data/raw/formaciones-despachadas-{ANIO}.csv`, leído con "
       "`src/lib_despachos.py`. Salidas: `intervalos_despacho.csv` y "
       "`despachos_diario.csv` en `data/processed/`.\n")
 
     w("## 1. El recurso agregado del portal no sirve\n")
-    w("Teníamos anotado usar el recurso **«Formaciones "
-      "despachadas - Total» (CSV, 2015 a la actualidad, archivo único)** y "
-      "que *«su historia desde 2015 es homogénea»*. **Las dos cosas son "
+    w("Teníamos anotado usar el recurso **\"Formaciones "
+      "despachadas - Total\" (CSV, 2015 a la actualidad, archivo único)** y "
+      "que *\"su historia desde 2015 es homogénea\"*. **Las dos cosas son "
       "falsas.** Verificado sobre la copia local y contra la API del portal el "
       "18/08/2026:\n")
     w("| Afirmación | Qué se verificó |")
     w("|---|---|")
-    w("| «2015 a la actualidad» | El contenido **termina el 22/10/2021**. El "
+    w("| \"2015 a la actualidad\" | El contenido **termina el 22/10/2021**. El "
       "metadato del recurso dice `last_modified = 2019-06-04`. |")
-    w("| «archivo único» | El dataset publica además **un recurso por año**, "
+    w("| \"archivo único\" | El dataset publica además **un recurso por año**, "
       "incluidos 2025 y 2026. |")
-    w("| «historia homogénea desde 2015» | Faltan **2016, 2017 y 2018 enteros**, "
+    w("| \"historia homogénea desde 2015\" | Faltan **2016, 2017 y 2018 enteros**, "
       "y de 2015 hay 6 días. |")
     w("")
     w("Es el mismo patrón que `viajes_anual.csv`: un recurso agregado que quedó "
@@ -220,7 +220,7 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
           "servicio**: los molinetes registran demanda normal en todo marzo, "
           "así que los trenes circularon y lo que falta es el registro de "
           "oferta. **Marzo queda fuera de cualquier ventana de ajuste o "
-          "validación** (decisión D4), y deja sin verificar los cuatro días "
+          "validación**, y deja sin verificar los cuatro días "
           "atípicos que el paso 3 detectó en ese mes.\n")
     n_parc = int(por_dia.parcial.sum())
     w(f"- Pares (línea, día) con datos parciales, por debajo del "
@@ -239,8 +239,8 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
           "molinetes con 66 pasajeros y 31 de 90 estaciones con dato, y lo "
           "clasificó como **hueco de datos del publicador**. No lo es: fue un "
           "**paro general, un día sin servicio**. Las dos fuentes son "
-          "independientes y coinciden. El tratamiento no cambia —el día se "
-          "excluye de todos los perfiles por no ser representativo— pero la "
+          "independientes y coinciden. El tratamiento no cambia (el día se "
+          "excluye de todos los perfiles por no ser representativo) pero la "
           "caracterización sí, y ahora está verificada en lugar de supuesta. "
           "Ver `reports/04_demanda.md`, sección 2.1.\n")
 
@@ -255,7 +255,7 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
     pico = tipicos[tipicos.hora.isin([7, 8, 17, 18])]
     valle = tipicos[tipicos.hora.isin([11, 12, 13, 14])]
     w("### 3.1 Por línea\n")
-    w("| Línea | Cabeceras | Pico (7–9 y 17–19) | Valle (11–15) | Trenes/h en pico |")
+    w("| Línea | Cabeceras | Pico (7-9 y 17-19) | Valle (11-15) | Trenes/h en pico |")
     w("|---|---|---:|---:|---:|")
     for l in LINEAS:
         p = pico[pico.linea == l].intervalo_s
@@ -281,7 +281,7 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
         celdas = []
         for l in LINEAS:
             v = perfil.loc[h, l] if l in perfil.columns else np.nan
-            celdas.append(num(v, 2) if pd.notna(v) else "—")
+            celdas.append(num(v, 2) if pd.notna(v) else "-")
         w(f"| {h:02d} | " + " | ".join(celdas) + " |")
     w("")
 
@@ -300,7 +300,7 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
       "hora y sentido.\n")
     w(f"> El diseño de la Línea F supone despachar **{num(mejor[1] / HEADWAY_F_S, 1)} "
       "veces más seguido que lo que hoy logra la mejor línea de la red**. No es "
-      "imposible —es una línea nueva, con señalamiento nuevo— pero **es un "
+      "imposible (es una línea nueva, con señalamiento nuevo) pero **es un "
       "supuesto fuerte del escenario futuro y hay que tratarlo como variable de "
       "escenario, no como dato**. El documento ya declara 1,5 min como cota "
       "superior de frecuencia; este contraste le da la magnitud.\n")
@@ -313,7 +313,7 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
       "registrada, así que la trazabilidad es prácticamente total.\n")
     w("> La distinción importa y es fácil de perder: si se filtran de entrada "
       "los servicios no prestados, **las causas que se ven son las de los "
-      "servicios que sí se hicieron**, y un paro —que por definición cancela— "
+      "servicios que sí se hicieron**, y un paro (que por definición cancela) "
       "desaparece del análisis. Acá se cuentan los no prestados.\n")
     w("| Causa | Servicios no prestados |")
     w("|---|---:|")
@@ -338,12 +338,12 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
             w(f"| {f} | {es(n)} | {tipos.get(f, '')} |")
         w("")
         w("**Estos días no pueden entrar en las ventanas de ajuste ni de "
-          "validación** (decisión D4): la oferta está afectada y la demanda "
+          "validación**: la oferta está afectada y la demanda "
           "medida en molinetes también, por razones que el modelo no representa.\n")
     con_causa = inter[inter.causa != ""]
     w(f"Aparte, {es(len(con_causa))} de los {es(len(inter))} intervalos entre "
       f"despachos **sí prestados** ({pc(len(con_causa) / len(inter))}) tienen "
-      "una causa cargada —demoras y anomalías que no impidieron el viaje—. "
+      "una causa cargada (demoras y anomalías que no impidieron el viaje). "
       "También se excluyen del cálculo de intervalos típicos.\n")
 
     w("## 5. El calendario del operador valida el paso 3\n")
@@ -361,7 +361,7 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
     w(f"- SBASE declara **{len(feriados)} feriados** en {ANIO}, de los cuales "
       f"**{len(fer_habiles)} caen en día hábil**.")
     w(f"- El método del paso 3 detectó **{len(aciertos)} de esos {len(fer_habiles)}**"
-      f"{' —todos—' if len(aciertos) == len(fer_habiles) else ''}, sin conocer "
+      f"{' (todos)' if len(aciertos) == len(fer_habiles) else ''}, sin conocer "
       "el calendario.\n")
     resto = sorted(atipicos - set(feriados))
     sin_dato = [f for f in resto if f not in cal.index]
@@ -381,8 +381,8 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
     w("> **El criterio del paso 3 queda validado**: recall de "
       f"{pc(len(aciertos) / len(fer_habiles), 0)} sobre los feriados hábiles, y "
       f"{len(sabado)} detecciones más que el propio operador corrobora como días "
-      "de servicio reducido. Sigue sin ser un clasificador de feriados —no lo "
-      "pretende— pero como detector de días no representativos funciona.\n")
+      "de servicio reducido. Sigue sin ser un clasificador de feriados (no lo "
+      "pretende) pero como detector de días no representativos funciona.\n")
 
     w("## 6. Coches por formación\n")
     coches = (
@@ -397,14 +397,14 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
         w(f"| {l} | {num(r.mediana, 0)} | {num(r.media, 2)} | {num(r.minimo, 0)} | "
           f"{num(r.maximo, 0)} |")
     w("")
-    w("La capacidad por formación no sale de acá —depende del modelo de coche— "
+    w("La capacidad por formación no sale de acá (depende del modelo de coche) "
       "pero la cantidad de coches sí, y varía dentro de una misma línea.\n")
 
     w("## 7. Qué queda de esto\n")
-    w("- **Corregido en `docs/contexto-del-proyecto.md`, sección 4**: el recurso «Total» "
+    w("- **Corregido en `docs/contexto-del-proyecto.md`, sección 4**: el recurso \"Total\" "
       "está congelado y la historia no es homogénea desde 2015 (sección 1).")
     w("- **Marzo de 2025 no existe en este dataset** (sección 2). Condiciona "
-      "D4: ninguna ventana de ajuste o validación puede tocar marzo.")
+      "la elección de períodos: ninguna ventana de ajuste o validación puede tocar marzo.")
     w("- **El headway de 1,5 min de la Línea F es un supuesto fuerte** "
       "(sección 3.3), no un dato: exige despachar bastante más seguido que la "
       "mejor línea actual. Va como variable de escenario.")

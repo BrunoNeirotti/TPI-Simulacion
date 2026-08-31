@@ -13,7 +13,7 @@ desaparece**, porque las estaciones que se confunden son justamente las que el
 complejo agrupa. El complejo es ademas la unidad correcta desde el modelo: el
 pasajero entra y sale de un lugar fisico, y por que linea circula es resultado
 de la asignacion de ruta, no dato de entrada. Es el mismo criterio de la
-decision D5 sobre andenes.
+el mismo criterio que usamos con los andenes.
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-# Paso 5 — Matriz origen-destino
+# Paso 5: Matriz origen-destino
 
 Generado por `src/06_matriz_od.py`. Dia relevado: **16/10/2024**, un miercoles habil. Fuente: `etapas_BAdata_20241016.csv` (Viajes y Etapas del AMBA), contrastada contra `molinetes-2024.zip` del mismo dia.
 
@@ -6,7 +6,7 @@ Generado por `src/06_matriz_od.py`. Dia relevado: **16/10/2024**, un miercoles h
 
 La red tiene **90 nodos** (par linea-estacion) agrupados en **78 complejos** de estacion, definidos como las componentes conexas del grafo de transbordos del paso 2. Diez complejos tienen mas de un nodo.
 
-Teniamos registrado como residuo de ambiguedad que las estaciones superpuestas de un mismo complejo se confunden al matchear por cercania: Correo Central [E], Corrientes [H] y Santa Fe [H] no aparecen nunca, y 9 de Julio [D], Diagonal Norte [C] e Independencia [C] no aparecen como origen. **Al nivel del complejo el problema no existe**, porque las estaciones que se confunden son exactamente las que el complejo agrupa. Es ademas la unidad correcta desde el modelo: el pasajero entra y sale de un lugar fisico, y por que linea circula es resultado de la asignacion de ruta, no dato de entrada. Mismo criterio que la decision D5 sobre andenes.
+Teniamos registrado como residuo de ambiguedad que las estaciones superpuestas de un mismo complejo se confunden al matchear por cercania: Correo Central [E], Corrientes [H] y Santa Fe [H] no aparecen nunca, y 9 de Julio [D], Diagonal Norte [C] e Independencia [C] no aparecen como origen. **Al nivel del complejo el problema no existe**, porque las estaciones que se confunden son exactamente las que el complejo agrupa. Es ademas la unidad correcta desde el modelo: el pasajero entra y sale de un lugar fisico, y por que linea circula es resultado de la asignacion de ruta, no dato de entrada. Mismo criterio que usamos con los andenes.
 
 ### 1.1 El matcheo es univoco
 
@@ -29,7 +29,7 @@ El campo `linea_etapa` es la linea del molinete que registro la transaccion: dat
 
 Dos consecuencias. Primera, el nodo de origen queda **completamente determinado** por el par (complejo, linea de ascenso): la ambiguedad de origen que dabamos por abierta esta resuelta. Segunda, es una **validacion independiente de la definicion de complejo**, que sale del GTFS, contra una georreferenciacion que sale de otro organismo y otra metodologia.
 
-Aun asi la linea de ascenso **no entra como insumo del modelo**. Fijarla seria fijar parte de la ruta, que es justamente lo que la simulacion tiene que producir. Queda como **contraste del reparto por linea que produzca el modelo**, en paralelo exacto con el contraste por anden de D5.
+Aun asi la linea de ascenso **no entra como insumo del modelo**. Fijarla seria fijar parte de la ruta, que es justamente lo que la simulacion tiene que producir. Queda como **contraste del reparto por linea que produzca el modelo**, en paralelo exacto con el contraste por anden.
 
 ## 2. Que se descarta
 
@@ -39,13 +39,13 @@ Aun asi la linea de ascenso **no entra como insumo del modelo**. Fijarla seria f
 | Origen y destino en el mismo complejo | 84 | 0,014 % |
 | **Utiles para la matriz** | **587.896** | **99,986 %** |
 
-Las 84 etapas intracomplejo no son viajes de subte: son pares de estaciones a distancia de caminata dentro de la misma combinacion. Al nivel de estacion el dataset no tenia ninguna etapa con origen igual a destino; al nivel de complejo aparecen estas, que es el precio —minimo— de agrupar. Se descartan.
+Las 84 etapas intracomplejo no son viajes de subte: son pares de estaciones a distancia de caminata dentro de la misma combinacion. Al nivel de estacion el dataset no tenia ninguna etapa con origen igual a destino; al nivel de complejo aparecen estas, que es el precio (minimo) de agrupar. Se descartan.
 
-### 2.1 D1: el `viaje_incompleto` no mueve la matriz
+### 2.1 Las etapas incompletas no mueven la matriz
 
 Las etapas marcadas `viaje_incompleto = t` son **24.057** (4,1 %) y expanden a **30.491** (4,1 % del total expandido).
 
-`matriz_od.csv` trae las dos versiones en columnas separadas, `expandidas` y `expandidas_completas`, para que **D1 se decida midiendo y no discutiendo**.
+`matriz_od.csv` trae las dos versiones en columnas separadas, `expandidas` y `expandidas_completas`, para que **se decida midiendo y no discutiendo**.
 
 ## 3. La matriz
 
@@ -69,13 +69,13 @@ Los diez pares mas cargados del dia:
 | Correo Central / Leandro N. Alem | Federico Lacroze | 2.191 |
 | Constitucion | Lavalle | 2.155 |
 
-## 4. Contraste contra molinetes del mismo dia — evidencia para D2
+## 4. Contraste contra molinetes del mismo dia: evidencia para decidir la matriz del modelo
 
 Una etapa de subte es el trayecto puerta a puerta dentro de la red, de modo que **una etapa expandida es un ingreso a la red** y es directamente comparable con un molinete. El contraste se hace contra el **16/10/2024**, el mismo dia que releva el dataset. Es anterior al pago sin contacto (01/12/2024), asi que ambas fuentes miden el mismo universo de pago y la comparacion no arrastra la ruptura de comparabilidad.
 
 - Molinetes del dia: **778.247 ingresos**.
 - Matriz O-D expandida: **740.568 etapas**.
-- **Factor global: 1,0509** — la matriz subregistra 4,8 % de la demanda medida.
+- **Factor global: 1,0509**, la matriz subregistra 4,8 % de la demanda medida.
 
 ### 4.1 Por linea de ascenso
 
@@ -134,9 +134,9 @@ Los cinco complejos donde la matriz mas subregistra y los cinco donde mas sobrer
 | Parque Patricios | 9.409 | 8.685 | 0,923 |
 | San Jose de Flores | 23.349 | 9.042 | 0,387 |
 
-## 5. Lo que la evidencia dice sobre D2
+## 5. Lo que la evidencia dice sobre el escalado
 
-D2 pregunta si el escalado de la matriz a los niveles de molinetes es un factor unico, por linea, por estacion o por franja horaria. Las tres secciones anteriores responden tres partes de esa pregunta y dejan la cuarta abierta.
+La pregunta es si el escalado de la matriz a los niveles de molinetes es un factor unico, por linea, por estacion o por franja horaria. Las tres secciones anteriores responden tres partes de esa pregunta y dejan la cuarta abierta.
 
 ### 5.1 La franja horaria no necesita factor propio
 

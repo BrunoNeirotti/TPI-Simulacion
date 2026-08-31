@@ -1,4 +1,4 @@
-# Pruebas de topes — cómo correrlas
+# Pruebas de topes: cómo correrlas
 
 > **Las cinco corrieron el 25/08/2026 y están CERRADAS.** Resultados y razonamiento
 > completo en `docs/pruebas-anylogic-topes.md`. Este archivo queda como referencia de
@@ -32,8 +32,8 @@ abrís sin cerrar, ves la versión vieja.
 No hace falta ver el reloj del modelo. **El contador que aparece debajo del bloque
 `source` es el reloj**, porque la tasa de llegada es constante y conocida.
 
-Si el modelo se corta antes de tiempo —por el tope de 5 h o por el de 50.000
-agentes—, ese número lo delata. Cada prueba de abajo trae el valor que debería dar si
+Si el modelo se corta antes de tiempo (por el tope de 5 h o por el de 50.000
+agentes), ese número lo delata. Cada prueba de abajo trae el valor que debería dar si
 todo está bien y el que daría si se topeó.
 
 Los otros contadores útiles: el de **contenido del `delay`** (arriba del bloque) dice
@@ -41,7 +41,7 @@ cuántos agentes hay vivos a la vez, y el del **`sink`** cuántos completaron.
 
 ---
 
-## A — `PruebaA_PML_20h.alp`
+## A: `PruebaA_PML_20h.alp`
 
 **Pregunta.** ¿Process Modeling Library corre más de 5 h de tiempo simulado?
 
@@ -62,7 +62,7 @@ tope de agentes no pueda contaminar el resultado. Lo único que se mide es el re
 
 ---
 
-## B — `PruebaB_Tope50k.alp`
+## B: `PruebaB_Tope50k.alp`
 
 **Pregunta.** El tope de 50.000, ¿cuenta **creaciones acumuladas** o **entidades vivas
 a la vez**?
@@ -85,19 +85,19 @@ en ventana. Sirve para saber si el modelo se frena del todo o solo deja de crear
 **Resultado: 50.027, con un solo agente vivo.** El tope cuenta **creaciones**.
 
 > Y su `Replicas10` falló con `RuntimeException ... during iteration 2`, mientras que el
-> de la prueba C completó diez iteraciones de 39.773 agentes —397.730 acumulados—. De
+> de la prueba C completó diez iteraciones de 39.773 agentes (397.730 acumulados). De
 > ahí sale el hallazgo lateral más útil: **el presupuesto de 50.000 se reinicia en cada
 > replicación**. Ojo con el matiz: al tocar el tope, la corrida simple **degrada con
 > elegancia** y parece andar, pero el experimento de replicaciones **aborta**.
 
-### B.2 — confirmación por otro camino, seis clics
+### B.2: confirmación por otro camino, seis clics
 
 **Ya la respondió la prueba D**, pero con bloques de biblioteca y no con un tipo de
 agente propio. Si alguna vez hace falta confirmarlo con el caso exacto:
 
 1. Nuevo modelo.
 2. Crear un tipo de agente `Pasajero` (*Agent type*, con población).
-3. Población inicial **60.000** —por encima del tope— y **ningún `Source`**.
+3. Población inicial **60.000** (por encima del tope) y **ningún `Source`**.
 4. Correr, aunque no haga nada.
 
 Si arranca, las poblaciones iniciales no cuentan y el reciclado queda confirmado por
@@ -105,13 +105,13 @@ dos caminos independientes.
 
 ---
 
-## C — `PruebaC_Rendimiento.alp`
+## C: `PruebaC_Rendimiento.alp`
 
 **Pregunta.** ¿Cuánto tarda en tiempo de reloj una corrida realista?
 
 **Cómo está armada.** Calibrada contra la escala real del TPI: **40.014 agentes** en
 **68.400 s = 19 h**, con retardo `triangular(600, 1800, 3600)` de media 2.000 s, lo
-que deja **~1.170 agentes vivos a la vez** — el orden de los grupos simultáneos con
+que deja **~1.170 agentes vivos a la vez**, el orden de los grupos simultáneos con
 k=25 en hora pico. Memoria en 2.048 MB.
 
 **Qué medir.** Cronometrá desde que arranca hasta que dice `Finished`. Anotá el pico de
@@ -134,7 +134,7 @@ casi al instante. El límite operativo es la licencia, no la máquina.
 
 ---
 
-## D — `PruebaD_PoblacionDeclarada.alp`
+## D: `PruebaD_PoblacionDeclarada.alp`
 
 **Pregunta.** ¿Una población **declarada** en la inicialización cuenta contra el tope de
 50.000, o solo cuentan las creaciones dinámicas?
@@ -148,12 +148,12 @@ flowchart normal, sin error de licencia.
 
 **Pero apareció otro límite.** Su `Replicas10` murió con
 `OutOfMemoryError ... in thread "Frame Collector"`. **Es memoria, no licencia**: 60.000
-bloques con presentación no entran en 2 GB. Y 60.000 era casi el triple de lo necesario
-— de ahí la prueba E.
+bloques con presentación no entran en 2 GB. Y 60.000 era casi el triple de lo necesario,
+de ahí la prueba E.
 
 ---
 
-## E — `PruebaE_PoolRealista.alp`
+## E: `PruebaE_PoolRealista.alp`
 
 **Pregunta.** ¿Entra en memoria el pool que el modelo **realmente** necesita?
 
@@ -198,7 +198,7 @@ ponen el `delay` en capacidad infinita, para que se comporte como retardo puro.
 > **Dato preliminar que dejó esa corrida fallida, y que igual sirve:** con **39.807
 > agentes creados y ~39.768 vivos a la vez**, 19 h simuladas, la corrida terminó
 > **casi instantáneamente** y llegó a `Finished`. No es la configuración buscada
-> —estaban parados en una cola, no en un retardo con temporizador propio— pero muestra
+> (estaban parados en una cola, no en un retardo con temporizador propio) pero muestra
 > que **40.000 agentes vivos no son un problema de memoria ni de tiempo**. La prueba C
 > bien configurada va a cargar más el planificador de eventos; el número que vale es
 > el de la corrida nueva.

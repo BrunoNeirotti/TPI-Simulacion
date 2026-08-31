@@ -1,4 +1,4 @@
-# Paso 2 — Grafo de la red
+# Paso 2: Grafo de la red
 
 Generado por `src/03_grafo_red.py`. Fuente: GTFS de Subte (`data/raw/gtfs/`). Salidas: `data/processed/grafo_nodos.csv` y `data/processed/grafo_aristas.csv`.
 
@@ -22,7 +22,7 @@ La velocidad comercial no incluye la detención en las cabeceras ni el tiempo de
 
 ## 2. El tiempo de detención es una constante, no una medición
 
-El feed declara **24 s de detención en toda parada de toda línea, sin una sola excepción** (166 tramos, desvío 0.0). No hay diferencia entre Constitución y Pasco, ni entre hora pico y valle —el GTFS no tiene bandas horarias—, ni entre cabecera y estación intermedia.
+El feed declara **24 s de detención en toda parada de toda línea, sin una sola excepción** (166 tramos, desvío 0.0). No hay diferencia entre Constitución y Pasco, ni entre hora pico y valle (el GTFS no tiene bandas horarias), ni entre cabecera y estación intermedia.
 
 > **Consecuencia.** Los 24 s son un **valor nominal de diseño del horario**, no una detención observada. Los teníamos anotados como tiempo de detención tomado del GTFS, y lo son, pero conviene precisar qué clase de dato son: sirven como punto de partida y como cota inferior, mientras que la detención real depende del volumen que sube y baja, que es justamente lo que el modelo produce. **En el modelo la detención tiene que ser endógena, con los 24 s como piso.**
 
@@ -51,7 +51,7 @@ Los tiempos del mismo sentido tampoco se salvan. Correlación entre tiempo de ma
 | E sentido 1, contra su distancia publicada | **0,010** | 11,4 km/h |
 | E sentido 1, contra la distancia real | 0,425 | 7,9 km/h |
 
-La correlación de 0,010 dice que el sentido 1 de la E está **desacoplado de su propia geometría**: no es que las distancias estén mal y los tiempos bien, están mal las dos columnas. El total sí cierra —11,71 km y 29 min 28 s en los dos sentidos—, así que el defecto es de reparto interno y pasa desapercibido en cualquier control agregado.
+La correlación de 0,010 dice que el sentido 1 de la E está **desacoplado de su propia geometría**: no es que las distancias estén mal y los tiempos bien, están mal las dos columnas. El total sí cierra (11,71 km y 29 min 28 s en los dos sentidos), así que el defecto es de reparto interno y pasa desapercibido en cualquier control agregado.
 
 Los cinco tramos donde más se aparta el dato publicado:
 
@@ -67,9 +67,9 @@ Los cinco tramos donde más se aparta el dato publicado:
 
 ## 4. Transbordos
 
-28 aristas dirigidas construidas sobre 104 pares de andenes. El tiempo de nodo a nodo es la **mediana** de los pares de andén del complejo, porque la demanda se modela por estación (decisión D5) y el andén de origen es resultado de la asignación de ruta, no un dato de entrada. El mínimo y el máximo quedan en el CSV para el análisis de sensibilidad.
+28 aristas dirigidas construidas sobre 104 pares de andenes. El tiempo de nodo a nodo es la **mediana** de los pares de andén del complejo, porque la demanda se modela por estación y el andén de origen es resultado de la asignación de ruta, no un dato de entrada. El mínimo y el máximo quedan en el CSV para el análisis de sensibilidad.
 
-Rango sobre pares de andén: 42–258 s. Mediana de las medianas: 146 s.
+Rango sobre pares de andén: 42-258 s. Mediana de las medianas: 146 s.
 
 **Los tiempos son direccionales**, y la diferencia no es despreciable:
 

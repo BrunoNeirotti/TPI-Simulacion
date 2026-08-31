@@ -9,7 +9,7 @@ El costo de un camino es tiempo de viaje percibido:
 
 Los 24 s son la detencion de diseno del GTFS (paso 2). Van por parada intermedia
 y no por tramo recorrido: el pasajero que asciende no espera la detencion de su
-estacion de ascenso —esa es su ventana de abordaje— y el que desciende tampoco
+estacion de ascenso (esa es su ventana de abordaje) y el que desciende tampoco
 espera la de su estacion de descenso. Contarlas por tramo abarataria en terminos
 relativos los caminos con muchas paradas, que es justo el error que un grafo de
 subte no puede darse.
@@ -31,7 +31,7 @@ de 58 s, asi que 58 - 24 = 34 s > 0.
 **El acceso y el egreso dentro de un complejo valen cero.** El pasajero entra al
 complejo, no a un anden: puede ascender en cualquiera de sus nodos y descender
 en cualquiera de los del complejo de destino. Caminar del molinete al anden no
-se modela —`pathways.txt` lo tiene, pero no para toda la red— y queda declarado
+se modela (`pathways.txt` lo tiene, pero no para toda la red) y queda declarado
 como simplificacion. La consecuencia buscada es que **caminar dentro del
 complejo de origen no cuenta como transbordo**, que seria falso.
 """

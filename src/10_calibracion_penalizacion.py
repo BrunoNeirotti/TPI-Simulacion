@@ -1,4 +1,4 @@
-"""Paso 10: calibracion de la penalizacion por transbordo (decision D9).
+"""Paso 10: calibracion de la penalizacion por transbordo.
 
 Hasta que llegaron los perfiles de carga de SBASE, la penalizacion por
 transbordo era un supuesto sin nada contra que medirse: el valor base de 120 s
@@ -55,16 +55,16 @@ REPORTES = RAIZ / "reports"
 PENALIZACIONES_S = list(range(0, 301, 10))
 
 # Valor que se conserva despues de correr el barrido, y por que no es el minimo
-# de la curva. El criterio pre-registrado —minimizar el WAPE de la hora pico
-# manana— apunta a 30 s, pero por 0,26 pp sobre una curva que entre 30 y 300 s
+# de la curva. El criterio pre-registrado (minimizar el WAPE de la hora pico
+# manana) apunta a 30 s, pero por 0,26 pp sobre una curva que entre 30 y 300 s
 # es plana, mientras que la muestra de reserva apunta a 270 s y el control de
 # reparto por linea empeora casi dos puntos en 30 s. Cuando dos muestras del
 # mismo fenomeno apuntan a extremos opuestos de un rango plano, lo que el dato
 # dice es que **no identifica el parametro**, no que el optimo sea el argmin de
 # una de las dos. Lo que si identifica es una **cota inferior dura**: por debajo
 # de 30 s el modelo se rompe. Dentro de la zona plana decide el argumento
-# fisico del paso 6 —la espera esperada es la mitad del intervalo, entre 95 y
-# 157 s en hora pico— y 120 s cae ahi.
+# fisico del paso 6 (la espera esperada es la mitad del intervalo, entre 95 y
+# 157 s en hora pico) y 120 s cae ahi.
 PENALIZACION_ELEGIDA_S = 120.0
 
 # Nodo Retiro de la Linea C, que es la discrepancia declarada del paso 6.
@@ -173,10 +173,10 @@ def escribir_reporte(barrido: pd.DataFrame, elegida: int, argmin_hpm: int,
     f_0 = barrido[barrido.penalizacion_s == 0].iloc[0]
     meseta = barrido[barrido.penalizacion_s >= 30]
 
-    w("# Paso 10 — Calibracion de la penalizacion por transbordo (D9)\n")
+    w("# Paso 10, Calibracion de la penalizacion por transbordo\n")
     w("El paso 6 fijo la penalizacion en **120 s** por un argumento indirecto: en hora ")
     w("pico los intervalos entre despachos van de 3,15 a 5,22 min, asi que la espera ")
-    w("esperada —la mitad del intervalo— cae entre 95 y 157 s. Era un supuesto sin nada ")
+    w("esperada (la mitad del intervalo) cae entre 95 y 157 s. Era un supuesto sin nada ")
     w("contra que medirse. Los perfiles de carga que entrego SBASE (paso 9) dan por ")
     w("primera vez un observado por tramo, y con eso el valor se puede elegir midiendo.\n")
 
@@ -245,7 +245,7 @@ def escribir_reporte(barrido: pd.DataFrame, elegida: int, argmin_hpm: int,
     w("- cae dentro de la zona plana, donde el observado no discrimina;")
     w("- esta muy por encima de la cota inferior de 30 s, que es lo unico que el dato fija;")
     w("- coincide con el argumento fisico del paso 6, que es la mitad del intervalo ")
-    w("  medido en hora pico (95–157 s), y ese argumento es el que corresponde usar ")
+    w("  medido en hora pico (95-157 s), y ese argumento es el que corresponde usar ")
     w("  cuando el ajuste no discrimina.")
     w("")
     w(f"Rinde {pc(f_e.wape_hpm, 2)} de WAPE en calibracion y {pc(f_e.wape_hpt, 2)} fuera ")
@@ -253,7 +253,7 @@ def escribir_reporte(barrido: pd.DataFrame, elegida: int, argmin_hpm: int,
     w("estaba calculada con este valor y queda vigente tal cual.\n")
     w("\n**Lo que cambia no es el numero sino su estatus.** Deja de ser un supuesto ")
     w("declarado y pasa a ser un parametro cuyo rango admisible se midio, con la ")
-    w("salvedad —que hay que escribir en el informe— de que **el indicador central es ")
+    w("salvedad (que hay que escribir en el informe) de que **el indicador central es ")
     w("poco sensible a el**. Eso es un resultado, no una limitacion: significa que la ")
     w("carga por tramo que produzca el modelo no depende de la parte mas discutible de ")
     w("la asignacion.\n")

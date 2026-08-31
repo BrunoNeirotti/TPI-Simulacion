@@ -10,7 +10,7 @@ Salidas en data/processed/:
   od_complejos.csv       catalogo de los 78 complejos
   matriz_od.csv          comp_origen x comp_destino x hora, expandida
   od_ascensos.csv        ascensos por complejo, linea de ascenso y hora
-  factores_escalado.csv  evidencia para la decision D2
+  factores_escalado.csv  evidencia sobre el escalado
 
 Reporte en reports/06_matriz_od.md.
 """
@@ -258,7 +258,7 @@ def main() -> None:
                    .reset_index())
     pares_linea.to_csv(PROCESADO / "od_pares_linea.csv", index=False)
 
-    # --- Contraste contra molinetes del mismo dia (evidencia de D2) ---
+    # --- Contraste contra molinetes del mismo dia ---
     mol = molinetes_del_dia(m)
     mol = mol.merge(m[["nodo", "complejo", "linea"]], on="nodo", how="left")
 
@@ -287,7 +287,7 @@ def main() -> None:
     ])
     factores.to_csv(PROCESADO / "factores_escalado.csv", index=False)
 
-    # --- Evidencia para D2: cuanto queda sin explicar segun el criterio ---
+    # --- Cuanto queda sin explicar segun el criterio ---
     f_comp = f_comp.join(cat[["n_nodos"]])
     f_comp["grupo"] = [clasificar(n, k) for n, k in zip(f_comp.nombre, f_comp.n_nodos)]
     f_grupo = f_comp.groupby("grupo").agg(n=("nombre", "size"), od=("od", "sum"),
@@ -306,7 +306,7 @@ def main() -> None:
 
 
 def clasificar(nombre_complejo: str, n_nodos: int) -> str:
-    """Categoria de un complejo a los efectos del escalado (decision D2)."""
+    """Categoria de un complejo a los efectos del escalado."""
     if nombre_complejo in PAR_FLORES:
         return "Par San Pedrito / San Jose de Flores"
     if nombre_complejo in FERROVIARIOS:
@@ -337,7 +337,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
 
     L: list[str] = []
     A = L.append
-    A("# Paso 5 — Matriz origen-destino\n")
+    A("# Paso 5, Matriz origen-destino\n")
     A(f"Generado por `src/06_matriz_od.py`. Dia relevado: **{DIA.strftime('%d/%m/%Y')}**, "
       "un miercoles habil. Fuente: `etapas_BAdata_20241016.csv` (Viajes y Etapas del AMBA), "
       "contrastada contra `molinetes-2024.zip` del mismo dia.\n")
@@ -353,7 +353,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
       "existe**, porque las estaciones que se confunden son exactamente las que el complejo "
       "agrupa. Es ademas la unidad correcta desde el modelo: el pasajero entra y sale de un "
       "lugar fisico, y por que linea circula es resultado de la asignacion de ruta, no dato "
-      "de entrada. Mismo criterio que la decision D5 sobre andenes.\n")
+      "de entrada. Mismo criterio que usamos con los andenes.\n")
 
     A("### 1.1 El matcheo es univoco\n")
     A(f"Los **{len(cen)} centroides h3 distintos** se asignan al complejo del nodo mas "
@@ -389,7 +389,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
     A("Aun asi la linea de ascenso **no entra como insumo del modelo**. Fijarla seria fijar "
       "parte de la ruta, que es justamente lo que la simulacion tiene que producir. Queda "
       "como **contraste del reparto por linea que produzca el modelo**, en paralelo exacto "
-      "con el contraste por anden de D5.\n")
+      "con el contraste por anden.\n")
 
     A("## 2. Que se descarta\n")
     A("| Concepto | Etapas | % |")
@@ -403,15 +403,15 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
     A(f"Las {int(intra.sum())} etapas intracomplejo no son viajes de subte: son pares de "
       "estaciones a distancia de caminata dentro de la misma combinacion. Al nivel de "
       "estacion el dataset no tenia ninguna etapa con origen igual a destino; al nivel de "
-      "complejo aparecen estas, que es el precio —minimo— de agrupar. Se descartan.\n")
+      "complejo aparecen estas, que es el precio (minimo) de agrupar. Se descartan.\n")
 
-    A("### 2.1 D1: el `viaje_incompleto` no mueve la matriz\n")
+    A("### 2.1 Las etapas incompletas no mueven la matriz\n")
     inc_exp = e_util[incompletas].factor_expansion_etapa.sum()
     A("Las etapas marcadas `viaje_incompleto = t` son **" + mil(int(incompletas.sum())) +
       "** (" + pc(incompletas.mean(), 1) + ") y expanden a **" + mil(inc_exp) + "** (" +
       pc(inc_exp / od_tot, 1) + " del total expandido).\n")
     A("`matriz_od.csv` trae las dos versiones en columnas separadas, `expandidas` y "
-      "`expandidas_completas`, para que **D1 se decida midiendo y no discutiendo**.\n")
+      "`expandidas_completas`, para que **se decida midiendo y no discutiendo**.\n")
 
     A("## 3. La matriz\n")
     pares = matriz.groupby(["comp_origen", "comp_destino"]).ngroups
@@ -432,7 +432,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
         A(f"| {nombre[o]} | {nombre[d]} | {mil(val)} |")
     A("")
 
-    A("## 4. Contraste contra molinetes del mismo dia — evidencia para D2\n")
+    A("## 4. Contraste contra molinetes del mismo dia, evidencia para decidir la matriz del modelo\n")
     A("Una etapa de subte es el trayecto puerta a puerta dentro de la red, de modo que "
       "**una etapa expandida es un ingreso a la red** y es directamente comparable con un "
       "molinete. El contraste se hace contra el **16/10/2024**, el mismo dia que releva el "
@@ -441,7 +441,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
       "comparabilidad.\n")
     A(f"- Molinetes del dia: **{mil(mol_tot)} ingresos**.")
     A(f"- Matriz O-D expandida: **{mil(od_tot)} etapas**.")
-    A(f"- **Factor global: {dec(glob, 4)}** — la matriz subregistra "
+    A(f"- **Factor global: {dec(glob, 4)}**, la matriz subregistra "
       f"{pc(1 - od_tot / mol_tot, 1)} de la demanda medida.\n")
 
     A("### 4.1 Por linea de ascenso\n")
@@ -458,7 +458,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
     A("|---|---:|---:|---:|")
     for i, r in f_h.iterrows():
         A(f"| {int(i):02d}:00 | {mil(r.od)} | {mil(r.molinetes)} | "
-          f"{dec(r.factor) if np.isfinite(r.factor) else '—'} |")
+          f"{dec(r.factor) if np.isfinite(r.factor) else '-'} |")
     A("")
 
     A("### 4.3 Por complejo\n")
@@ -477,8 +477,8 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
         A(f"| {r.nombre} | {mil(r.od)} | {mil(r.molinetes)} | {dec(r.factor)} |")
     A("")
 
-    A("## 5. Lo que la evidencia dice sobre D2\n")
-    A("D2 pregunta si el escalado de la matriz a los niveles de molinetes es un factor "
+    A("## 5. Lo que la evidencia dice sobre el escalado\n")
+    A("La pregunta es si el escalado de la matriz a los niveles de molinetes es un factor "
       "unico, por linea, por estacion o por franja horaria. Las tres secciones anteriores "
       "responden tres partes de esa pregunta y dejan la cuarta abierta.\n")
 

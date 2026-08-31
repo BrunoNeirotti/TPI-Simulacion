@@ -1,6 +1,6 @@
-# Expediente EX-2026-20211143-GCABA-APRA — extracción de datos utilizables
+# Expediente EX-2026-20211143-GCABA-APRA: extracción de datos utilizables
 
-Estudio de Impacto Ambiental "Línea F – Sistema Integrado de Movilidad – CABA".
+Estudio de Impacto Ambiental "Línea F - Sistema Integrado de Movilidad - CABA".
 Recibido el 05/08/2026 por respuesta de `audienciaspublicas@buenosaires.gob.ar` a la
 consulta de expediente. 98 documentos, copia local en
 `docs/Documentos-EX-2026-20211143/`.
@@ -17,33 +17,33 @@ figura acá, no está en el expediente.
 
 | Doc | Identificador | Contenido | Págs |
 |---|---|---|---|
-| 0007 | IF-2026-20217151 | Cálculo del Nivel de Complejidad Ambiental | — |
-| 0008 | IF-2026-20217613 | EsIA Cap. 1 – Introducción | — |
-| 0009 | IF-2026-20218731 | EsIA Cap. 2 – Marco normativo e institucional | — |
-| **0010** | **IF-2026-20219129** | **EsIA Cap. 3 – Descripción del proyecto** | **101** |
-| 0011 | IF-2026-20219535 | EsIA Cap. 4 – Áreas de influencia | — |
-| 0012 | IF-2026-20220169 | EsIA Cap. 5 – Línea de base ambiental y social | — |
-| **0013** | **IF-2026-20220749** | **EsIA Cap. 6 – Estudios especiales** | **152** |
-| 0014 | IF-2026-20221297 | EsIA Cap. 7 – Evaluación de impactos | — |
-| 0015 | IF-2026-20221672 | EsIA Cap. 8 – Medidas de gestión ambiental | — |
-| 0016 | IF-2026-20222054 | EsIA Cap. 9 – Plan de gestión ambiental y social | — |
+| 0007 | IF-2026-20217151 | Cálculo del Nivel de Complejidad Ambiental | - |
+| 0008 | IF-2026-20217613 | EsIA Cap. 1 - Introducción | - |
+| 0009 | IF-2026-20218731 | EsIA Cap. 2 - Marco normativo e institucional | - |
+| **0010** | **IF-2026-20219129** | **EsIA Cap. 3 - Descripción del proyecto** | **101** |
+| 0011 | IF-2026-20219535 | EsIA Cap. 4 - Áreas de influencia | - |
+| 0012 | IF-2026-20220169 | EsIA Cap. 5 - Línea de base ambiental y social | - |
+| **0013** | **IF-2026-20220749** | **EsIA Cap. 6 - Estudios especiales** | **152** |
+| 0014 | IF-2026-20221297 | EsIA Cap. 7 - Evaluación de impactos | - |
+| 0015 | IF-2026-20221672 | EsIA Cap. 8 - Medidas de gestión ambiental | - |
+| 0016 | IF-2026-20222054 | EsIA Cap. 9 - Plan de gestión ambiental y social | - |
 | 0017 | IF-2026-20222472 | Informe de evaluación de impacto acústico | 63 |
-| 0018 | IF-2026-20223041 | Planos de trazado y progresivas | — |
-| 0019 | IF-2026-20223669 | EsIA – Resumen ejecutivo | — |
-| 0036 | IF-2026-23674238 | Intervención Secretaría de Transporte (DGDPM) | — |
+| 0018 | IF-2026-20223041 | Planos de trazado y progresivas | - |
+| 0019 | IF-2026-20223669 | EsIA - Resumen ejecutivo | - |
+| 0036 | IF-2026-23674238 | Intervención Secretaría de Transporte (DGDPM) | - |
 | 0045 | IF-2026-24925954 | Informe técnico Planeamiento Urbano (DGPLUR) | 113 |
-| 0058 | IF-2026-28526299 | Documento de divulgación | — |
-| 0061 | IF-2026-28526025 | Cronograma de obra, línea completa | — |
-| 0062 | IF-2026-28525919 | Planos de interferencias de servicios | — |
-| 0076 | IF-2026-31346661 | Informe técnico de categorización (DGEVA) | — |
-| 0091 | RS-2026-31593105 | **RESOL-2026-195-GCABA-APRA** (convocatoria a audiencia) | — |
+| 0058 | IF-2026-28526299 | Documento de divulgación | - |
+| 0061 | IF-2026-28526025 | Cronograma de obra, línea completa | - |
+| 0062 | IF-2026-28525919 | Planos de interferencias de servicios | - |
+| 0076 | IF-2026-31346661 | Informe técnico de categorización (DGEVA) | - |
+| 0091 | RS-2026-31593105 | **RESOL-2026-195-GCABA-APRA** (convocatoria a audiencia) | - |
 
 Los restantes son providencias, pases y notas de circulación interna sin contenido
 técnico.
 
 ---
 
-## 2. Parámetros operativos — **resuelven un pendiente de la propuesta**
+## 2. Parámetros operativos: **resuelven un pendiente de la propuesta**
 
 Todos de **doc 0010, § 3.1.2 "Características del Sistema en Operación", pág. 15**.
 Es el insumo directo del escenario futuro del modelo.
@@ -77,7 +77,7 @@ que es lo que dice el doc 0010. Se adopta la lectura del 0010. **No usar la cifr
 
 ---
 
-## 3. Estaciones — **RESUELVE el pendiente de denominaciones**
+## 3. Estaciones: **RESUELVE el pendiente de denominaciones**
 
 No había dos versiones en conflicto: **el propio EsIA usa denominaciones dobles o
 triples** y lo declara de forma explícita (doc 0010, § 3.1, pág. 11): *"se presentan
@@ -85,17 +85,17 @@ todas las posibles denominaciones asignadas hasta la fecha sobre cada estación"
 
 | # | Denominación en el EsIA | Combinación |
 |---|---|---|
-| 1 | Brandsen | — (cabecera sur, semienterrada) |
+| 1 | Brandsen |, (cabecera sur, semienterrada) |
 | 2 | Constitución | Línea C + FF.CC. Roca (+ Belgrano Sur a futuro) |
 | 3 | Cochabamba | Línea E |
-| 4 | Chile | — |
+| 4 | Chile | - |
 | 5 | Congreso | Línea A |
 | 6 | Corrientes | Línea B |
 | 7 | Pizzurno / Santa Fe | Línea D |
-| 8 | Recoleta / Junín | — |
-| 9 | Hospital Rivadavia / Pueyrredón | — (ver nota sobre la Línea H) |
-| 10 | Parque Las Heras / Ruggeri / Cnel. Díaz | — |
-| 11 | Plaza Italia / Ecoparque | — |
+| 8 | Recoleta / Junín | - |
+| 9 | Hospital Rivadavia / Pueyrredón |, (ver nota sobre la Línea H) |
+| 10 | Parque Las Heras / Ruggeri / Cnel. Díaz | - |
+| 11 | Plaza Italia / Ecoparque | - |
 | 12 | Palermo / Juan B. Justo / Pacífico | Línea D + FF.CC. San Martín |
 
 Las tablas de demanda usan las formas cortas: *Pizzurno*, *Recoleta/Junin*,
@@ -109,10 +109,10 @@ Las Heras**, **Ecoparque**, **Pacífico**. Es sistemáticamente el segundo nombr
 par del EsIA. Queda cerrado: son dos convenciones sobre las mismas doce estaciones, no
 un conflicto.
 
-**Para la tabla maestra de estaciones del modelo, usar el número de orden (1–12) como
+**Para la tabla maestra de estaciones del modelo, usar el número de orden (1-12) como
 clave y tratar las denominaciones como alias.**
 
-### Nota — la combinación con la Línea H no está resuelta en el expediente
+### Nota: la combinación con la Línea H no está resuelta en el expediente
 
 El expediente se contradice a sí mismo y hay que decidirlo por geometría, no por cita:
 
@@ -134,55 +134,55 @@ sostiene seis.
 
 ### 3.1 Progresivas y distancias entre estaciones
 
-Progresivas del doc 0010, Tabla 4, págs. 20–21. Las distancias son **derivadas por
+Progresivas del doc 0010, Tabla 4, págs. 20-21. Las distancias son **derivadas por
 nosotros** desde el punto medio de cada estación; no figuran como tales en el EsIA.
 
 | # | Estación | Progresiva (m) | Centro (m) | Tramo anterior (m) |
 |---|---|---|---|---|
-| 1 | Brandsen | 326 – 461 | 393 | — |
-| 2 | Constitución | 1.443 – 1.600 | 1.521 | 1.128 |
-| 3 | Cochabamba | 3.015 – 3.200 | 3.107 | 1.586 |
-| 4 | Chile | 3.600 – 3.829 | 3.714 | 607 |
-| 5 | Congreso | 4.475 – 4.528 * | 4.501 | 787 |
-| 6 | Corrientes | 5.200 – 5.413 | 5.306 | 805 |
-| 7 | Pizzurno / Santa Fe | 5.800 – 6.100 | 5.950 | 644 |
-| 8 | Recoleta / Junín | 6.700 – 7.000 | 6.850 | 900 |
-| 9 | Pueyrredón / H. Rivadavia | 7.417 – 7.600 | 7.508 | 658 |
-| 10 | Parque Las Heras | 8.300 – 8.550 | 8.425 | 917 |
-| 11 | Plaza Italia / Ecoparque | 9.400 – 9.670 | 9.535 | 1.110 |
-| 12 | Palermo / J. B. Justo | 10.300 – 10.500 | 10.400 | 865 |
+| 1 | Brandsen | 326 - 461 | 393 | - |
+| 2 | Constitución | 1.443 - 1.600 | 1.521 | 1.128 |
+| 3 | Cochabamba | 3.015 - 3.200 | 3.107 | 1.586 |
+| 4 | Chile | 3.600 - 3.829 | 3.714 | 607 |
+| 5 | Congreso | 4.475 - 4.528 * | 4.501 | 787 |
+| 6 | Corrientes | 5.200 - 5.413 | 5.306 | 805 |
+| 7 | Pizzurno / Santa Fe | 5.800 - 6.100 | 5.950 | 644 |
+| 8 | Recoleta / Junín | 6.700 - 7.000 | 6.850 | 900 |
+| 9 | Pueyrredón / H. Rivadavia | 7.417 - 7.600 | 7.508 | 658 |
+| 10 | Parque Las Heras | 8.300 - 8.550 | 8.425 | 917 |
+| 11 | Plaza Italia / Ecoparque | 9.400 - 9.670 | 9.535 | 1.110 |
+| 12 | Palermo / J. B. Justo | 10.300 - 10.500 | 10.400 | 865 |
 
-\* El original imprime "4+528 – 4+475", con los extremos invertidos. Se corrigió el
+\* El original imprime "4+528 - 4+475", con los extremos invertidos. Se corrigió el
 orden; el intervalo es el mismo.
 
-Longitud Brandsen–Palermo = **10,0 km**; distancia media entre estaciones derivada =
+Longitud Brandsen-Palermo = **10,0 km**; distancia media entre estaciones derivada =
 **910 m**, contra los **800 m** que declara el texto. La discrepancia no está
 explicada en el expediente. **Usar las progresivas, no el promedio declarado.**
 
 La traza total llega a la progresiva 10+900 (cocheras al inicio desde 0+000 y
-"túnel y secciones especiales" 10+500–10+900), que es de donde sale la cifra de
+"túnel y secciones especiales" 10+500-10+900), que es de donde sale la cifra de
 10,9 km.
 
 ---
 
-## 4. Demanda — perfil de carga por tramo
+## 4. Demanda: perfil de carga por tramo
 
 **Este es el hallazgo más valioso del expediente.** Es exactamente el "perfil de carga
 por tramo" que se pidió por la solicitud Ley 104 N° 00866317/26, y ya está disponible.
 
 > **Cadena de procedencia, resuelta el 05/08/2026 con el pliego.** El
 > `LF-GL-GEN-GNR-IN-003` **no es** el análisis de demanda, como se creía: es el informe
-> *"Demandas Etapa I – Medios de Salida"* del pliego, que **ya está en mano** y del cual
+> *"Demandas Etapa I - Medios de Salida"* del pliego, que **ya está en mano** y del cual
 > el EsIA copió las tablas. Se verificó que su tabla SBP es idéntica a la Tabla 2 de acá,
-> valor por valor. El estudio primario —la nota técnica *Análisis de Demanda Línea F*,
+> valor por valor. El estudio primario (la nota técnica *Análisis de Demanda Línea F*,
 > SBASE 2019, y su derivado *Informe Strans Demanda de la Línea F*, entregado el
-> 17/07/2025— **no es público**: no está ni en la licitación ni en este expediente.
+> 17/07/2025) **no es público**: no está ni en la licitación ni en este expediente.
 > Detalle en `docs/pliego-licitacion-linea-f.md`, sección 3.
 
 Fuente primaria declarada: **Análisis de Demanda Línea F, SBASE 2019**, vía el
 documento de proyecto LF-GL-GEN-GNR-IN-003. Aparece dos veces:
 
-- **doc 0010, Tablas 2 y 3, págs. 15–16** (S / B / P por estación y sentido).
+- **doc 0010, Tablas 2 y 3, págs. 15-16** (S / B / P por estación y sentido).
 - **doc 0013, Figura 65, pág. 97** (las mismas tablas más columnas de flujo entrante,
   saliente y total por estación). Ahí se cita como *Informe Strans Demanda de la Línea
   F*, elaborado por SBASE y aportado por el Ministerio de Infraestructura el
@@ -247,7 +247,7 @@ S = suben, B = bajan, P = permanecen a bordo al salir de la estación.
 4. **Ascensos totales en hora pico ≈ 73.900 pas./h** (ambos sentidos; 27.162 + 46.706
    en HPT, 46.713 + 27.163 en HPM). Cálculo propio a partir de las tablas.
 
-5. **Tensión con la cifra anunciada de 270.000–300.000 pas./día.** Si ambas cifras
+5. **Tensión con la cifra anunciada de 270.000-300.000 pas./día.** Si ambas cifras
    fueran correctas, la hora pico concentraría ≈25 % de la demanda diaria. Es un valor
    muy alto: en la red actual la hora pico está bastante por debajo de eso, y se puede
    verificar directamente con los molinetes. **Es un contraste concreto que el TPI
@@ -257,7 +257,7 @@ S = suben, B = bajan, P = permanecen a bordo al salir de la estación.
 6. **Constitución domina el sistema.** 42.486 pas./h de flujo total, contra 19.812 de
    la segunda (Corrientes). El **70 %** de los ascensos del sentido cargado en HPM
    (32.640 sobre 46.713) ocurre en una sola estación. El comportamiento de la Línea F
-   está esencialmente gobernado por la transferencia desde el FF.CC. Roca — lo que es
+   está esencialmente gobernado por la transferencia desde el FF.CC. Roca, lo que es
    consistente con el 70 % de viajes de la Línea C que combinan con ferrocarril (§ 5).
 
 ---
@@ -300,7 +300,7 @@ Importante para no sobreestimar lo obtenido:
   "escenarios con proyecto" del Cap. 6 son microsimulaciones de **tránsito de
   superficie** durante la obra (estaciones Congreso y Constitución), no de la red de
   subte.
-- **No hay cifra de demanda diaria de la Línea F.** Los 270.000–300.000 pas./día de los
+- **No hay cifra de demanda diaria de la Línea F.** Los 270.000-300.000 pas./día de los
   anuncios no aparecen en ningún documento del expediente.
 - **No hay matriz origen-destino de la red a nivel estación.** Solo el perfil de carga
   de la Línea F. La matriz O-D sigue saliendo del dataset de viajes y etapas del AMBA.
@@ -333,7 +333,7 @@ lugar de restarle sentido, y conviene decirlo así en el documento.
 
 ---
 
-## 7. Impacto sobre el TPI — qué cambia
+## 7. Impacto sobre el TPI: qué cambia
 
 > **Ya aplicado al documento el 05/08/2026.** Los puntos de "Se resuelve" y "Se
 > agrega como debilidad" están incorporados. Lo de "Queda pendiente" sigue abierto.

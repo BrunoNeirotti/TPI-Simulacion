@@ -1,6 +1,6 @@
-# Paso 11 — La matriz de demanda del modelo (D2)
+# Paso 11: La matriz de demanda del modelo
 
-D2 quedo decidida el 27/08/2026: **la matriz de SBASE es la base y la del paso 5 
+Quedo decidido el 27/08/2026: **la matriz de SBASE es la base y la del paso 5 
 aporta el perfil horario**. Este es el armado y sus controles.
 
 
@@ -10,7 +10,7 @@ aporta el perfil horario**. Este es el armado y sus controles.
 |---|---|---|
 | Nivel y distribucion espacial | Matriz diaria de SBASE | Viene expandida: no 
 hay escalado que decidir, y no tiene el defecto de San Pedrito / San Jose de Flores |
-| Horas 8–9 y 17–18 | Matrices HPM y HPT de SBASE | Direccionalidad **medida**, 
+| Horas 8-9 y 17-18 | Matrices HPM y HPT de SBASE | Direccionalidad **medida**, 
 no impuesta por simetria diaria |
 | Resto del dia | Perfil horario por par del paso 5 | Es la unica fuente con 
 apertura horaria completa |
@@ -95,6 +95,6 @@ naturales, todas baratas porque el pipeline ya esta armado:
 - **Los 687 viajes diarios entre nodos de un mismo complejo quedan afuera.** En 
   el modelo son una caminata dentro de la estacion.
 - **La matriz es de septiembre de 2024.** No describe la red de 2026.
-- **D1 sigue sin decidirse**, y este paso la deja lista para medirse: el perfil 
+- **Lo de las etapas incompletas sigue sin decidirse**, y este paso lo deja listo para medirse: el perfil 
   horario usa la columna `expandidas`, y correrlo con `expandidas_completas` es 
   cambiar una constante.

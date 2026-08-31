@@ -1,4 +1,4 @@
-# Paso 9 — Matriz O-D y perfiles de carga de SBASE (Ley 104)
+# Paso 9: Matriz O-D y perfiles de carga de SBASE (Ley 104)
 
 Fuente: `IF-2026-38553261-GCABA-SBASE.pdf`, del 26/08/2026, respuesta a la 
 solicitud 00866317/26. Las dos planillas venian **embebidas dentro del PDF** 
@@ -11,8 +11,8 @@ solicitud 00866317/26. Las dos planillas venian **embebidas dentro del PDF**
 | Periodo | Pares con flujo | Viajes |
 |---|---:|---:|
 | Dia habil completo | 7.699 de 8.010 | 827.976 |
-| Hora pico manana (8–9 h) | 4.812 de 8.010 | 74.351 |
-| Hora pico tarde (17–18 h) | 5.868 de 8.010 | 80.197 |
+| Hora pico manana (8-9 h) | 4.812 de 8.010 | 74.351 |
+| Hora pico tarde (17-18 h) | 5.868 de 8.010 | 80.197 |
 
 La unidad espacial es el **nodo**, no el complejo: las 90 estaciones de la 
 planilla son los 90 pares linea-estacion del grafo del paso 2 y cruzan una a 
@@ -40,8 +40,8 @@ coinciden**, y son independientes entre si.
 Eso vuelve a cerrar el mismo contraste sobre la Linea F, ahora con la propia 
 fuente que produjo la cifra en discusion: para que los ~73.900 ascensos de hora 
 pico del *Analisis de Demanda Linea F* (SBASE, 2019) fueran compatibles con los 
-270.000–300.000 viajes diarios anunciados, la Linea F tendria que concentrar en 
-una hora cerca del 25 % de su demanda diaria — dos veces y media lo que concentra 
+270.000-300.000 viajes diarios anunciados, la Linea F tendria que concentrar en 
+una hora cerca del 25 % de su demanda diaria, dos veces y media lo que concentra 
 la red que la propia SBASE mide.
 
 
@@ -86,8 +86,8 @@ tren; el total de la matriz es 827.976 (ver seccion 8).
 
 La matriz de SBASE queda **6,3 % por encima** de 
 los molinetes del 16/10/2024 y la del paso 5 queda 4,8 % por debajo. No son el 
-mismo dia ni el mismo mes —septiembre corre mas alto que octubre en la serie de 
-molinetes— y SBASE declara que su base son transacciones SUBE, que en septiembre 
+mismo dia ni el mismo mes (septiembre corre mas alto que octubre en la serie de 
+molinetes) y SBASE declara que su base son transacciones SUBE, que en septiembre 
 de 2024 concentraban mas del 95 % de los pagos: expandir ese 95 % al total 
 explica un factor de 1,05 por si solo.
 
@@ -112,7 +112,7 @@ de la matriz de SBASE:
 | Lavalle | 4.956 | 6.322 | 1,276 | 1,008 |
 
 
-### El par San Pedrito / San Jose de Flores, que abrio la decision D8
+### El par San Pedrito / San Jose de Flores, que nos hizo dudar del reparto
 
 El paso 5 encontro que el dataset de Viajes y Etapas reparte mal la demanda entre 
 esas dos estaciones vecinas de la Linea A: el total del par cierra bien pero el 
@@ -125,8 +125,8 @@ reparto esta corrido, y eso explica el 35 % del desvio absoluto de toda la red.
 | San Pedrito | 24.248 | 24.971 | 1,030 | 8.945 | 0,369 |
 | San Jose de Flores | 9.042 | 10.684 | 1,182 | 23.349 | 2,582 |
 
-Es un argumento fuerte a favor de la matriz de SBASE en D2, y de paso vuelve 
-innecesaria la reparacion que D8 planteaba: el defecto es de una fuente, no del 
+Es un argumento fuerte a favor de la matriz de SBASE, y de paso vuelve 
+innecesaria la reparacion que planteabamos: el defecto es de una fuente, no del 
 fenomeno.
 
 
@@ -171,7 +171,7 @@ El modelo del paso 6 se aparta de SBASE a lo sumo 16,2 % en un
 complejo (Retiro) y 5,5 % en la mediana.
 
 
-**Retiro, la discrepancia que abrio la decision D9.** El paso 6 predecia 
+**Retiro, la discrepancia que abrio la revision de la penalizacion.** El paso 6 predecia 
 69,8 % de los ascensos por la Linea C contra 85,5 % 
 de molinetes. SBASE mide 86,0 %: le da la razon a molinetes y 
 confirma que el modelo manda demasiada gente a la Linea E en ese nodo.
@@ -215,8 +215,8 @@ prensa sino contra la medicion de la propia SBASE sobre su propia red.
 ## 7. Validacion de la asignacion todo-o-nada del paso 6
 
 Se cargo la matriz de SBASE de cada hora pico sobre el grafo del paso 2 usando 
-los caminos minimos del paso 6 —asignacion todo-o-nada, penalizacion por 
-transbordo de 120 s— y se comparo la carga que resulta en cada tramo contra la 
+los caminos minimos del paso 6 (asignacion todo-o-nada, penalizacion por 
+transbordo de 120 s) y se comparo la carga que resulta en cada tramo contra la 
 que mide SBASE. **Es la primera validacion de la asignacion de ruta contra un 
 observado**; hasta ahora solo se podia contrastar el reparto por linea de ascenso.
 
@@ -280,7 +280,7 @@ mismo en la tarde. Es consistente con el sesgo por linea de la seccion 5.
 ## 8. Que queda declarado
 
 - **Viajes dentro de un mismo complejo.** La matriz diaria trae 687 
-  viajes (0,08 % del total) entre dos nodos del mismo complejo — Retiro [C] a 
+  viajes (0,08 % del total) entre dos nodos del mismo complejo, Retiro [C] a 
   Retiro [E] y equivalentes. En el modelo son una caminata dentro de la estacion, 
   no un viaje en tren, y quedan fuera de la asignacion. Se declaran, no se 
   reparten.

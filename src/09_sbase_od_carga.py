@@ -1,8 +1,8 @@
 """Paso 9: la matriz O-D y los perfiles de carga que SBASE entrego por Ley 104.
 
 El 26 y el 27 de agosto de 2026 llegaron las respuestas a la solicitud
-00866317/26. SBASE adjunto —embebido dentro del PDF, no como archivo del
-mail— dos libros de Excel que cierran los dos huecos que el expediente del EIA
+00866317/26. SBASE adjunto (embebido dentro del PDF, no como archivo del
+mail) dos libros de Excel que cierran los dos huecos que el expediente del EIA
 no habia cubierto:
 
   1. una matriz origen-destino de 90x90 a nivel de estacion, con apertura
@@ -16,8 +16,8 @@ como salida del modelo **sin contraparte empirica posible**. Ahora
 la tiene, para hora pico y para la red actual.
 
 Este paso no reemplaza la matriz del paso 5. La deja al lado y las mide una
-contra otra: son dos fuentes independientes —una encuesta expandida de un dia
-de octubre y un conteo de transacciones de septiembre— del mismo objeto.
+contra otra: son dos fuentes independientes (una encuesta expandida de un dia
+de octubre y un conteo de transacciones de septiembre) del mismo objeto.
 
 Salidas en data/processed/:
   sbase_od.csv               las tres matrices en formato largo, por nodo
@@ -230,7 +230,7 @@ def escribir_reporte(od, perfil, comp, asc, reparto, modelo, contraste, nodos,
     pares = od.groupby("periodo").size()
     diaria = tot["diaria"]
 
-    w("# Paso 9 — Matriz O-D y perfiles de carga de SBASE (Ley 104)\n")
+    w("# Paso 9, Matriz O-D y perfiles de carga de SBASE (Ley 104)\n")
     w("Fuente: `IF-2026-38553261-GCABA-SBASE.pdf`, del 26/08/2026, respuesta a la ")
     w("solicitud 00866317/26. Las dos planillas venian **embebidas dentro del PDF** ")
     w("(`/Names /EmbeddedFiles`), no como adjuntos del correo; se extrajeron a ")
@@ -240,8 +240,8 @@ def escribir_reporte(od, perfil, comp, asc, reparto, modelo, contraste, nodos,
     w("| Periodo | Pares con flujo | Viajes |")
     w("|---|---:|---:|")
     for p, etiqueta in (("diaria", "Dia habil completo"),
-                        ("hpm", "Hora pico manana (8–9 h)"),
-                        ("hpt", "Hora pico tarde (17–18 h)")):
+                        ("hpm", "Hora pico manana (8-9 h)"),
+                        ("hpt", "Hora pico tarde (17-18 h)")):
         w(f"| {etiqueta} | {mil(pares[p])} de 8.010 | {mil(tot[p])} |")
     w("")
     w("La unidad espacial es el **nodo**, no el complejo: las 90 estaciones de la ")
@@ -266,8 +266,8 @@ def escribir_reporte(od, perfil, comp, asc, reparto, modelo, contraste, nodos,
     w("\nEso vuelve a cerrar el mismo contraste sobre la Linea F, ahora con la propia ")
     w("fuente que produjo la cifra en discusion: para que los ~73.900 ascensos de hora ")
     w("pico del *Analisis de Demanda Linea F* (SBASE, 2019) fueran compatibles con los ")
-    w("270.000–300.000 viajes diarios anunciados, la Linea F tendria que concentrar en ")
-    w("una hora cerca del 25 % de su demanda diaria — dos veces y media lo que concentra ")
+    w("270.000-300.000 viajes diarios anunciados, la Linea F tendria que concentrar en ")
+    w("una hora cerca del 25 % de su demanda diaria, dos veces y media lo que concentra ")
     w("la red que la propia SBASE mide.\n")
 
     # Asimetria: la mitad de la suma de |M[o][d] - M[d][o]| sobre todos los
@@ -321,8 +321,8 @@ def escribir_reporte(od, perfil, comp, asc, reparto, modelo, contraste, nodos,
     w("tren; el total de la matriz es 827.976 (ver seccion 8).\n")
     w(f"La matriz de SBASE queda **{pc(asc.sbase.sum() / mol_tot - 1)} por encima** de ")
     w("los molinetes del 16/10/2024 y la del paso 5 queda 4,8 % por debajo. No son el ")
-    w("mismo dia ni el mismo mes —septiembre corre mas alto que octubre en la serie de ")
-    w("molinetes— y SBASE declara que su base son transacciones SUBE, que en septiembre ")
+    w("mismo dia ni el mismo mes (septiembre corre mas alto que octubre en la serie de ")
+    w("molinetes) y SBASE declara que su base son transacciones SUBE, que en septiembre ")
     w("de 2024 concentraban mas del 95 % de los pagos: expandir ese 95 % al total ")
     w("explica un factor de 1,05 por si solo.\n")
 
@@ -345,7 +345,7 @@ def escribir_reporte(od, perfil, comp, asc, reparto, modelo, contraste, nodos,
           f"| {num(r.f_paso5, 3)} |")
     w("")
 
-    w("\n### El par San Pedrito / San Jose de Flores, que abrio la decision D8\n")
+    w("\n### El par San Pedrito / San Jose de Flores, que nos hizo dudar del reparto\n")
     w("El paso 5 encontro que el dataset de Viajes y Etapas reparte mal la demanda entre ")
     w("esas dos estaciones vecinas de la Linea A: el total del par cierra bien pero el ")
     w("reparto esta corrido, y eso explica el 35 % del desvio absoluto de toda la red. ")
@@ -357,8 +357,8 @@ def escribir_reporte(od, perfil, comp, asc, reparto, modelo, contraste, nodos,
         w(f"| {r.nombre} | {mil(r.pax)} | {mil(r.sbase)} | {num(r.sbase / r.pax, 3)} "
           f"| {mil(r.paso5)} | {num(r.paso5 / r.pax, 3)} |")
     w("")
-    w("Es un argumento fuerte a favor de la matriz de SBASE en D2, y de paso vuelve ")
-    w("innecesaria la reparacion que D8 planteaba: el defecto es de una fuente, no del ")
+    w("Es un argumento fuerte a favor de la matriz de SBASE, y de paso vuelve ")
+    w("innecesaria la reparacion que planteabamos: el defecto es de una fuente, no del ")
     w("fenomeno.\n")
 
     w("\n## 5. Reparto por linea en los complejos de combinacion\n")
@@ -388,7 +388,7 @@ def escribir_reporte(od, perfil, comp, asc, reparto, modelo, contraste, nodos,
     ret = cuatro[cuatro.complejo_nombre == "Retiro"]
     if not ret.empty:
         c_ = ret[ret.linea == "LineaC"].iloc[0]
-        w("\n**Retiro, la discrepancia que abrio la decision D9.** El paso 6 predecia ")
+        w("\n**Retiro, la discrepancia que abrio la revision de la penalizacion.** El paso 6 predecia ")
         w(f"{pc(c_.p_predicho)} de los ascensos por la Linea C contra {pc(c_.p_molinetes)} ")
         w(f"de molinetes. SBASE mide {pc(c_.share_sbase)}: le da la razon a molinetes y ")
         w("confirma que el modelo manda demasiada gente a la Linea E en ese nodo.\n")
@@ -419,8 +419,8 @@ def escribir_reporte(od, perfil, comp, asc, reparto, modelo, contraste, nodos,
 
     w("\n## 7. Validacion de la asignacion todo-o-nada del paso 6\n")
     w("Se cargo la matriz de SBASE de cada hora pico sobre el grafo del paso 2 usando ")
-    w("los caminos minimos del paso 6 —asignacion todo-o-nada, penalizacion por ")
-    w("transbordo de 120 s— y se comparo la carga que resulta en cada tramo contra la ")
+    w("los caminos minimos del paso 6 (asignacion todo-o-nada, penalizacion por ")
+    w("transbordo de 120 s) y se comparo la carga que resulta en cada tramo contra la ")
     w("que mide SBASE. **Es la primera validacion de la asignacion de ruta contra un ")
     w("observado**; hasta ahora solo se podia contrastar el reparto por linea de ascenso.\n")
     fuera = contraste[~contraste.comparable]
@@ -483,7 +483,7 @@ def escribir_reporte(od, perfil, comp, asc, reparto, modelo, contraste, nodos,
                   - comp.sbase.sum())
     w("\n## 8. Que queda declarado\n")
     w(f"- **Viajes dentro de un mismo complejo.** La matriz diaria trae {mil(intra)} ")
-    w("  viajes ({:s} del total) entre dos nodos del mismo complejo — Retiro [C] a "
+    w("  viajes ({:s} del total) entre dos nodos del mismo complejo, Retiro [C] a "
       .format(pc(intra / od[od.periodo == 'diaria'].viajes.sum(), 2)))
     w("  Retiro [E] y equivalentes. En el modelo son una caminata dentro de la estacion, ")
     w("  no un viaje en tren, y quedan fuera de la asignacion. Se declaran, no se ")

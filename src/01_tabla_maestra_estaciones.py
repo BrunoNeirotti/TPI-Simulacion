@@ -213,7 +213,7 @@ def escribir_reporte(inv, tabla, sin_match, huerfanas, gtfs, res) -> None:
     pax_activo = inv[~inv.es_centinela & ~inv.es_premetro].pax_total.sum()
     L = []
     A = L.append
-    A("# Paso 1 — Tabla maestra de estaciones\n")
+    A("# Paso 1, Tabla maestra de estaciones\n")
     A("Generado por `src/01_tabla_maestra_estaciones.py`. "
       "Fuente de demanda: `molinetes-2025.zip`. Fuente de topologia: GTFS.\n")
     A("## Control de lectura\n")

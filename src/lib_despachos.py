@@ -9,7 +9,7 @@ recursos por anio.
 
 El esquema cambio entre uno y otro. El archivo Total trae nombres tipo
 `fr1_salc1` y causas codificadas en una o dos letras; los anuales de 2025 y 2026
-traen nombres legibles, causas en texto y —sobre todo— una columna **`Tipo Dia`
+traen nombres legibles, causas en texto y (sobre todo) una columna **`Tipo Dia`
 con el valor `Feriado`**, que es el calendario operativo del propio operador.
 
 Particularidades del formato, verificadas sobre los archivos de 2025 y 2026 el

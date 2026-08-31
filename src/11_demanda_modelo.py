@@ -1,13 +1,13 @@
-"""Paso 11: la matriz de demanda que consume el modelo (decision D2).
+"""Paso 11: la matriz de demanda que consume el modelo.
 
-D2 se cerro el 27/08/2026: **la matriz de SBASE es la base y la del paso 5
+Se cerro el 27/08/2026: **la matriz de SBASE es la base y la del paso 5
 aporta el perfil horario**. Este paso la construye.
 
 El armado tiene tres piezas y cada una viene de donde mejor la mide:
 
 1. **Nivel y distribucion espacial**: la matriz diaria de SBASE, que viene ya
-   expandida y no necesita escalado. Eso es lo que disuelve D2 en su forma
-   original —el criterio de escalado a molinetes— y tambien D8, porque esta
+   expandida y no necesita escalado. Eso es lo que disuelve la pregunta en su forma
+   original (el criterio de escalado a molinetes) y tambien el problema del par San Pedrito, porque esta
    matriz no tiene el corrimiento de San Pedrito / San Jose de Flores.
 2. **Las dos horas pico**: se anclan a las matrices HPM y HPT de SBASE, que
    estan medidas y son asimetricas. La direccionalidad horaria deja de ser una
@@ -52,7 +52,7 @@ HORA_HPT = 17
 
 # Columna del paso 5 que se usa para el perfil horario. La alternativa es
 # `expandidas_completas`, que descarta el 4,1 % de etapas marcadas
-# `viaje_incompleto`: esa es la decision D1 y se resuelve corriendo el modelo
+# `viaje_incompleto`: eso se resuelve corriendo el modelo
 # con las dos, no discutiendola. Aca solo entra como forma de la curva horaria,
 # no como nivel, asi que su efecto es de segundo orden.
 COLUMNA_PASO5 = "expandidas"
@@ -191,8 +191,8 @@ def escribir_reporte(od_hora, intra, sbase, red, nombre, de_nodo_a_comp) -> None
     total = od_hora.viajes.sum()
     por_hora = od_hora.groupby("hora").viajes.sum()
 
-    w("# Paso 11 — La matriz de demanda del modelo (D2)\n")
-    w("D2 quedo decidida el 27/08/2026: **la matriz de SBASE es la base y la del paso 5 ")
+    w("# Paso 11, La matriz de demanda del modelo\n")
+    w("Quedo decidido el 27/08/2026: **la matriz de SBASE es la base y la del paso 5 ")
     w("aporta el perfil horario**. Este es el armado y sus controles.\n")
 
     w("\n## 1. De donde sale cada pieza\n")
@@ -200,7 +200,7 @@ def escribir_reporte(od_hora, intra, sbase, red, nombre, de_nodo_a_comp) -> None
     w("|---|---|---|")
     w("| Nivel y distribucion espacial | Matriz diaria de SBASE | Viene expandida: no ")
     w("hay escalado que decidir, y no tiene el defecto de San Pedrito / San Jose de Flores |")
-    w("| Horas 8–9 y 17–18 | Matrices HPM y HPT de SBASE | Direccionalidad **medida**, ")
+    w("| Horas 8-9 y 17-18 | Matrices HPM y HPT de SBASE | Direccionalidad **medida**, ")
     w("no impuesta por simetria diaria |")
     w("| Resto del dia | Perfil horario por par del paso 5 | Es la unica fuente con ")
     w("apertura horaria completa |")
@@ -262,7 +262,7 @@ def escribir_reporte(od_hora, intra, sbase, red, nombre, de_nodo_a_comp) -> None
     w("- **Los 687 viajes diarios entre nodos de un mismo complejo quedan afuera.** En ")
     w("  el modelo son una caminata dentro de la estacion.")
     w("- **La matriz es de septiembre de 2024.** No describe la red de 2026.")
-    w("- **D1 sigue sin decidirse**, y este paso la deja lista para medirse: el perfil ")
+    w("- **Lo de las etapas incompletas sigue sin decidirse**, y este paso lo deja listo para medirse: el perfil ")
     w("  horario usa la columna `expandidas`, y correrlo con `expandidas_completas` es ")
     w("  cambiar una constante.")
     w("")

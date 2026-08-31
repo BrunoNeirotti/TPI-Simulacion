@@ -11,7 +11,7 @@ Produce cuatro cosas:
    entrada de demanda del modelo. **Excluye los dias atipicos**, que de otro modo
    arrastran el perfil de dia habil hacia abajo.
 2. El total diario por linea, separando dias atipicos de huecos de datos. Sirve
-   para elegir los periodos de ajuste y validacion (decision D4) y resuelve el
+   para elegir los periodos de ajuste y validacion y resuelve el
    pendiente del viernes 08/08/2025 que dejo abierto el paso 1.
 3. La concentracion horaria: que fraccion de la demanda diaria cae en la hora
    pico, para la red, por linea y por estacion. **Es el control que la propuesta
@@ -19,7 +19,7 @@ Produce cuatro cosas:
    la cifra anunciada de 270.000-300.000 pasajeros diarios de la Linea F son
    conciliables entre si.
 4. El reparto por anden en las estaciones donde el identificador de molinete lo
-   informa, que la decision D5 reserva como contraste independiente del reparto
+   informa, que reservamos como contraste independiente del reparto
    que produzca el modelo.
 
 Todo lo que sale de aca es ingreso por molinete: **no es ocupacion a bordo ni
@@ -59,7 +59,7 @@ N_FRANJAS = 96  # 24 h en bloques de 15 min
 
 # Un dia habil se marca atipico si su total cae por debajo de esta fraccion de la
 # mediana de los habiles del MISMO mes. La comparacion es intramensual porque la
-# estacionalidad es fuerte —enero es mes de vacaciones— y contra la mediana anual
+# estacionalidad es fuerte (enero es mes de vacaciones) y contra la mediana anual
 # saldria enero entero. El umbral detecta anomalias, no clasifica feriados.
 UMBRAL_ATIPICO = 0.80
 
@@ -69,7 +69,7 @@ UMBRAL_HUECO = 0.05
 
 # Sentidos que identifican un anden por direccion de circulacion. Los de
 # vestibulo (HALL, C, Aliv) y los registros sin campo de anden no cuentan: son el
-# ~30 % que motivo la decision D5.
+# ~30 % que motivo modelar la demanda por estacion.
 SENTIDO_DIRECCIONAL = {"N", "S", "E", "O", "NE", "NO", "SE", "SO"}
 ABREVIA_SENTIDO = {"NORTE": "N", "SUR": "S", "ESTE": "E", "OESTE": "O", "W": "O"}
 
@@ -409,7 +409,7 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
     hab = conc[(conc.tipo_dia == "habil") & (~conc.atipico) & (~conc.hueco_datos)]
     pico_red = hab.pico60_share.mean()
 
-    w("# Paso 3 — Demanda por estación, franja de 15 min y tipo de día\n")
+    w("# Paso 3, Demanda por estación, franja de 15 min y tipo de día\n")
     w("Generado por `src/04_demanda_molinetes.py` sobre "
       f"`data/raw/molinetes-{ANIO}.zip`. Salidas: "
       "`demanda_estacion_franja.csv`, `demanda_diaria.csv`, "
@@ -506,8 +506,8 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
     w("> **Esta lista hay que contrastarla contra el calendario oficial de "
       "feriados de 2025.** El método detecta anomalías, no feriados: un paro, un "
       "corte de servicio o un día de lluvia extraordinaria aparecen igual. La "
-      "forma de la lista es compatible con el calendario —1/1, 1/5, 25/12, el "
-      "24 y el 31, los lunes de carnaval y los puentes— pero **compatible no es "
+      "forma de la lista es compatible con el calendario (1/1, 1/5, 25/12, el "
+      "24 y el 31, los lunes de carnaval y los puentes) pero **compatible no es "
       "verificado**. Los días atípicos quedan fuera del perfil de día hábil y "
       "**no se reasignan a domingo**, que sería un supuesto sin sustento.\n")
 
@@ -540,11 +540,11 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
           "viernes 1.º (0,70).\n")
 
     # --- 3 -----------------------------------------------------------------
-    w("## 3. Concentración horaria — el control que quedaba pendiente\n")
+    w("## 3. Concentración horaria, el control que quedaba pendiente\n")
     w("La pregunta es si dos cifras de la Línea F son conciliables entre sí: los "
       "**≈73.900 ascensos en hora pico** que suman las tablas de SBASE del EsIA "
       "(46.713 hacia Palermo más 27.163 hacia Brandsen, misma hora pico de la "
-      "mañana) y los **270.000–300.000 pasajeros diarios** anunciados. Para que "
+      "mañana) y los **270.000-300.000 pasajeros diarios** anunciados. Para que "
       "lo fueran, la hora pico tendría que concentrar cerca del **25 %** de la "
       "demanda diaria.\n")
     w("La hora pico se busca como la ventana móvil de 60 min de mayor ingreso, "
@@ -554,8 +554,8 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
     w("|---|---:|---:|---:|---:|")
     for col, et in (
         ("pico60_share", "Hora pico móvil de 60 min"),
-        ("h08_share", "Hora 8:00–9:00"),
-        ("h17_share", "Hora 17:00–18:00"),
+        ("h08_share", "Hora 8:00-9:00"),
+        ("h17_share", "Hora 17:00-18:00"),
         ("pico15_share", "Franja pico de 15 min"),
     ):
         s = hab[col]
@@ -610,9 +610,9 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
       "línea.\n")
     w("A nivel de estación individual sí hay casos que superan el 25 %: "
       f"{maxi.nombre} [{maxi.linea[5:]}] llega al {pc(maxi.pico60_share)}. Pero "
-      f"son estaciones chicas y de uso casi monopropósito —{maxi.nombre} tiene "
+      f"son estaciones chicas y de uso casi monopropósito ({maxi.nombre} tiene "
       f"{es(maxi.pax_dia_medio)} ingresos diarios, el "
-      f"{pc(maxi.pax_dia_medio / hab.pax.mean())} de la red— donde entra "
+      f"{pc(maxi.pax_dia_medio / hab.pax.mean())} de la red) donde entra "
       "personal de oficinas a la mañana y sale a la tarde. **Una línea entera "
       "de doce estaciones no se comporta como una estación de oficinas.**\n")
     if not ferro.empty and (ferro.nombre == "Constitucion").any():
@@ -631,15 +631,15 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
           f"la Línea C, y el {pc(32640 / c.pax_dia_medio)} de todo su ingreso "
           "diario actual.")
         w("")
-        w("Los transbordos desde el ferrocarril **sí pasan por molinete** —son "
-          "sistemas tarifarios distintos—, así que están contados en esos "
+        w("Los transbordos desde el ferrocarril **sí pasan por molinete** (son "
+          "sistemas tarifarios distintos), así que están contados en esos "
           f"{es(c.pax_dia_medio)} ingresos. La comparación no está subestimando "
           "la demanda ferroviaria.\n")
     w("De ahí salen dos lecturas del mismo hecho, y conviene decir las dos:\n")
     w(f"1. **Si la Línea F se pareciera a la red actual**, sus 73.900 ascensos "
       f"de hora pico implicarían del orden de **{es(round(implicada, -3))} "
       "pasajeros diarios**, entre 2 y 3 veces la cifra anunciada de "
-      "270.000–300.000.")
+      "270.000-300.000.")
     w("2. **Si la cifra anunciada fuese correcta**, la Línea F tendría que "
       "concentrar cerca del 25 % de su demanda diaria en una hora: "
       + f"{25 / (pico_red * 100):.1f}".replace(".", ",")
@@ -652,22 +652,22 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
     w("**Tres salvedades, que acotan el alcance sin cambiar la conclusión:**\n")
     w("1. **Unidades.** Los molinetes miden ingresos a la red; los ascensos de "
       "SBASE incluyen además los transbordos desde las otras seis líneas de "
-      "subte. Los ascensos son necesariamente más que los ingresos —en la red "
+      "subte. Los ascensos son necesariamente más que los ingresos (en la red "
       "actual el 48,8 % de las etapas termina en una línea distinta de la de "
-      "ascenso—, así que la cifra diaria implicada del punto 1 es una **cota "
+      "ascenso), así que la cifra diaria implicada del punto 1 es una **cota "
       "superior**. La comparación de *concentración*, que es una proporción, no "
       "se ve afectada por el nivel.")
     w("2. **La hora pico de SBASE es la de la línea, no la de la red.** Una "
       "línea puede tener su pico desplazado respecto del pico agregado, lo que "
       "aumentaría su concentración propia. La sección 3.2 muestra que entre "
       "líneas la dispersión es chica: del 9,0 % al 12,0 %.")
-    w("3. **Los 270.000–300.000 no tienen fuente documental.** No aparecen en "
+    w("3. **Los 270.000-300.000 no tienen fuente documental.** No aparecen en "
       "ninguna pieza del expediente ni de la licitación. Que no cierren contra "
       "el perfil de SBASE es una razón más para no usarlos como insumo, que es "
       "lo que el trabajo ya venía haciendo.\n")
 
     # --- 4 -----------------------------------------------------------------
-    w("## 4. Reparto por andén — el contraste que reserva D5\n")
+    w("## 4. Reparto por andén, el contraste que queda como reserva\n")
     atribuido = sum(d.anden.values())
     total_nodos = sum(d.anden_total.values())
     cob = anden.groupby("nodo_id").cobertura_estacion.first()
@@ -679,7 +679,7 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
     w(f"- De esas {len(cob)}, cobertura mediana {pc(cob.median())}; "
       f"{int((cob >= 0.99).sum())} superan el 99 % y "
       f"{int((cob < 0.5).sum())} quedan por debajo del 50 %.\n")
-    w("**El faltante no está repartido al azar**, y por eso D5 decidió modelar "
+    w("**El faltante no está repartido al azar**, y por eso decidimos modelar "
       "la demanda por estación: hay 28 estaciones enteras sin el dato. Lo que "
       "queda es un contraste **parcial y sesgado por construcción** del reparto "
       "entre andenes que produzca el modelo, útil solo donde el dato existe.\n")
@@ -720,7 +720,7 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
       "calendario `Tipo Día` del propio operador: 11 de 11 feriados hábiles "
       "detectados, 6 más corroborados como servicio de sábado, 4 sin datos de "
       "despachos y 4 sin explicación. Ver `reports/05_despachos.md`, sección 5.")
-    w("- **D4 queda en condiciones de decidirse**: la tabla diaria da los "
+    w("- **Ya se pueden elegir los períodos de ajuste y validación**: la tabla diaria da los "
       "candidatos a ventana de ajuste y de validación, ambos posteriores a "
       "diciembre de 2024, sin días atípicos y con estacionalidad comparable.")
     w("")

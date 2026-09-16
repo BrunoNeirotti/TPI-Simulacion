@@ -384,7 +384,9 @@ por línea. Es lo que el motor de eventos discretos actualiza en cada evento.
     declaradas por el Estudio de Impacto Ambiental, dos adicionales solo en el mapa
     oficial). Se recalcula la tabla de caminos mínimos con el mismo procedimiento:
     la redistribución de pasajeros es resultado del cambio de topología, no un
-    supuesto impuesto línea por línea.
+    supuesto impuesto línea por línea. El reparto que resulte se contrasta después
+    contra las matrices origen-destino de SBASE~2019 en los nodos de combinación
+    (ver sección~\ref{sec:supuestos} y \texttt{decisiones.md}), nunca al revés.
 \end{itemize}
 
 % ---------- 13. Datos de entrada ----------
@@ -486,9 +488,19 @@ informando intervalos de confianza.
   \item \textbf{Intervalo entre trenes de la Línea F como variable de escenario, no
     como dato fijo}: la fuente oficial dice explícitamente que el plan de servicio
     no existe.
-  \item \textbf{Demanda futura de la Línea F}: no hay medición posible; el perfil de
-    SBASE de 2019 se usa como contraste declarado, con la salvedad de que implica
-    una concentración horaria que la red actual no exhibe.
+  \item \textbf{Demanda futura de la Línea F}: no hay medición posible; la nota
+    técnica \textit{Análisis de Demanda Línea F} (SBASE, 2019) --- obtenida en
+    fuente primaria por la solicitud N.\textsuperscript{o}~00934682/26, no solo
+    citada por el EsIA --- se usa \textbf{solo como contraste, nunca como insumo del
+    modelo} (decidido el 16/09/2026, ver \texttt{decisiones.md}), con tres
+    salvedades: implica una concentración horaria (\textasciitilde 25~\% de la
+    demanda diaria en la hora pico) que la red actual no exhibe (9,9~\%); su cuadro
+    de intervalos de entrada para las líneas actuales es un supuesto de mejora de
+    frecuencia de 2019 que no se concretó (los despachos medidos de 2025 son más
+    espaciados en las seis líneas); y su trazado tiene \textbf{13 estaciones con
+    terminal sur en California}, no las 12 vigentes con terminal en Brandsen, así
+    que la correspondencia estación por estación con el diseño actual debe
+    verificarse por geometría antes de comparar, no darse por sentada.
 \end{itemize}
 
 % ---------- 16. Preguntas de simulación ----------

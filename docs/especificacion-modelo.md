@@ -225,7 +225,9 @@ lo que el motor de eventos discretos actualiza en cada evento.
   conectados a la red existente en las estaciones de combinación (seis declaradas por
   el EsIA, dos adicionales solo en el mapa oficial). Se recalcula `caminos_minimos`
   con el mismo procedimiento: la redistribución de pasajeros es resultado del cambio
-  de topología, no un supuesto impuesto línea por línea.
+  de topología, no un supuesto impuesto línea por línea. El reparto que resulte se
+  contrasta después contra las matrices origen-destino de SBASE 2019 en los nodos de
+  combinación (ver sección 15 y `decisiones.md`), nunca al revés.
 
 ## 13. Datos de entrada
 
@@ -295,10 +297,18 @@ intervalos de confianza.
   fondo, B y E con verificación agregada.
 - **Headway de la Línea F como variable de escenario, no como dato fijo** (D7): la
   fuente oficial dice explícitamente que el plan de servicio no existe.
-- **Demanda futura de la Línea F**: no hay medición posible; el perfil de SBASE 2019
-  del EsIA se usa como contraste declarado, con la salvedad de que implica una
-  concentración horaria (~25 % de la demanda diaria en la hora pico) que la red
-  actual no exhibe (9,9 %).
+- **Demanda futura de la Línea F**: no hay medición posible; la nota técnica *Análisis
+  de Demanda Línea F* (SBASE, 2019) —obtenida en fuente primaria por la solicitud
+  N° 00934682/26, no solo citada por el EsIA— se usa **solo como contraste, nunca
+  como insumo del modelo** (decidido el 16/09/2026, ver `decisiones.md`), con tres
+  salvedades: implica una concentración horaria (~25 % de la demanda diaria en la
+  hora pico) que la red actual no exhibe (9,9 %); su cuadro de intervalos de entrada
+  para las líneas actuales es un supuesto de mejora de frecuencia de 2019 que no se
+  concretó (los despachos medidos de 2025 son más espaciados en las seis líneas); y
+  su trazado tiene **13 estaciones con terminal sur en California**, no las 12
+  vigentes con terminal en Brandsen, así que la correspondencia estación por estación
+  con el diseño actual debe verificarse por geometría antes de comparar, no darse por
+  sentada.
 
 ## 16. Preguntas de simulación
 

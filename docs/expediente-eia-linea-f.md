@@ -132,6 +132,19 @@ entorno inmediato de la Est. Pueyrredón / Hospital Rivadavia de la F, pero el e
 no lo afirma. Para el modelo lo resolvemos por distancia entre coordenadas del GTFS y lo
 declaramos como criterio propio. No se cita como dato oficial.
 
+> **Corroboración no oficial, 16/09/2026.** La miniatura de un video de YouTube
+> (`i.ytimg.com/vi/ka0nrsfOM5k`, título "¡Así será la NUEVA LÍNEA DE SUBTE de BUENOS
+> AIRES!", canal y fecha sin verificar) muestra un diagrama de andén con las doce
+> estaciones —Brandsen, Constitución (C), Cochabamba (E), Chile, Congreso (A),
+> Corrientes (B), Pizzurno (D), Junín, Pueyrredón (H), Parque las Heras, Ecoparque,
+> Pacífico (D)— en el mismo orden y con las mismas seis combinaciones que este
+> documento, y ubica la combinación con la H exactamente en **Pueyrredón**, coincidiendo
+> con el criterio propio por geometría. **No se cita como dato oficial**: es la
+> miniatura de un video sin canal ni fecha verificados, no una fuente primaria. Sirve
+> como corroboración adicional del criterio ya declarado, no lo reemplaza. Si se
+> identifica el origen del video y resulta ser material oficial (SBASE, GCBA o la
+> licitación), esta nota se actualiza y el dato pasa a citarse como tal.
+
 ### 3.1 Progresivas y distancias entre estaciones
 
 Las progresivas salen del doc 0010, Tabla 4, págs. 20-21. Las distancias las derivamos

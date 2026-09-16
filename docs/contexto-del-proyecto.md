@@ -46,6 +46,7 @@ El pipeline de datos está cerrado. Lo que falta es el modelo.
 | Pipeline de datos (pasos 1 a 6, y 9 a 11) | Cerrado |
 | Insumos que consume el modelo | Generados y verificados |
 | Límites de AnyLogic PLE | Medidos |
+| Especificación del modelo (entrega Etapa 1/2, Classroom) | Escrita, `docs/especificacion-modelo.tex`, lista como `EspecificacionModelo_GRUPO_3.pdf`. Vence el 27/09/2026 |
 | Modelo en AnyLogic (pasos 7 y 8) | Pendiente |
 
 Del pipeline, el modelo consume cinco archivos, todos en `data/processed/`:
@@ -180,6 +181,19 @@ El EsIA publica el perfil de carga por estación, sentido y hora pico, con cuán
 sube, baja y permanece. Lo tomó del *Análisis de Demanda Línea F* de SBASE, 2019. Está
 transcripto en la ficha del expediente, sección 4, y es nuestro punto de comparación para
 el escenario futuro.
+
+Esa nota técnica dejó de ser solo una cita indirecta: llegó completa el 16/09/2026, por la
+solicitud Ley 104 N° 00934682/26 (ver 5.5). Trae, además del perfil agregado que ya
+teníamos, las matrices origen-destino punto por punto en las siete estaciones donde la
+Línea F combina con otra línea, para las dos horas pico. Es un dato nuevo, sin otra vía de
+obtención, pero con un problema: el estudio modela una traza de **13 estaciones con
+terminal sur en California**, no la vigente de **12 con terminal en Brandsen** (ver 3.1).
+La correspondencia estación por estación entre ese estudio y el trazado actual no calza de
+forma prolija ni se puede asumir por nombre o por posición en la lista; hay que
+verificarla por geometría antes de usarla. Por eso, y porque es la misma fuente que en 3.6
+ya tratamos con reserva, **decidimos el 16/09/2026 usarla solo como contraste una vez que
+el modelo calcule su propio reparto en el escenario futuro, nunca como insumo** (detalle
+en `docs/respuestas-oficiales/respuesta-solicitud-00934682.md`).
 
 La cifra anunciada de 270.000 a 300.000 pasajeros diarios no tiene respaldo documental:
 no aparece en ninguna pieza del expediente. La citamos como estimación anunciada, nunca
@@ -384,8 +398,9 @@ Buena parte de lo que usamos no estaba publicado y hubo que pedirlo. Los origina
 en `docs/respuestas-oficiales/` y en las carpetas de documentación oficial, y las fichas
 de análisis en `docs/`.
 
-El frente de pedidos está cerrado. Lo que falta tiene poco valor y los escenarios con y
-sin proyecto son justamente lo que el TPI produce.
+El frente de pedidos está cerrado. Lo único que faltaba, la nota técnica de demanda de la
+Línea F, llegó el 16/09/2026 (ver 5.5). Lo que sigue sin respuesta (los escenarios con y
+sin proyecto) tiene poco valor y es justamente lo que el TPI produce.
 
 ### 5.1 Expediente del EIA
 
@@ -446,15 +461,25 @@ contesta lo que se pidió: la respuesta lee el pedido como documentación licita
 cuando lo que pedimos es información de operación. Remitir al pliego es remitir a un
 corpus donde ya verificamos que lo pedido no está (ver 5.2).
 
-### 5.5 Lo que sigue sin ser público
+### 5.5 Solicitud Ley 104 N° 00934682/26, la que llegó tarde pero llegó
 
-Un solo documento: la nota técnica *Análisis de Demanda Línea F* de SBASE, 2019, o su
-derivado, el *Informe Strans Demanda de la Línea F*. Es el único eslabón de la cadena que
-no es público. Sus tablas de perfil de carga están transcriptas en la ficha del
-expediente, así que no frena nada.
+El documento que faltaba era uno solo: la nota técnica *Análisis de Demanda Línea F* de
+SBASE, 2019 (o su derivado, el *Informe Strans Demanda de la Línea F*), que hasta ahora
+era el único eslabón de la cadena que no era público. Sus tablas de perfil de carga
+agregado ya estaban transcriptas en la ficha del expediente, así que no frenaba nada, pero
+faltaba el documento en sí.
 
-No hay que confundirlo con el LF-GL-GEN-GNR-IN-003: ese código es el informe "Demandas
-Etapa I, Medios de Salida" del pliego, que ya está descargado. Son documentos distintos.
+Se presentó por Ley 104 el 26/08/2026, directo a SBASE. La respuesta llegó el 16/09/2026,
+con casi tres semanas de demora (`IF-2026-41875173-GCABA-DGTALMMI`), y esta vez sí adjuntó
+el documento pedido, embebido dentro de `IF-2019-20550252-GCABA-SBASE.pdf`. Trae el
+perfil de carga que ya conocíamos más las matrices origen-destino en las siete estaciones
+de combinación de la Línea F, con la salvedad del trazado que ya contamos en 3.6. Ficha
+completa en `docs/respuestas-oficiales/respuesta-solicitud-00934682.md`; copias en
+`docs/respuestas-oficiales/`.
+
+No hay que confundir este documento con el LF-GL-GEN-GNR-IN-003: ese código es el informe
+"Demandas Etapa I, Medios de Salida" del pliego, que ya estaba descargado desde antes. Son
+documentos distintos.
 
 ---
 
@@ -485,10 +510,13 @@ disimulamos.
   en que la red no está al límite. Es lo que el análisis de sensibilidad tiene que
   recorrer.
 - El escenario futuro no tiene dato observable, pero sí con qué contrastarlo. El perfil de
-  carga del EsIA es exigente, pero no es una medición: es la salida de otro modelo, de
-  2019, previo a la pandemia y a la apertura de medios de pago, con un supuesto de
+  carga de SBASE es exigente, pero no es una medición: es la salida de otro modelo, de
+  2019 (VISUM), previo a la pandemia y a la apertura de medios de pago, con un supuesto de
   simetría diaria incorporado, porque las tablas de hora pico mañana y tarde son la imagen
-  especular exacta una de la otra. A eso se le suma lo de la concentración horaria de 3.6.
+  especular exacta una de la otra, y con un trazado de 13 estaciones que no es el vigente
+  de 12 (ver 3.6 y 5.5). Por eso se usa solo como contraste después de que el modelo corra
+  su propia asignación, nunca como insumo. A eso se le suma lo de la concentración horaria
+  de 3.6.
 - Los indicadores del modelo tienen piso pero no techo observable. El tiempo de detención
   del GTFS es un valor de diseño de 24 s, idéntico en toda parada de toda línea, y el
   `min_transfer_time` es un mínimo de diseño. Ninguno de los dos es una medición. En el
@@ -516,8 +544,10 @@ conviene reintroducirlas:
 
 ## 7. Decisiones que tomamos
 
-Son once decisiones de método. Seis están cerradas, y son las que importaban para poder
-escribir el modelo; las que quedan abiertas no lo frenan.
+Son once decisiones de método. Ocho están cerradas (dos se cerraron el 16/09/2026:
+profundidad de calibración y headway de la Línea F); las dos que quedan abiertas no
+frenan el modelo, y la que sigue sin poder decidirse por sí sola (D1) se resuelve
+midiendo, no discutiendo.
 
 Ninguna decisión la toma alguien por su cuenta: se proponen las opciones con sus
 consecuencias, se elige entre todos, y recién ahí se registra con fecha y evidencia.
@@ -575,6 +605,25 @@ así que es la base obligada. El horizonte es el día completo. La fidelidad vis
 detalle va en un submodelo peatonal de Constitución en hora pico, que con 9.951 ingresos
 entra a escala real.
 
+**Profundidad de calibración: solo el corredor de la Línea F y las líneas que combinan.**
+Cerrada el 16/09/2026. La propuesta ya declaraba esta opción (calibrar y validar a fondo
+el corredor de la Línea F y las líneas A, C, D y H, con las que combina, y representar el
+resto de la red —B y E— con verificación agregada, sin el mismo ajuste tramo a tramo), y
+la confirmamos: calibrar las seis líneas por igual no es viable en el cuatrimestre y no
+aporta donde el trabajo necesita precisión, que es el corredor que cambia con la Línea F.
+
+**Rango de headway de la Línea F: variable de escenario, entre 90 y 189 s.** Cerrada el
+16/09/2026. El EsIA fija 1,5 min (90 s) y 40 trenes por sentido y hora, y el
+IF-2026-37530623 agrega 100 s "de requerirse". Medimos que la mejor línea actual en hora
+pico es la C con 3,15 min (189 s), o sea que el diseño supone despachar 2,1 veces más
+seguido que lo que hoy se logra. Como el plan de servicio no existe y lo va a fijar el
+futuro operador, tratarlo como variable de escenario es la única lectura fiel de la
+fuente. El rango recorre el piso de diseño (90 s, la cifra que consolidan más piezas) y
+el techo observado (189 s, lo que logra hoy la mejor línea real). La nota técnica de
+SBASE 2019 que llegó después (ver 3.6 y 5.5) simuló el tramo troncal de la Línea F a
+100 s, una tercera fuente que converge dentro del mismo rango sin dar motivo para
+reabrirlo.
+
 ### 7.2 Abiertas
 
 Ninguna frena el arranque del modelo.
@@ -583,10 +632,6 @@ Ninguna frena el arranque del modelo.
 expanden a 30.491. Se decide corriendo el modelo con las dos versiones y viendo si cambia
 algo, no discutiéndola: `matriz_od.csv` ya trae las dos en columnas separadas,
 `expandidas` y `expandidas_completas`.
-
-**Profundidad de calibración.** Si calibramos toda la red por igual o solo el corredor de
-la Línea F y las líneas con las que combina, representando el resto de forma más gruesa.
-La propuesta ya declara la segunda opción, falta confirmarla.
 
 **Períodos de ajuste y validación.** Ya no es una elección libre: las dos ventanas tienen
 que ser posteriores a diciembre de 2024 y no pueden tocar marzo de 2025, que no tiene
@@ -608,14 +653,6 @@ Está aplicada la primera, con el interruptor `REPARAR_LINEA_E` en `src/03_grafo
 Lo medimos: regenerando el grafo sin el reparo cambian 58 pares de 6.006, o sea el 1,0 %,
 y 18 cambian de línea de ascenso. Para la elección de ruta pesa poco, pero sigue abierta
 porque afecta los tiempos de viaje sobre la E, que sí entran al modelo.
-
-**Qué rango de headway recorrer para la Línea F.** El EsIA fija 1,5 min y 40 trenes por
-sentido y hora, y el IF-2026-37530623 agrega 100 s "de requerirse". Medimos que la mejor
-línea actual en hora pico es la C con 3,15 min, o sea que el diseño supone despachar 2,1
-veces más seguido que lo que hoy se logra. Como el plan de servicio no existe y lo va a
-fijar el futuro operador, tratarlo como variable de escenario es la única lectura fiel de
-la fuente. Lo que falta decidir es el rango: piso de 90 a 100 s de diseño, techo los 3,15
-min de la Línea C.
 
 ### 7.3 Un tema abierto: Retiro
 

@@ -47,6 +47,7 @@ tomamos y el plan de trabajo. Si lo que se busca es armar el modelo, el archivo 
 | Pipeline de datos (pasos 1 a 6, 9 a 11) | Cerrado |
 | Insumos que consume el modelo | Generados y verificados |
 | Límites de AnyLogic PLE | Medidos |
+| Especificación del modelo (control de avance, Etapa 1/2) | Redactada, a revisar por el grupo antes de entregar |
 | Modelo en AnyLogic (pasos 7 y 8) | Pendiente |
 
 ---
@@ -76,6 +77,9 @@ Los documentos de `docs/` que conviene conocer:
 | `pruebas-anylogic-topes.md` | Las cuatro pruebas de límites de AnyLogic y qué salió de cada una |
 | `respuestas-oficiales/` | Los informes oficiales que recibimos, con su ficha de análisis |
 | `definitivo-main.tex` | La propuesta |
+| `especificacion-modelo.tex` / `.pdf` | Especificación del modelo conceptual, entrega de control de avance (Etapa 1/2) |
+| `figuras/` | Figuras de la propuesta y diagramas del modelo (incluye la fuente editable de cada diagrama) |
+| `historico/` | Versiones superadas de la propuesta y entregas puntuales ya presentadas; no son documentos vigentes |
 
 ---
 

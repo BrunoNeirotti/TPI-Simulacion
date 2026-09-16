@@ -1,0 +1,455 @@
+% TPI - Propuesta final de proyecto para el Trabajo Practico Integrador
+
+\documentclass{article}
+
+\usepackage{arxiv}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage[spanish]{babel}
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{enumitem}
+
+\raggedbottom
+
+\title{Evaluación mediante simulación del impacto de la Línea F sobre la operación de la red de Subte de Buenos Aires}
+
+\author{
+  \textbf{Bruno Neirotti}\textsuperscript{1} \qquad \textbf{Alexis Galasco}\textsuperscript{2} \qquad \textbf{Salami Tomás}\textsuperscript{3} \qquad \textbf{Mesapelle Giani}\textsuperscript{4} \qquad \textbf{Lovatti Francisco}\textsuperscript{5} \\[0.5ex]
+  \textsuperscript{1}Legajo: 47792 -- \texttt{bneirotti@gmail.com} \\
+  \textsuperscript{2}Legajo: 51474 -- \texttt{alexis.galasco123@gmail.com} \\
+  \textsuperscript{3}Legajo: 51534 -- \texttt{tomas.salami1@gmail.com} \\
+  \textsuperscript{4}Legajo: 52897 -- \texttt{gianimesapelle04@gmail.com} \\
+  \textsuperscript{5}Legajo: 52420 -- \texttt{franciscolovatti08@gmail.com} \\[0.5ex]
+  Universidad Tecnológica Nacional -- FRRo \\
+  Zeballos 1341, S2000, Argentina \\
+}
+\date{05 de agosto de 2026}
+
+\begin{document}
+\maketitle
+
+% ---------- 1. Introducción ----------
+\section{Introducción}
+
+En este documento presentamos la propuesta que el grupo adopta para el Trabajo Práctico Integrador de la
+materia Simulación. El trabajo aborda un problema de planificación: estimar, mediante simulación, qué
+efecto tendría sobre el conjunto de la red de Subte de la Ciudad Autónoma de Buenos Aires la incorporación
+de la futura Línea F.
+
+El transporte público urbano guiado es la infraestructura que sostiene la movilidad cotidiana de las
+ciudades densas, y a la vez es la más costosa y la menos reversible. Por esa razón, las decisiones de expansión
+se apoyan habitualmente en modelos que permiten anticipar el desempeño de la red antes de que la obra
+exista. La simulación de eventos discretos resulta apropiada para este tipo de evaluación porque
+representa explícitamente los mecanismos que generan la congestión (llegadas de pasajeros variables en
+el tiempo, intervalos irregulares entre formaciones, capacidad finita de coche y de andén, transbordos)
+y permite comparar escenarios alternativos bajo los mismos supuestos, algo que un cálculo agregado de
+capacidad no ofrece.
+
+El criterio de selección del caso es la disponibilidad de datos. La demanda y la oferta de la red actual
+están documentadas en registros públicos con marca de tiempo publicados por Subterráneos de Buenos Aires
+(SBASE), de modo que las tasas de llegada y los intervalos de despacho se estiman a partir de mediciones y
+no de supuestos propios. El escenario futuro tampoco es enteramente hipotético: la Línea F cuenta con traza
+establecida por ley, se encuentra en proceso licitatorio y su Estudio de Impacto Ambiental fue sometido a
+audiencia pública en agosto de 2026. El expediente completo de esa evaluación ambiental fue obtenido
+mediante pedido de vista ante la Agencia de Protección Ambiental y se incorpora a esta propuesta [13]: de él
+provienen el trazado, las estaciones, las progresivas, las etapas constructivas y --- lo que resulta
+decisivo para el modelo --- los parámetros operativos con que la línea fue dimensionada. No obstante, ese
+expediente no contiene una evaluación del efecto de la nueva línea sobre el conjunto de la red, que es
+precisamente el objeto de este trabajo. Los pedidos de acceso a la información pública cursados para
+obtener ese material continúan en trámite, y el trabajo está diseñado para no quedar condicionado a su
+resultado: los parámetros que la documentación disponible no permita fijar se declaran como supuestos y se
+someten a análisis de sensibilidad.
+
+% ---------- 2. Propuesta ----------
+\section{Propuesta}
+
+\subsection{Problema}
+
+La red de Subte de Buenos Aires opera seis líneas con una demanda concentrada en dos picos diarios y muy
+desigualmente repartida entre estaciones. A esa concentración temporal se suma una característica
+estructural: el trazado es fuertemente radial, con líneas que convergen sobre el área central, de modo que
+buena parte de los viajes entre el sur y el norte de la ciudad solo puede resolverse transbordando en el
+macrocentro. El resultado son estaciones de combinación y tramos troncales que operan cerca de su
+capacidad en hora pico, mientras otros sectores de la red circulan holgados.
+
+La Línea F fue concebida precisamente como respuesta a ese desequilibrio. Su traza fue establecida por la
+Ley 670 de la Ciudad [10], fue revisada en el Plan Estratégico y Técnico para la Expansión de la Red de
+Subtes (PETERS) elaborado para SBASE con financiamiento del Banco Interamericano de Desarrollo [11], y hoy
+forma parte
+del proyecto \textit{Línea F -- Sistema Integrado de Movilidad}, actualmente en licitación pública nacional
+e internacional y con audiencia pública ambiental celebrada en agosto de 2026. Se trata de un corredor
+transversal entre Barracas y Palermo, con doce estaciones que vincularían las seis líneas existentes entre
+sí y con los ferrocarriles Roca y San Martín, y cuya ejecución está prevista en dos tramos. Sobre su
+magnitud circulan dos cifras que no miden lo mismo: el pliego describe una línea de 9,8 km [12] y el Estudio
+de Impacto Ambiental refiere 10,9 km de túneles [13]. Se adopta la primera para dimensionar el servicio y se
+deja constancia de la segunda. El objetivo de descongestionar las líneas existentes y de mejorar la
+conectividad norte--sur figura en la comunicación oficial del proyecto [14] y se reitera en el expediente
+ambiental, donde el PETERS es citado como el estudio que plantea a la Línea F como la alternativa para que
+la Línea C opere sin congestión con proyección de demanda a 2030, y donde la Secretaría de Transporte
+extiende el objetivo a las líneas C y D [13]. Un dato del propio expediente permite dimensionar el
+mecanismo: el 70\,\% de los viajes que incluyen una etapa en la Línea C corresponde a combinaciones con el
+ferrocarril, de modo que el alivio esperado depende de que la nueva línea capte la transferencia desde la
+terminal Constitución. La comunicación oficial estima además una demanda de 270.000 a 300.000 pasajeros
+diarios; se trata de una cifra anunciada y no del resultado de un estudio publicado --- no aparece en
+ninguna pieza del expediente ambiental ni en la documentación licitatoria ---, y como tal se la utiliza. El
+presupuesto oficial de la obra asciende a 1.350 millones de dólares con anticipo financiero del 20\,\%, según
+las Cláusulas Particulares del pliego y la resolución que postergó la apertura de ofertas [12].
+
+Ahora bien, ese beneficio se afirma pero no se cuantifica. La revisión del expediente ambiental completo
+permite precisar qué falta y qué no. El expediente sí aporta el dimensionamiento de la nueva línea y un
+perfil de carga por estación, sentido y hora pico elaborado para ella. En cambio, no contiene ninguna
+comparación del funcionamiento de la red con y sin el proyecto, ni una matriz origen--destino de la red a
+nivel de estación, ni parámetros operativos de las seis líneas existentes, ni cuantificación alguna del
+alivio atribuido a las líneas C y D, que se enuncia únicamente en términos cualitativos. Los análisis con y
+sin proyecto que el estudio incluye corresponden a microsimulaciones de tránsito de superficie durante la
+etapa de obra, no a la operación de la red subterránea. Sigue sin estar disponible, entonces, una evaluación
+desagregada que indique en qué estaciones, en qué tramos y en qué franjas horarias se produciría el alivio,
+ni qué frecuencia de servicio sería necesaria para que ese alivio se materialice. Frente a una inversión de
+esa magnitud y a un plazo de obra de varios años, resulta razonable disponer de un modelo que permita
+comparar el desempeño de la red con y sin la nueva línea, y que además permita explorar variantes: el primer
+tramo constructivo frente a la traza completa, o distintos niveles de frecuencia de la Línea F.
+
+El problema, entonces, no se agota en la política de despachos de una línea. Requiere representar la red
+como un sistema conectado, en el que un viaje puede resolverse por distintos caminos y en el que la
+aparición de una traza nueva modifica la elección de ruta de una parte de los pasajeros y, con ello, la
+carga que soportan las líneas existentes. Ese planteo exige una matriz origen--destino [2], y ninguna fuente
+pública la ofrece directamente: el registro de molinetes informa ingresos por estación pero no destinos, y
+el dataset de viajes y etapas del Área Metropolitana, que sí informa destinos, corresponde a un único día
+hábil típico y los obtiene por imputación. Reconciliar ambas fuentes y declarar de manera explícita los
+supuestos que esa reconciliación introduce forma parte del problema a resolver y no de sus condiciones de
+contorno.
+
+\subsection{Objetivos}
+
+\textbf{Objetivo general.} Construir un modelo de simulación de eventos discretos de la red de Subte de la
+Ciudad Autónoma de Buenos Aires, calibrado con datos públicos de demanda y de oferta, que permita comparar
+el desempeño operativo de la red actual con el de un escenario futuro que incorpore la Línea F.
+
+\textbf{Objetivos específicos.}
+\begin{itemize}[leftmargin=1.4em,itemsep=0.15em,topsep=0.3em]
+	\item Caracterizar la demanda de ingreso a cada estación por franja horaria y tipo de día a partir del
+	      registro de molinetes, y aprovechar la codificación de andén que ese registro contiene para
+	      contrastar el reparto entre andenes que el modelo produce.
+	\item Construir una matriz origen--destino a nivel de estación, derivada de las etapas de subte del
+	      dataset de viajes y etapas del Área Metropolitana y escalada a los niveles de demanda medidos por
+	      los molinetes, dejando explícitos los supuestos que introduce esa combinación.
+	\item Caracterizar el intervalo real entre formaciones despachadas y su dispersión por línea y franja
+	      horaria a partir del registro de trenes despachados, y contrastarlo con la frecuencia nominal
+	      programada.
+	\item Implementar en AnyLogic un modelo de la red actual que incluya las seis líneas, sus estaciones y
+	      sus combinaciones, con una profundidad de calibración mayor en el corredor de la Línea F y en las
+	      líneas con las que combina, y validarlo contra un período no utilizado para el ajuste.
+	\item Incorporar un escenario futuro con la Línea F, construido a partir de la traza, las estaciones y
+	      las combinaciones definidas en la documentación oficial del proyecto.
+	\item Definir y medir un conjunto de indicadores operativos comparables entre escenarios.
+	\item Comparar los escenarios considerados: red actual, red con el primer tramo de la Línea F, red con
+	      la traza completa y variantes de frecuencia de la nueva línea.
+	\item Analizar el efecto sobre la congestión y la redistribución de la demanda entre líneas, y evaluar
+	      la sensibilidad de los resultados a los supuestos declarados en la construcción de la matriz
+	      origen--destino.
+\end{itemize}
+
+\subsection{Metodología}
+
+\textbf{Demanda.} La fuente principal es el dataset \textit{Subte: Viajes Molinetes} [3], publicado por
+SBASE en Buenos Aires Data, con una fila por molinete, estación y bloque de quince minutos, discriminando
+pasajeros pagos, con pase y franquiciados. De allí se estima la tasa de ingreso a cada estación por franja
+horaria y tipo de día, agregando los molinetes de una misma estación. Sobre esta fuente pesa una
+discontinuidad que condiciona la elección de períodos: la apertura a medios de pago distintos de SUBE ---
+pago sin contacto desde diciembre de 2024 y código QR desde mayo de 2025, que hacia septiembre de ese año
+ya explicaban cerca de un tercio de los viajes --- amplió la cobertura del registro, cambio que los archivos
+publicados reflejan en su denominación. Los totales anteriores y posteriores a esa apertura no son
+comparables en nivel, de modo que el ajuste y la validación se realizan dentro del régimen homogéneo
+posterior.
+
+\textbf{Oferta.} La operación real se caracteriza con el dataset \textit{Subte: Trenes despachados} [4],
+que informa día, tipo de día, línea, cantidad de coches, hora de salida de cada cabecera y causa asociada a
+cada formación despachada. De allí se reconstruye la serie de intervalos reales entre despachos sucesivos
+por línea y franja, se separan los eventos con causa de demora registrada de la variabilidad propia de la
+operación, y se obtiene la composición de las formaciones. La frecuencia nominal de contraste proviene del
+\textit{Cronograma de servicio} y de \textit{Frecuencia del subte} [15], y la disponibilidad de material
+rodante del recurso \textit{Estado de flota} incluido en [4].
+
+\textbf{Topología y tiempos de recorrido.} La estructura física de la red se toma del feed
+\textit{Subte: GTFS} [6], que aporta la secuencia ordenada de estaciones de cada línea y sentido, los
+tiempos de llegada y salida del tren en cada estación --- de los que se derivan el tiempo de recorrido de
+cada tramo y el tiempo de detención en andén ---, las distancias acumuladas sobre la traza, la jerarquía
+estación--andén--acceso y, en el archivo de transbordos, el tiempo mínimo de combinación medido para cada
+par de andenes conectados. Esto reemplaza la estimación propia de esos parámetros, pero exige una
+advertencia de vigencia: el período declarado del feed finaliza en 2019, su calendario de servicios en 2021,
+y el portal informa que los datasets en formato GTFS están suspendidos y en revisión. De allí se sigue un
+uso selectivo. La topología que describe continúa siendo la vigente --- incluye la extensión de la Línea E a
+Retiro y la Línea H hasta Facultad de Derecho --- y los tiempos de tramo, de detención y de combinación son
+magnitudes físicas estables: ambos se utilizan. Las frecuencias programadas que el feed contiene son
+previas a la pandemia y no se emplean, porque los intervalos de despacho se estiman del registro de
+operación real [4]. La
+georreferenciación de estaciones y accesos se complementa con \textit{Subte: Estaciones} [5] y
+\textit{Bocas de Subte} [7]. El Premetro queda fuera del alcance del modelo.
+
+\textbf{Matriz origen--destino.} Los destinos provienen del dataset \textit{Viajes y etapas en transporte
+público del Área Metropolitana de Buenos Aires} [8], estimado a partir de registros SUBE; cada etapa de
+subte informa origen, destino, línea de ascenso, hora y factor de expansión. Su documentación metodológica
+[9] fija tres condiciones de uso. Los datos corresponden a un único día hábil típico de octubre o noviembre,
+no a un promedio anual; se emplea la edición 2024. Las coordenadas publicadas no son la ubicación real de la
+transacción sino el centroide del hexágono H3 de resolución 10 que la contiene, de unos 150 m de diámetro:
+verificamos que los 89 centroides distintos correspondientes a etapas de subte se ubican a una mediana de
+44 m y a un máximo de 70 m de alguna estación del listado oficial [5], de modo que la correspondencia entre
+celda y estación es unívoca y no constituye un supuesto de reparto. Y los destinos no son observados sino
+imputados por el organismo publicador bajo dos reglas declaradas --- parada más cercana con tolerancia de
+2,2 km, y simetría diaria del primer y último viaje ---, supuestos que este trabajo hereda y declara en
+lugar de reemplazar.
+
+Un rasgo de esa imputación resulta determinante: las seis líneas se tratan como ramales de una sola, por lo
+que toda estación puede ser origen y destino de cualquier otra; en efecto, el 48,8\,\% de las etapas de
+subte termina en una línea distinta de la de ascenso. La matriz es entonces estación--estación para el
+conjunto de la red y ya contiene los viajes con combinación sin desagregar el camino recorrido, que es
+exactamente lo que el modelo necesita: la ruta y los transbordos son resultado de la simulación y no un dato
+de entrada, condición para que agregar la Línea F redistribuya la carga por sí misma. El archivo aporta
+587.980 etapas de subte, 740.675 una vez expandidas, de las cuales un 4,1\,\% pertenece a viajes con alguna
+etapa sin destino imputado y se trata por separado. Restan dos ajustes propios, objeto del análisis de
+sensibilidad: la matriz tiene resolución horaria, por lo que el perfil intrahorario se toma de los
+molinetes, y su nivel absoluto se escala a los totales que estos miden. Este segundo ajuste no es menor: el
+proceso de depuración del dataset descarta un 27,5\,\% de las transacciones originales por problemas de
+geolocalización, de imputación o de registro, y el factor de expansión que compensa esa pérdida está topeado
+en 3 para evitar que una línea con pérdida excesiva distorsione el resultado. El criterio con que se
+distribuye ese faltante --- factor único, por línea, por estación o por franja --- es el supuesto propio más
+influyente del trabajo, y por eso se lo recorre explícitamente. Como contrapartida favorable, el día
+publicado para 2024 es anterior a la apertura a otros medios de pago, de modo que la cobertura de la fuente
+en esa edición es prácticamente completa.
+
+\textbf{Escenario futuro.} La configuración de la Línea F se toma de documentación oficial: la traza
+establecida por la Ley 670 [10], el pliego de la licitación \textit{Ingeniería, construcción y equipamiento
+Línea F} publicado en el portal BA Obras [12], el expediente del Estudio de Impacto Ambiental obtenido por
+pedido de vista ante la Agencia de Protección Ambiental [13] y el PETERS [11] como antecedente de
+planificación. El capítulo de descripción del proyecto del Estudio aporta el recorrido, las doce estaciones
+proyectadas con sus progresivas sobre la traza, las combinaciones con las líneas existentes y la división en
+tramos constructivos. Dos precisiones que ese capítulo permite establecer. La primera es que las
+denominaciones de estación no se contradicen entre fuentes: el propio Estudio consigna, y así lo declara,
+todas las denominaciones asignadas a cada estación hasta la fecha, de modo que se adopta el orden sobre la
+traza como identificador y las denominaciones como equivalencias. La segunda es que las combinaciones
+declaradas estación por estación son seis --- Constitución con la Línea C y el Ferrocarril Roca, Cochabamba
+con la E, Congreso con la A, Corrientes con la B, Pizzurno con la D y Palermo con la D y el Ferrocarril San
+Martín ---, sin que el expediente precise en qué estación se produciría la combinación con la Línea H que
+menciona en su descripción general; esa vinculación se resuelve por proximidad geográfica entre andenes a
+partir del feed GTFS [6] y se declara como criterio propio.
+
+Los parámetros operativos dejan de ser supuestos. El Estudio dimensiona la línea con un intervalo entre
+formaciones de 1,5 minutos --- equivalente a cuarenta trenes por sentido y por hora ---, una capacidad de
+1.075 pasajeros por formación y, en consecuencia, una capacidad de transporte de 43.000 pasajeros por
+sentido y por hora; un tiempo de detención en estación de 30 segundos; velocidades de diseño de 90 km/h en
+tramos rectos, reducidas a 70 y 45 km/h según la curvatura; aceleración de 1 m/s\textsuperscript{2} y
+frenado de 1,1 m/s\textsuperscript{2}; y una flota necesaria de 25 formaciones. Prevé además andén central
+en las doce estaciones y un recorrido peatonal de combinación no mayor a 100 m, valor que se adopta para el
+tiempo de transbordo de las estaciones nuevas en lugar del que el GTFS informa para las combinaciones
+existentes. Los tiempos de recorrido entre estaciones se derivan de las progresivas publicadas y de esos
+parámetros cinemáticos, y no ya de la velocidad comercial de las líneas existentes. La frecuencia de
+servicio se conserva como variable de escenario: el valor de 1,5 minutos es el de diseño y no
+necesariamente el de explotación inicial, de modo que se lo toma como cota superior de oferta y se recorren
+valores menores.
+
+\textbf{Ajuste de distribuciones.} Las llegadas de pasajeros por estación y franja y los intervalos entre
+formaciones se ajustan siguiendo el procedimiento visto en la materia [1]: construcción de histogramas,
+estimación de parámetros por máxima verosimilitud y pruebas de bondad de ajuste. La partición entre ajuste y
+validación se hace por período, reservando datos no utilizados para estimar. Los dos registros admiten
+particiones distintas y por razones distintas. El de despachos no se ve afectado por el cambio en los medios
+de pago, de modo que su historia completa desde 2015 es homogénea y permite reservar un año entero. El de
+molinetes sí lo está, por lo que ambos períodos deben pertenecer al régimen de cobertura posterior a
+diciembre de 2024; la partición se realiza en ese tramo y se controla la estacionalidad comparando meses y
+tipos de día equivalentes. Se deja constancia de que esta restricción reduce el margen temporal disponible
+respecto de lo que la extensión de las series publicadas sugeriría, y de que es preferible asumirla antes
+que validar contra un período cuya diferencia de nivel respondería a un cambio en el registro y no al
+desempeño del modelo.
+
+\textbf{Implementación en AnyLogic.} El modelo representa la red como un conjunto de líneas, cada una
+compuesta por una secuencia de estaciones y tramos, vinculadas por estaciones de combinación a las que se
+asocia el tiempo mínimo de transbordo que el GTFS declara para cada par de andenes. Los pasajeros se generan
+en cada estación según la tasa ajustada para su franja horaria, reciben un destino sorteado a partir de la
+matriz origen--destino y siguen una ruta tomada de una tabla de caminos mínimos precalculada fuera del
+modelo, con una penalización por transbordo; no se implementan algoritmos de asignación dinámica. Las
+formaciones se despachan desde cada cabecera según la distribución de intervalos ajustada sobre el registro
+de despachos, recorren cada tramo con el tiempo derivado del GTFS y se detienen en cada estación durante el
+tiempo de detención que ese mismo feed informa. El ascenso está limitado por la capacidad del coche: el
+pasajero que no logra abordar permanece en el andén y espera la formación siguiente. El andén se modela como un espacio de
+capacidad finita, lo que permite medir la aglomeración de plataforma además de la ocupación a bordo. El
+escenario con Línea F se obtiene agregando la nueva línea a la topología y recalculando la tabla de
+caminos mínimos con el mismo procedimiento, de modo que la redistribución de pasajeros resulta del cambio
+de estructura de la red y no de un supuesto impuesto sobre cada línea.
+
+\textbf{Verificación y validación.} La verificación se realiza comparando, en un caso degenerado sin
+variabilidad en el intervalo de despacho ni en la demanda, la ocupación resultante contra el cálculo
+analítico directo de pasajeros acumulados en un intervalo fijo, y controlando la conservación de entidades:
+los pasajeros que ingresaron a lo largo de una corrida deben coincidir con la suma de los que llegaron a
+destino, los que están a bordo y los que permanecen en andén al final del período simulado. Se incluye en
+esta instancia, y no en la siguiente, el contraste entre la distribución de intervalos entre formaciones
+producida por el modelo y la distribución ajustada que lo alimenta: al ser una entrada del modelo, su
+reproducción comprueba la implementación pero no la representatividad.
+
+La validación se restringe a magnitudes efectivamente observables en los registros públicos, que son tres. La
+primera es el ingreso de pasajeros por estación, franja de quince minutos y tipo de día, contrastado contra
+el período de molinetes reservado. La segunda es el reparto de la demanda entre líneas, contrastado contra la
+distribución de las etapas de subte del dataset de viajes y etapas [8], que es una fuente independiente
+construida con otra metodología y sobre otro período. Corresponde señalar por qué el control agregado natural
+no está disponible: el recurso oficial de total anual de pasajeros por línea [5] dejó de actualizarse en
+septiembre de 2020, de modo que no cubre el régimen posterior a la apertura de medios de pago, que es el
+único que este trabajo puede utilizar. La tercera surge de una propiedad del registro de molinetes que
+conviene explicitar:
+el identificador de cada molinete codifica el andén en el que está instalado, de modo que el ingreso queda
+atribuido a un sentido de circulación. Esa atribución no es completa --- sobre el año 2025 alcanza al
+70,5\,\% de los ingresos, porque una parte de los identificadores no incluye el campo de andén y hay
+estaciones enteras sin él ---, y por eso la demanda se genera en el modelo a nivel de estación y no de andén,
+evitando introducir un criterio de reparto para el resto. Pero el reparto entre andenes que el modelo produce
+como resultado de la asignación de ruta sí puede contrastarse contra el observado en las estaciones que
+cuentan con el dato. Es una validación parcial y sesgada por construcción, en tanto cubre solo un subconjunto
+de estaciones que no fue elegido por nosotros, y como tal se la presenta.
+Corresponde señalar una limitación de fondo: la ocupación a bordo y la aglomeración de plataforma, que son
+indicadores centrales del trabajo, no se registran en ninguna fuente pública. Son salidas del modelo sin
+contraparte empírica, dependientes de la matriz origen--destino y, por lo tanto, del supuesto de escalado
+declarado más arriba. No se las valida y no se las presenta como magnitudes medidas, sino como resultados
+condicionados a supuestos explícitos, cuya utilidad reside en la comparación entre escenarios evaluados bajo
+esos mismos supuestos y no en su valor absoluto.
+
+Para el escenario futuro no existe, por definición, dato observable de ninguna clase, pero el expediente
+ambiental aporta un término de comparación más exigente que el orden de magnitud de la cifra anunciada. El
+Estudio publica, por cada una de las doce estaciones y para ambos sentidos, la cantidad de pasajeros que
+suben, bajan y permanecen a bordo en la hora pico de la mañana y en la de la tarde, tomada de un análisis de
+demanda elaborado por SBASE en 2019 [13]. De esas tablas se obtiene el perfil de carga por tramo, cuyo
+máximo se ubica en 35.742 pasajeros por hora entre Constitución y Cochabamba, equivalente al 83\,\% de la
+capacidad de diseño de la línea. La carga por tramo que el modelo produzca para la Línea F se contrasta
+contra ese perfil. Corresponden tres salvedades, y por ellas el contraste se declara como referencia y no
+como validación. El perfil no es una medición sino la salida de otro modelo, de modo que coincidir con él
+acredita consistencia con la hipótesis oficial y no correspondencia con la realidad. Data de 2019, esto es,
+de antes de la pandemia y de la apertura a otros medios de pago. Y lleva incorporado un supuesto de simetría
+diaria: las tablas de la hora pico de la mañana y de la tarde son la imagen especular exacta una de la otra,
+supuesto de la misma naturaleza que el que hereda la matriz origen--destino y que, por lo tanto, no puede
+usarse para comprobarlo. Se agrega un control de consistencia entre fuentes oficiales: los ascensos que ese
+perfil totaliza en la hora pico suponen una concentración horaria de la demanda que se verifica contra la
+que efectivamente presenta la red actual según el registro de molinetes, antes de utilizar tanto el perfil
+como la cifra diaria anunciada.
+
+Cada escenario se corre con un mínimo de diez replicaciones, descartando el período de calentamiento, y los
+resultados se informan con intervalos de confianza.
+
+\subsection{Resultados esperados}
+
+Esperamos obtener, en primer lugar, un cuadro comparativo de indicadores operativos entre el escenario
+actual y los escenarios con Línea F: tiempo medio de espera en andén por estación y franja horaria, tiempo
+medio de viaje completo dentro del sistema incluyendo transbordos, ocupación media y máxima de coche por
+tramo, nivel de aglomeración de plataforma y proporción de pasajeros que no logran abordar la primera
+formación que arriba.
+
+En segundo lugar, esperamos caracterizar el uso de la nueva infraestructura: viajes diarios captados por la
+Línea F, carga por tramo, tramo de máxima demanda y factor de ocupación resultante para la frecuencia
+supuesta, junto con la variación de carga que se produce en cada una de las líneas existentes y en las
+estaciones de combinación del área central. Eso permite identificar qué líneas y qué estaciones concentran
+el beneficio y en qué franjas horarias se manifiesta, distinguiendo el alivio efectivo de la simple
+redistribución de la congestión hacia otras combinaciones.
+
+En tercer lugar, esperamos cuantificar cómo cambian esos resultados frente a los supuestos declarados:
+cuánto varía el beneficio estimado según el criterio con que la matriz se escala a los niveles medidos y
+según el tratamiento de las etapas sin destino imputado, y qué frecuencia mínima de la Línea F es necesaria
+para que la mejora sea perceptible en los indicadores de la red. La comparación entre el primer tramo
+constructivo --- que el Estudio de Impacto Ambiental define entre Brandsen y Pizzurno --- y la traza
+completa permite, además, estimar qué porción del beneficio se obtiene con esa primera puesta en servicio.
+
+Corresponde aclarar el alcance. El trabajo no pretende producir una previsión de demanda ni sustituir los
+estudios oficiales del proyecto: los valores absolutos que arroje el modelo dependen de supuestos declarados
+de manera explícita. Lo informativo es la comparación entre escenarios evaluados bajo esos mismos supuestos,
+expresada en las magnitudes con las que se discute el nivel de servicio: minutos de espera, minutos de viaje
+y pasajeros por coche.
+
+% ---------- Referencias ----------
+\section*{Referencias}
+\begin{list}{}{\leftmargin=2em \itemindent=-2em \itemsep=0.25em}
+
+\item[] [1] Law, A. M. (2015). \textit{Simulation Modeling and Analysis} (5.\textsuperscript{a} ed.).
+McGraw-Hill Education.
+
+\item[] [2] Ortúzar, J. de D. y Willumsen, L. G. (2011). \textit{Modelling Transport} (4.\textsuperscript{a}
+ed.). John Wiley \& Sons.
+
+\item[] [3] Subterráneos de Buenos Aires (SBASE). \textit{Subte: Viajes Molinetes}. Buenos Aires Data.
+Archivos anuales comprimidos, 2013--2025. Desde diciembre de 2024 se publican con la denominación
+\texttt{INCLUYEOTROMODOSDEPAGO}, que indica la incorporación de medios de pago distintos de la tarjeta SUBE.
+\url{https://data.buenosaires.gob.ar/dataset/subte-viajes-molinetes}
+
+\item[] [4] Subterráneos de Buenos Aires (SBASE). \textit{Subte: Trenes despachados}. Buenos Aires Data.
+Recursos \textit{Formaciones despachadas -- Total} (CSV, 2015 a la actualidad) y \textit{Estado de flota}.
+\url{https://data.buenosaires.gob.ar/dataset/subte-trenes-despachados}
+
+\item[] [5] Subterráneos de Buenos Aires (SBASE). \textit{Subte: Estaciones}. Buenos Aires Data. Incluye los
+recursos \textit{Estaciones de Subte}, \textit{Líneas de Subte} y \textit{Total de pasajeros de cada línea
+de subte por año}. Pese a que el título de este último indica ``desde junio 2013'', el archivo publicado
+abarca hasta 2020 y su última modificación registrada es del 7 de septiembre de 2020.
+\url{https://data.buenosaires.gob.ar/dataset/subte-estaciones}
+
+\item[] [6] Subterráneos de Buenos Aires (SBASE). \textit{Subte: GTFS}. Buenos Aires Data. Feed versión 2.0;
+período declarado en \texttt{feed\_info} hasta el 31/12/2019 y calendario de servicios hasta el 31/12/2021.
+El portal advierte que los datasets en formato API y GTFS están suspendidos y en revisión.
+\url{https://data.buenosaires.gob.ar/dataset/subte-gtfs}
+
+\item[] [7] Subterráneos de Buenos Aires (SBASE). \textit{Bocas de Subte}. Buenos Aires Data.
+\url{https://data.buenosaires.gob.ar/dataset/bocas-subte}
+
+\item[] [8] Subsecretaría de Planificación de la Movilidad y Seguridad Vial. \textit{Viajes y etapas en
+transporte público del Área Metropolitana de Buenos Aires 2019 a 2024}. Buenos Aires Data.
+\url{https://data.buenosaires.gob.ar/dataset/viajes-etapas-transporte-publico}
+
+\item[] [9] Observatorio de Movilidad y Seguridad Vial de la Ciudad de Buenos Aires, Ministerio de
+Infraestructura. \textit{Dataset de Viajes y Etapas en Transporte Público del Área Metropolitana de Buenos
+Aires. Notas para su uso, 2019--2025}. Abril de 2025. Documento metodológico del dataset [8].
+
+\item[] [10] Legislatura de la Ciudad Autónoma de Buenos Aires. \textit{Ley 670}, sancionada el 8 de
+noviembre de 2001, de construcción de las líneas de subterráneos F, G e I, y sus modificatorias.
+\url{http://www2.cedom.gob.ar/es/legislacion/normas/leyes/ley670.html}
+
+\item[] [11] Subterráneos de Buenos Aires (SBASE) y Banco Interamericano de Desarrollo. \textit{Plan
+Estratégico y Técnico para la Expansión de la Red de Subtes de Buenos Aires (PETERS)}. Estudio elaborado
+por AC\&A, publicado por SBASE, 2015.
+
+\item[] [12] Gobierno de la Ciudad Autónoma de Buenos Aires, Ministerio de Movilidad e Infraestructura.
+\textit{Licitación pública nacional e internacional de etapa múltiple N.\textsuperscript{o}
+10241-0094-LPU25, ``Ingeniería, construcción y equipamiento línea de Subterráneo F''}. Expedientes
+EX-2025-43875108-GCABA-SSPO y EX-2025-43793855-GCABA-DGTALMI. Portal BA Obras. Se citan en particular el
+Pliego de Cláusulas Particulares PLIEG-2026-30055586-SSPO, el Pliego de Especificaciones Técnicas Rev. 01
+PLIEG-2026-30055895-GCABA-SSPO, los informes LF-GL-GEN-GNR-IN-003 y LF-GL-GEN-GNR-IN-004
+(\textit{Demandas Etapa I y II --- Medios de Salida}), y la Resolución N.\textsuperscript{o}
+175/GCABA-MMIGC/26, que posterga la apertura de ofertas al 10 de septiembre de 2026 y consigna el
+presupuesto oficial.
+\url{https://buenosairesobras.dguiaf-gcba.gov.ar}
+
+\item[] [13] Agencia de Protección Ambiental, Gobierno de la Ciudad Autónoma de Buenos Aires.
+\textit{Estudio de Impacto Ambiental --- Proyecto ``Línea F -- Sistema Integrado de Movilidad, CABA''}.
+Expediente EX-2026-20211143-GCABA-APRA, 98 documentos, obtenido por pedido de vista. Estudio elaborado por
+Serman \& asociados s.a. Convocado a audiencia pública por Resolución N.\textsuperscript{o}
+195/GCABA-APRA/26, celebrada el 18 de agosto de 2026. Se citan en particular: IF-2026-20219129-GCABA-APRA,
+capítulo 3, \textit{Descripción del proyecto} --- parámetros operativos (p. 15), estimaciones de demanda por
+estación (pp. 15--16), estaciones y progresivas (pp. 20--21), cocheras y flota (p. 42), cronograma de obra
+(p. 100) ---; IF-2026-20220749-GCABA-APRA, capítulo 6, \textit{Estudios especiales} --- Línea C y PETERS
+(p. 62), pasajeros por estación (p. 97) ---; IF-2026-23674238-GCABA-DGDPM, intervención de la Dirección
+General de Diseño y Planificación de la Movilidad; e IF-2026-28526299-GCABA-DGPRO, \textit{Documento de
+divulgación}. Las estimaciones de demanda que el Estudio reproduce se atribuyen en él al
+\textit{Análisis de Demanda Línea F} elaborado por SBASE en 2019, documento que el expediente cita pero no
+incorpora.
+
+\item[] [14] Gobierno de la Ciudad Autónoma de Buenos Aires. \textit{Anuncio del proyecto de construcción de
+la línea F de subte: trazado, estaciones, etapas y cronograma previsto}.
+\url{https://buenosaires.gob.ar/noticias/jorge-macri-anuncio-la-construccion-de-la-linea-f-de-subte}
+
+\item[] [15] Subterráneos de Buenos Aires (SBASE). \textit{Subte: Cronograma de servicio} y
+\textit{Frecuencia del subte}. Buenos Aires Data.
+\url{https://data.buenosaires.gob.ar/dataset/subte-cronograma-servicio} y
+\url{https://data.buenosaires.gob.ar/dataset/frecuencia-subte}
+
+\end{list}
+
+\end{document}

@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Modelo conceptual: pasajero y formación en la red de Subte",
+    "quality_profile": "standard",
+    "legend": { "mode": "hidden" }
+  },
+  "lanes": [
+    { "id": "pasajero", "label": "Flujo del pasajero" },
+    { "id": "formacion", "label": "Flujo de la formación" }
+  ],
+  "phases": [
+    { "id": "ingreso", "label": "Generación y despacho", "fromCol": 0, "toCol": 0 },
+    { "id": "anden_viaje", "label": "Espera, abordaje y viaje", "fromCol": 1, "toCol": 3, "variant": "emphasis" },
+    { "id": "cierre", "label": "Salida y reciclado", "fromCol": 4, "toCol": 4 }
+  ],
+  "groups": [
+    { "id": "escenario_formacion", "label": "Línea F: headway variable (90-189 s)", "lane": "formacion", "fromCol": 0, "toCol": 1, "variant": "emphasis" }
+  ],
+  "mainPath": ["p_genera", "p_anden", "p_intento", "p_abordo", "p_sale"],
+  "nodes": [
+    { "id": "p_genera", "lane": "pasajero", "col": 0, "type": "external", "label": "Generación", "width": 138 },
+    { "id": "p_anden", "lane": "pasajero", "col": 1, "type": "messagebus", "label": "Espera en andén", "width": 138 },
+    { "id": "p_intento", "lane": "pasajero", "col": 2, "type": "security", "label": "Intento de abordaje", "width": 138 },
+    { "id": "p_abordo", "lane": "pasajero", "col": 3, "type": "backend", "label": "A bordo", "width": 138 },
+    { "id": "p_sale", "lane": "pasajero", "col": 4, "type": "backend", "label": "Sale del sistema", "width": 138 },
+
+    { "id": "f_despacho", "lane": "formacion", "col": 0, "type": "backend", "label": "Despacho", "width": 138 },
+    { "id": "f_llega", "lane": "formacion", "col": 1, "type": "backend", "label": "Llega a estación", "width": 138 },
+    { "id": "f_asciende", "lane": "formacion", "col": 2, "type": "security", "label": "Suben y bajan", "width": 138 },
+    { "id": "f_cabecera", "lane": "formacion", "col": 3, "type": "backend", "label": "Cabecera opuesta", "width": 138 },
+    { "id": "f_recicla", "lane": "formacion", "col": 4, "type": "database", "label": "Recicla en pool", "width": 138 }
+  ],
+  "edges": [
+    { "id": "p1", "from": "p_genera", "to": "p_anden", "label": "ruta asignada", "variant": "default", "role": "main" },
+    { "id": "p2", "from": "p_anden", "to": "p_intento", "label": "llega una formación", "variant": "default", "role": "main" },
+    { "id": "p3", "from": "p_intento", "to": "p_abordo", "label": "hay lugar", "variant": "emphasis", "role": "main" },
+    { "id": "p4", "from": "p_intento", "to": "p_anden", "label": "sin lugar", "variant": "dashed", "role": "branch" },
+    { "id": "p5", "from": "p_abordo", "to": "p_sale", "label": "llega a destino", "variant": "emphasis", "role": "main" },
+    { "id": "p6", "from": "p_abordo", "to": "p_anden", "label": "transbordo", "variant": "dashed", "role": "branch" },
+
+    { "id": "f1", "from": "f_despacho", "to": "f_llega", "label": "recorre el tramo", "variant": "default" },
+    { "id": "f2", "from": "f_llega", "to": "f_asciende", "label": "abre puertas", "variant": "default" },
+    { "id": "f3", "from": "f_asciende", "to": "f_cabecera", "label": "cierra puertas", "variant": "default" },
+    { "id": "f4", "from": "f_cabecera", "to": "f_recicla", "variant": "default" },
+    { "id": "f5", "from": "f_recicla", "to": "f_despacho", "label": "vuelve al pool", "variant": "dashed", "role": "branch" },
+
+    { "id": "x1", "from": "p_intento", "to": "f_asciende", "label": "capacidad de coche", "variant": "emphasis", "role": "async" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Dos escenarios, un solo proceso",
+      "items": [
+        "Escenario base: seis líneas actuales",
+        "Escenario futuro: se agrega la Línea F a la topología",
+        "El proceso del pasajero y de la formación no cambia; cambia la red y, en la Línea F, el headway"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Recurso compartido",
+      "items": [
+        "La capacidad de coche es el único recurso limitado del modelo",
+        "El pasajero que no logra abordar espera la próxima formación en el mismo andén"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Pasajero, paso a paso",
+      "items": [
+        "Generación: tasa horaria + perfil intrahorario, por complejo de origen",
+        "Ruta asignada: camino mínimo precalculado, no dinámico",
+        "Espera en andén: cola por estación, línea y sentido",
+        "Intento de abordaje: hay lugar o no en la formación que llega",
+        "A bordo: viaja el tramo hasta el próximo nodo de decisión",
+        "Sale del sistema: se registra el tiempo total de viaje"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Formación, paso a paso",
+      "items": [
+        "Despacho: intervalo ajustado por línea y hora (o headway de escenario en la Línea F)",
+        "Recorre el tramo: tiempo de viaje más detención endógena",
+        "Suben y bajan: hasta la capacidad del coche",
+        "Recicla en pool: arquitectura Enter / Exit, no Source / Sink"
+      ]
+    }
+  ]
+}

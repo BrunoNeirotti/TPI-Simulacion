@@ -231,7 +231,7 @@ sensible a este parámetro. El barrido completo está en
 
 | Variable | Rango | Por qué |
 |---|---|---|
-| Headway de la Línea F | Piso de 90 a 100 s de diseño, techo de 189 s (3,15 min, lo mejor que hoy logra la C) | No hay plan de servicio y no va a haberlo hasta que haya operador. Es una cita oficial, no una elección nuestra. Los 90 s suponen despachar 2,1 veces más seguido que la mejor línea actual |
+| Intervalo entre trenes de la Línea F | Piso 90 s, techo 189 s (3,15 min, lo mejor que hoy logra la C). Decidido el 16/09/2026, ver `decisiones.md` | No hay plan de servicio y no va a haberlo hasta que haya operador. Es una cita oficial, no una elección nuestra. Los 90 s suponen despachar 2,1 veces más seguido que la mejor línea actual |
 | Detención de la Línea F | Piso de 30 s según el EsIA | El mismo informe dice que el operador va a definir los tiempos finales de detención |
 | Reparto de la demanda fuera de las horas pico | Tres variantes: perfil por par del paso 5 (la base), perfil de la red igual para todos, y perfil por complejo de origen sacado de molinetes | Es el supuesto que pusimos nosotros. Afecta solo a las celdas con `fuente = perfil_paso5`; las horas 8 y 17 son dato medido y quedan fijas |
 | Etapas marcadas como incompletas | Con y sin ellas, son el 4,1 % (30.491 viajes expandidos) | Se resuelve corriendo las dos versiones y midiendo si cambia algo. `matriz_od.csv` ya trae las dos en columnas separadas |
@@ -349,10 +349,12 @@ Ninguna de estas frena el arranque del modelo.
 | Qué falta | Cómo pega en el modelo |
 |---|---|
 | Qué hacer con el 4,1 % de etapas incompletas | Cambia el nivel de la demanda en un 4,1 %. Se decide midiendo |
-| Si calibramos toda la red por igual o solo el corredor de la F | Define dónde poner el esfuerzo de ajuste, no la estructura del modelo |
 | Qué períodos usar para ajustar y para validar | Los dos tienen que ser posteriores a diciembre de 2024, sin marzo de 2025, sin el 10/04/2025, sin los 25 días hábiles atípicos y sin los 100 días con cancelaciones gremiales |
 | Si dejamos el reparo del sentido 1 de la Línea E | Está aplicado (`REPARAR_LINEA_E = True`). Apagarlo cambia 58 pares de 6.006, o sea el 1,0 %. Afecta los tiempos de viaje sobre la E |
-| Qué rango de headway recorrer para la Línea F | Es la variable de escenario principal del trabajo. Ver 4.3 |
+
+Decididas el 16/09/2026 y ya no están abiertas: profundidad de calibración (solo el
+corredor de la Línea F y las líneas que combinan, D3) y rango de intervalo entre
+trenes a recorrer para la Línea F (90 a 189 s, D7). Ver `decisiones.md`.
 
 ---
 

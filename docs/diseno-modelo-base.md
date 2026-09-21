@@ -126,10 +126,16 @@ declarado.
 | **a. Despachos independientes por cabecera, sin tope de flota**. Cada formación sale, recorre, y en la cabecera opuesta vuelve a la población libre | Lo que dice la especificación. Los intervalos salen de la distribución medida y ya reflejan la flota real. Simple |
 | b. Circulación cerrada: la formación que llega a una cabecera es la próxima que sale en sentido contrario, tras un tiempo de vuelta | Respeta la flota (25 formaciones en la Línea F). Obliga a modelar el tiempo de vuelta en cabecera, que no está medido, y acopla los dos sentidos |
 
-**Decidido: a.** Para la Línea F conviene **verificar
-después** que con la flota de 25 formaciones se puede sostener el intervalo del
-escenario (con 9,8 km y el tiempo de recorrido, es una cuenta directa) y declararlo, en
-vez de modelarlo.
+**Decidido: a.** Para la Línea F se verifica aparte que la flota de 25 formaciones
+sostiene el intervalo del escenario, y se declara en vez de modelarlo.
+
+> **Verificado el 21/09/2026** (`reports/12_ajuste_intervalos.md`, sección 5). La vuelta
+> en cabecera se midió en las líneas actuales: mediana en pico de 72 s (C) a 430 s (B).
+> Con 18 min de viaje por sentido, 25 formaciones sostienen como mínimo **92 s** con una
+> vuelta como la de la C, 95 s como la de la H y 100 s como la de la A. **Los 90 s exigen
+> una vuelta de 45 s o menos**, que ninguna línea actual logra en mediana. No reabre D7
+> (90 s es el valor de diseño oficial), pero hay que declararlo al informar ese
+> extremo.
 
 ### 6.4 Adelantamiento: **separación mínima por tramo** (D15)
 

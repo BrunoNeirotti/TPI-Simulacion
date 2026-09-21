@@ -387,7 +387,7 @@ def figura(t: pd.DataFrame, linea: str, destino: Path) -> None:
 # Reporte
 # --------------------------------------------------------------------------
 
-def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control) -> None:
+def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta) -> None:
     L: list[str] = []
     w = L.append
     nombre = pd.read_csv(PROCESADO / "grafo_nodos.csv").set_index("nodo_id").nombre
@@ -541,7 +541,50 @@ def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, cont
           f"{num(r.mediana_obs, 0)} | {num(r.cv_obs)} |")
     w("")
 
-    w("## 5. Lo que este paso no resuelve\n")
+    w("## 5. Vuelta en cabecera y flota de la Línea F\n")
+    w("D14 dejó pendiente verificar que la flota de la Línea F alcanza para cada "
+      "intervalo del escenario (D7: de 90 a 189 s). Con despachos independientes "
+      "por cabecera el modelo no lo impone, así que se verifica aparte.\n")
+    w("**La vuelta en cabecera se mide en las líneas actuales.** Cada fila del "
+      "dataset es una formación que sale de A y después de D (así en "
+      f"{pc(vuelta.frac_A_primero.min(), 0)} de las filas), de modo que la diferencia "
+      "entre sus dos salidas es el viaje de A a D más la vuelta en D. Restando el "
+      "tiempo de viaje del GTFS queda la vuelta **más el desvío del viaje real "
+      "respecto del programado**: es una cota superior de la maniobra.\n")
+    w("| Línea | Viaje GTFS (s) | Vuelta en pico, mediana (p10–p90) | Vuelta en valle, mediana |")
+    w("|---|---:|---|---:|")
+    for linea in LINEAS:
+        p = vuelta[(vuelta.linea == linea) & (vuelta.periodo == "pico")].iloc[0]
+        v = vuelta[(vuelta.linea == linea) & (vuelta.periodo == "valle")].iloc[0]
+        w(f"| {linea} | {mil(p.viaje_gtfs_s)} | {mil(p.vuelta_mediana_s)} s "
+          f"({mil(p.p10)}–{mil(p.p90)}) | {mil(v.vuelta_mediana_s)} s |")
+    w("")
+    w(f"**Intervalo mínimo que sostienen {FLOTA_F} formaciones** en la Línea F, con "
+      f"{VIAJE_F_S // 60} min de viaje por sentido: `(2 × {VIAJE_F_S} + 2 × vuelta) / "
+      f"{FLOTA_F}`, tomando como vuelta la mediana en pico de cada línea actual.\n")
+    w("| Vuelta como la de la línea | Vuelta (s) | Intervalo mínimo (s) |")
+    w("|---|---:|---:|")
+    pico = vuelta[vuelta.periodo == "pico"].sort_values("vuelta_mediana_s")
+    for _, r in pico.iterrows():
+        h = (2 * VIAJE_F_S + 2 * r.vuelta_mediana_s) / FLOTA_F
+        w(f"| {r.linea} | {mil(r.vuelta_mediana_s)} | {num(h, 1)} |")
+    vuelta_90 = (90 * FLOTA_F - 2 * VIAJE_F_S) / 2
+    w("")
+    w(f"**Para sostener 90 s la vuelta tiene que ser de {vuelta_90:.0f} s o menos por "
+      "cabecera**, y ninguna línea actual lo logra en mediana; la más rápida, la C, "
+      f"da {num((2 * VIAJE_F_S + 2 * pico.vuelta_mediana_s.min()) / FLOTA_F, 1)} s. Las "
+      "fuentes oficiales son consistentes con esto: el EsIA da 25 formaciones y "
+      "90 s, o sea un ciclo de 37,5 min, y con los 18 min de viaje que informa el "
+      "Ministerio eso deja justo 45 s de vuelta por cabecera. Y los 100 s *\"de "
+      "requerirse\"* del mismo Ministerio corresponden a una vuelta como la de la "
+      "A.\n")
+    w("No cambia la decisión D7, que recorre de 90 a 189 s porque son los valores "
+      "de diseño y el plan de servicio no existe. Pero **el extremo de 90 s supone "
+      "una maniobra en cabecera más rápida que cualquiera de la red actual**, o una "
+      "flota mayor que la declarada, y eso hay que decirlo al informar los "
+      "resultados de ese extremo.\n")
+
+    w("## 6. Lo que este paso no resuelve\n")
     w("- **Los intervalos consecutivos no son independientes**: un despacho "
       "atrasado acorta el siguiente. Muestrear intervalos independientes pierde "
       "esa correlación. Se ve en la verificación del modelo.")
@@ -553,6 +596,47 @@ def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, cont
     (REPORTES / "12_ajuste_intervalos.md").write_text("\n".join(L), encoding="utf-8")
 
 
+def vuelta_en_cabecera(sentidos: pd.DataFrame) -> pd.DataFrame:
+    """Tiempo de vuelta en la cabecera D, medido en las lineas actuales.
+
+    Cada fila del dataset es una formacion que sale de A y despues de D (en 2025
+    siempre en ese orden). La diferencia entre las dos salidas es el viaje de A a
+    D mas la vuelta en D. Se le resta el tiempo de viaje del GTFS (marcha mas 24 s
+    por parada intermedia), asi que lo que queda es la vuelta **mas el desvio del
+    viaje real respecto del programado**: es una cota superior de la maniobra.
+    Sirve para verificar la flota de la Linea F (D14).
+    """
+    crudo = leer(paso4.ANIO, ResultadoLectura())
+    crudo = crudo[(crudo.tipo_dia == "Habil") & crudo.linea.isin(LINEAS)
+                  & crudo.viajo_A & crudo.viajo_D
+                  & crudo.salida_A.notna() & crudo.salida_D.notna()]
+    a = pd.read_csv(PROCESADO / "grafo_aristas.csv")
+    a = a[a.tipo == "tramo"]
+    filas = []
+    for linea in LINEAS:
+        x = crudo[crudo.linea == linea]
+        largo = x.km_A.round(2).mode()[0]
+        x = x[(x.km_A >= largo - TOLERANCIA_COMPLETO_KM) & (x.km_D >= largo - TOLERANCIA_COMPLETO_KM)]
+        sentido_a = int(sentidos[(sentidos.linea == linea) & (sentidos.cabecera == "A")].direction_id.iloc[0])
+        g = a[(a.linea == f"Linea{linea}") & (a.direction_id == sentido_a)]
+        viaje = g.t_s.sum() + 24 * (len(g) - 1)
+        dif = x.salida_D - x.salida_A
+        hora = x.salida_A // 3600
+        for periodo, horas in (("pico", [7, 8, 17, 18]), ("valle", [11, 12, 13, 14])):
+            v = (dif - viaje)[hora.isin(horas) & (dif > 0)]
+            filas.append({"linea": linea, "periodo": periodo, "viaje_gtfs_s": viaje,
+                          "n": len(v), "vuelta_mediana_s": v.median(),
+                          "p10": v.quantile(.1), "p90": v.quantile(.9),
+                          "frac_A_primero": (dif > 0).mean()})
+    return pd.DataFrame(filas)
+
+
+# Linea F: tiempo de viaje entre cabeceras (IF-2026-37530623-GCABA-MMIGC) y flota
+# (EsIA, doc 0010 § 3.3). Ver docs/expediente-eia-linea-f.md.
+VIAJE_F_S = 18 * 60
+FLOTA_F = 25
+
+
 def main() -> None:
     d, res = despachos()
     rec = recorridos()
@@ -561,6 +645,7 @@ def main() -> None:
     t, conteo = intervalos(d)
     teo, det = ajuste_teorico(t)
     tabla, control = tabla_empirica(t)
+    vuelta = vuelta_en_cabecera(sentidos)
 
     sentidos.to_csv(PROCESADO / "cabeceras_despacho.csv", index=False, float_format="%.4g")
     ap_config.to_csv(PROCESADO / "apertura_formaciones.csv", index=False)
@@ -569,7 +654,7 @@ def main() -> None:
     FIGURAS.mkdir(parents=True, exist_ok=True)
     figura(t, "C", FIGURAS / "ajuste-intervalos-c-pico.png")
     figura(t, "H", FIGURAS / "ajuste-intervalos-h-pico.png")
-    escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control)
+    escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta)
     print(f"viajes={conteo['viajes']:,} intervalos={len(t):,} celdas={len(control)} "
           f"ks_max_empirica={control.ks_d_muestra.max():.4f}")
     print(sentidos[["linea", "cabecera", "direction_id", "error_km_elegido", "error_km_otro"]].to_string())

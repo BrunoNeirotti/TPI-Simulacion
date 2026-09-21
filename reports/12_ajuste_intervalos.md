@@ -142,7 +142,37 @@ La H despacha con un horario muy rígido: en hora pico, la mitad de los interval
 | H | D | 8 | 3.720 | 217,4 | 206 | 0,20 |
 | H | D | 17 | 3.728 | 217,2 | 206 | 0,21 |
 
-## 5. Lo que este paso no resuelve
+## 5. Vuelta en cabecera y flota de la Línea F
+
+D14 dejó pendiente verificar que la flota de la Línea F alcanza para cada intervalo del escenario (D7: de 90 a 189 s). Con despachos independientes por cabecera el modelo no lo impone, así que se verifica aparte.
+
+**La vuelta en cabecera se mide en las líneas actuales.** Cada fila del dataset es una formación que sale de A y después de D (así en 100 % de las filas), de modo que la diferencia entre sus dos salidas es el viaje de A a D más la vuelta en D. Restando el tiempo de viaje del GTFS queda la vuelta **más el desvío del viaje real respecto del programado**: es una cota superior de la maniobra.
+
+| Línea | Viaje GTFS (s) | Vuelta en pico, mediana (p10–p90) | Vuelta en valle, mediana |
+|---|---:|---|---:|
+| A | 1.529 | 170 s (67–306) | 116 s |
+| B | 1.587 | 430 s (279–660) | 408 s |
+| C | 751 | 72 s (7–161) | 103 s |
+| D | 1.527 | 314 s (192–537) | 382 s |
+| E | 1.720 | 277 s (160–452) | 254 s |
+| H | 1.112 | 105 s (68–200) | 107 s |
+
+**Intervalo mínimo que sostienen 25 formaciones** en la Línea F, con 18 min de viaje por sentido: `(2 × 1080 + 2 × vuelta) / 25`, tomando como vuelta la mediana en pico de cada línea actual.
+
+| Vuelta como la de la línea | Vuelta (s) | Intervalo mínimo (s) |
+|---|---:|---:|
+| C | 72 | 92,2 |
+| H | 105 | 94,8 |
+| A | 170 | 100,0 |
+| E | 277 | 108,6 |
+| D | 314 | 111,5 |
+| B | 430 | 120,8 |
+
+**Para sostener 90 s la vuelta tiene que ser de 45 s o menos por cabecera**, y ninguna línea actual lo logra en mediana; la más rápida, la C, da 92,2 s. Las fuentes oficiales son consistentes con esto: el EsIA da 25 formaciones y 90 s, o sea un ciclo de 37,5 min, y con los 18 min de viaje que informa el Ministerio eso deja justo 45 s de vuelta por cabecera. Y los 100 s *"de requerirse"* del mismo Ministerio corresponden a una vuelta como la de la A.
+
+No cambia la decisión D7, que recorre de 90 a 189 s porque son los valores de diseño y el plan de servicio no existe. Pero **el extremo de 90 s supone una maniobra en cabecera más rápida que cualquiera de la red actual**, o una flota mayor que la declarada, y eso hay que decirlo al informar los resultados de ese extremo.
+
+## 6. Lo que este paso no resuelve
 
 - **Los intervalos consecutivos no son independientes**: un despacho atrasado acorta el siguiente. Muestrear intervalos independientes pierde esa correlación. Se ve en la verificación del modelo.
 - **La configuración de apertura es la típica**, no la de cada día.

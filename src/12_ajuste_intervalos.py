@@ -51,6 +51,8 @@ Salidas:
   data/processed/apertura_formaciones.csv
   data/processed/intervalos_empiricos.csv       (lo que consume el modelo)
   data/processed/distribuciones_despacho.csv    (ajuste teorico, referencia)
+  data/processed/verificacion_despachos.csv     (ajuste contra verificacion, D4)
+  data/processed/variantes/oferta_d_2024_09/    (sensibilidad de D4: la D de sept. 2024)
   docs/figuras/ajuste-intervalos-c-pico.png
   docs/figuras/ajuste-intervalos-h-pico.png
   reports/12_ajuste_intervalos.md
@@ -349,12 +351,12 @@ def ajuste_teorico(t: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
 
 # ---- empirica (lo que usa el modelo) --------------------------------------
 
-def tabla_empirica(t: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+def tabla_empirica(t: pd.DataFrame, lineas=LINEAS) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Cuantiles por celda y verificacion por muestreo."""
     p = np.linspace(0, 1, N_CUANTILES)
     rng = np.random.default_rng(SEMILLA)
     filas, control = [], []
-    for linea in LINEAS:
+    for linea in lineas:
         for cab in ("A", "D"):
             for h in HORAS:
                 fuente = hora_de_datos(t, linea, cab, h)
@@ -409,7 +411,7 @@ def figura(t: pd.DataFrame, linea: str, destino: Path) -> None:
 # Reporte
 # --------------------------------------------------------------------------
 
-def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta, verif) -> None:
+def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta, verif, var) -> None:
     L: list[str] = []
     w = L.append
     nombre = pd.read_csv(PROCESADO / "grafo_nodos.csv").set_index("nodo_id").nombre
@@ -625,15 +627,32 @@ def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, cont
     w(f"El intervalo en hora pico difiere entre ventanas a lo sumo {pc(dif.max())} "
       f"(mediana {pc(dif.median())}).\n")
 
-    w("## 7. Lo que este paso no resuelve\n")
+    w("## 7. Variante para la sensibilidad de D4: la Línea D de septiembre de 2024\n")
+    w(f"D4 prevé correr el escenario base también con la oferta de la **Línea {var['linea']}** "
+      f"del mes de la demanda de SBASE ({var['desde']} a {var['hasta']}). La variante está en "
+      f"`{var['carpeta'].relative_to(RAIZ).as_posix()}/`: los mismos tres archivos de oferta, "
+      f"iguales a la base salvo la {var['linea']}. Se leyó con `lib_despachos`, que ahora "
+      "entiende el archivo de 2024 (dos esquemas mezclados; ver su docstring).\n")
+    w("| Lado | Días | Intervalo en pico, base (s) | Variante (s) | Última salida, variante | Formaciones en la apertura |")
+    w("|---|---:|---:|---:|---|---:|")
+    base_pico = verif.set_index(["linea", "cabecera"]).intervalo_pico_s_ajuste
+    for cab in ("A", "D"):
+        w(f"| {cab} | {int(var['dias'].get(cab, 0))} | {num(base_pico[(var['linea'], cab)], 1)} | "
+          f"{num(var['pico_variante'].get(cab, float('nan')), 1)} | "
+          f"{hhmm(var['ultima'].get((var['linea'], cab), float('nan')))} | "
+          f"{int(var['apertura'].set_index('cabecera').formaciones.get(cab, 0))} |")
+    w("")
+    w(f"{mil(var['intervalos'])} intervalos; {var['celdas_vecinas']} celdas toman la hora "
+      f"vecina por tener menos de {N_MINIMO}; la empírica reproduce los datos con D de "
+      f"Kolmogorov-Smirnov máximo {num(var['ks_max'], 3)}.\n")
+
+    w("## 8. Lo que este paso no resuelve\n")
     w("- **Los intervalos consecutivos no son independientes**: un despacho "
       "atrasado acorta el siguiente. Muestrear intervalos independientes pierde "
       "esa correlación. Se ve en la verificación del modelo.")
     w("- **La configuración de apertura es la típica**, no la de cada día.")
-    w("- **La Línea D en septiembre de 2024** (el mes de la demanda de SBASE) "
-      "despachaba unos 280 s en pico contra unos 218 s de la ventana de ajuste. D4 "
-      "prevé una sensibilidad del escenario base con esa oferta; requiere leer los "
-      "despachos de 2024, que tienen otro esquema.")
+    w("- **La variante de la D** (sección 7) es solo la oferta: el efecto se mide "
+      "corriendo el simulador de referencia con ella (`reports/13_verificacion_referencia.md`).")
     w("- **Las formaciones que se retiran al final del servicio** (horas 0 y 1, "
       "con recorrido parcial) quedan fuera: el modelo corta a las 24 h.\n")
 
@@ -704,6 +723,82 @@ VIAJE_F_S = 18 * 60
 FLOTA_F = 25
 
 
+def ultima_salida(d: pd.DataFrame) -> pd.DataFrame:
+    """Ultima salida de recorrido completo de cada cabecera, mediana entre dias.
+
+    Redondeada al minuto: el despachador del modelo deja de despachar ahi. Las
+    salidas despues de medianoche (horas 0 y 1 de la B y la D) quedan fuera del
+    horizonte del modelo (D11), que corta a las 24 h.
+    """
+    ult = (d[d.completo & (d.salida_s < 24 * 3600)]
+           .groupby(["linea", "cabecera", "fecha"]).salida_s.max()
+           .groupby(["linea", "cabecera"]).median()
+           .rename("ultima_salida_s").reset_index())
+    ult["ultima_salida_s"] = (ult.ultima_salida_s / 60).round().astype(int) * 60
+    return ult
+
+
+# Sensibilidad de D4 (agregado 1): la oferta de la Linea D en el mes de la
+# demanda de SBASE. La D cambio de regimen en 2025 (282 s en pico en sept. 2024,
+# 218 s desde julio de 2025).
+VARIANTE_D = ("D", 2024, "2024-09-01", "2024-09-30", "oferta_d_2024_09")
+
+
+def variante_linea(d: pd.DataFrame, sentidos: pd.DataFrame, ap_config: pd.DataFrame,
+                   tabla: pd.DataFrame, rec: dict) -> dict:
+    """Oferta completa con una linea tomada de otro periodo; el resto, la base.
+
+    El largo del recorrido completo se toma de la ventana de ajuste: en sept. de
+    2024 la D registraba dos largos de recorrido completo (10,46 y 10,81 km, en
+    partes casi iguales) y la moda dejaria la mitad como parciales.
+    """
+    linea, anio, desde, hasta, nombre = VARIANTE_D
+    largo = d.groupby("linea").km_linea.first()
+    dv, _ = despachos(anio, (desde, hasta), largo)
+    dv = dv[dv.linea == linea].copy()
+    # En sept. de 2024 el lado A de la D registraba 10,81 km de recorrido completo
+    # y el D 10,46: los viajes parciales del lado A traen el mismo corrimiento de
+    # 0,35 km (1,01 / 3,70 / 7,48 son los 0,66 / 3,35 / 7,13 de 2025 mas 0,35).
+    # Se descuenta por lado para ubicar las formaciones de la apertura.
+    for cab in ("A", "D"):
+        lado = dv.cabecera == cab
+        moda = dv[lado & dv.completo].km.round(2).mode()[0]
+        dv.loc[lado, "km"] = dv.loc[lado, "km"] - (moda - largo[linea])
+    sv = inferir_sentidos(dv, rec) if (dv.de_apertura & ~dv.completo).any() else None
+    base_s = sentidos[sentidos.linea == linea]
+    if sv is not None:
+        igual = (sv.set_index("cabecera").direction_id
+                 == base_s.set_index("cabecera").direction_id).all()
+        if not igual:
+            raise ValueError(f"la correspondencia de cabeceras de la {linea} cambia en {anio}")
+    ap_v, ap_res_v = apertura(dv, base_s.drop(columns=["ultima_salida_s", "apertura_s"]), rec)
+    tv, conteo_v = intervalos(dv)
+    tabla_v, control_v = tabla_empirica(tv, [linea])
+    ult_v = ultima_salida(dv).set_index(["linea", "cabecera"]).ultima_salida_s
+
+    s_out = sentidos.copy()
+    clave = list(zip(s_out.linea, s_out.cabecera))
+    s_out["ultima_salida_s"] = [ult_v.get(k, u) for k, u in zip(clave, s_out.ultima_salida_s)]
+    s_out.loc[s_out.linea == linea, "apertura_s"] = ap_v.hora_s.iloc[0]
+    ap_out = pd.concat([ap_config[ap_config.linea != linea], ap_v], ignore_index=True)
+    tabla_out = pd.concat([tabla[tabla.linea != linea], tabla_v], ignore_index=True)
+
+    carpeta = PROCESADO / "variantes" / nombre
+    carpeta.mkdir(parents=True, exist_ok=True)
+    s_out.to_csv(carpeta / "cabeceras_despacho.csv", index=False, float_format="%.4g")
+    ap_out.to_csv(carpeta / "apertura_formaciones.csv", index=False)
+    tabla_out.to_csv(carpeta / "intervalos_empiricos.csv", index=False, float_format="%.6g")
+
+    pico_v = tv[tv.hora.isin([7, 8, 17, 18])].groupby("cabecera").intervalo_s.mean()
+    return {
+        "linea": linea, "desde": desde, "hasta": hasta, "carpeta": carpeta,
+        "dias": dv.groupby("cabecera").fecha.nunique(),
+        "pico_variante": pico_v, "apertura": ap_res_v, "ultima": ult_v,
+        "intervalos": len(tv), "celdas_vecinas": int((control_v.hora_fuente != control_v.hora).sum()),
+        "ks_max": control_v.ks_d_muestra.max(),
+    }
+
+
 def main() -> None:
     d, res = despachos()
     rec = recorridos()
@@ -716,16 +811,7 @@ def main() -> None:
     verif = verificacion_oferta(d, t)
     verif.to_csv(PROCESADO / "verificacion_despachos.csv", index=False, float_format="%.2f")
 
-    # Ultima salida de recorrido completo de cada cabecera, mediana entre dias
-    # (redondeada al minuto): el despachador del modelo deja de despachar ahi.
-    # Las salidas despues de medianoche (horas 0 y 1 de la B y la D) quedan fuera
-    # del horizonte del modelo (D11), que corta a las 24 h.
-    ult = (d[d.completo & (d.salida_s < 24 * 3600)]
-           .groupby(["linea", "cabecera", "fecha"]).salida_s.max()
-           .groupby(["linea", "cabecera"]).median()
-           .rename("ultima_salida_s").reset_index())
-    ult["ultima_salida_s"] = (ult.ultima_salida_s / 60).round().astype(int) * 60
-    sentidos = sentidos.merge(ult, on=["linea", "cabecera"])
+    sentidos = sentidos.merge(ultima_salida(d), on=["linea", "cabecera"])
     sentidos["apertura_s"] = sentidos.linea.map(
         ap_config.groupby("linea").hora_s.first())
 
@@ -736,7 +822,8 @@ def main() -> None:
     FIGURAS.mkdir(parents=True, exist_ok=True)
     figura(t, "C", FIGURAS / "ajuste-intervalos-c-pico.png")
     figura(t, "H", FIGURAS / "ajuste-intervalos-h-pico.png")
-    escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta, verif)
+    var = variante_linea(d, sentidos, ap_config, tabla, rec)
+    escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta, verif, var)
     print(f"viajes={conteo['viajes']:,} intervalos={len(t):,} celdas={len(control)} "
           f"ks_max_empirica={control.ks_d_muestra.max():.4f}")
     print(sentidos[["linea", "cabecera", "direction_id", "error_km_elegido", "error_km_otro"]].to_string())

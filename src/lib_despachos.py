@@ -135,6 +135,91 @@ def _parsear_fechas(serie: pd.Series, res: ResultadoLectura) -> pd.Series:
     return fuera
 
 
+TIPO_DIA_2024 = {"H": "Habil", "S": "Sabado", "D": "Domingo", "F": "Feriado"}
+MARCAS = {"CNR", "Alstom", "Mitsubishi", "Fiat", "CAF", "Materfer", "Nagoya"}
+
+
+def _leer_2024(res: ResultadoLectura) -> pd.DataFrame:
+    """El CSV de 2024, que tiene **dos esquemas en el mismo archivo**.
+
+    Verificado el 21/09/2026 (se usa para la sensibilidad de D4: la oferta de la
+    Linea D en septiembre de 2024). Todas las filas tienen 20 campos y un solo
+    encabezado, pero:
+
+    - **Esquema viejo**: `Nombre Formacion`, `Modelo Formacion`, `Causa A`
+      (codigo), `Descripcion A`, `Causa D`, `Descripcion D`.
+    - **Esquema nuevo** (el de 2025): `Formacion A/D`, `Modelo A/D`, `Causa A/D`
+      en texto.
+    - **El formato de fecha no indica el esquema** (hay filas `dd/mm/aa` con el
+      nuevo y `d/m/aaaa` con el viejo), ni tampoco el ancho de relleno. Lo que
+      lo indica es el contenido: en el viejo la columna 7 es la marca del tren;
+      en el nuevo la marca esta en la 8 (o en la 9, si el lado A no viajo). Si
+      ninguna es marca, la 8 es un codigo
+      de causa (viejo) o esta vacia, y entonces decide si hay descripcion en la
+      9 (viejo) o causa en texto en la 10 (nuevo).
+    - Las columnas 12 a 19 (coches, km, tipo de viaje, hora de salida) coinciden.
+    - El tipo de dia viene como `H/S/D/F` o como `Habil/Sabado/...` segun la fila.
+    - UTF-8 con BOM. Cada (linea, dia) usa un solo formato: no hay filas
+      duplicadas entre esquemas.
+
+    Se lee por posicion y se normaliza al mismo formato de salida que `leer`.
+    Como causa se toma la descripcion en texto si existe, si no el codigo.
+    """
+    ruta = CRUDO / "formaciones-despachadas-2024.csv"
+    texto, cod = _leer_texto(ruta)
+    res.archivo, res.codificacion = ruta.name, cod
+    from io import StringIO
+
+    d = pd.read_csv(StringIO(texto), sep=";", dtype=str, header=None, skiprows=1)
+    res.filas_crudas = len(d)
+    if d.shape[1] != 20:
+        raise ValueError(f"se esperaban 20 columnas en 2024, hay {d.shape[1]}")
+    vacias = d.isna().all(axis=1) | d[0].isna()
+    res.filas_vacias = int(vacias.sum())
+    d = d[~vacias].copy()
+    d = d.fillna("")
+
+    def limpio(s: pd.Series) -> pd.Series:
+        return s.str.replace(r"\s+", " ", regex=True).str.strip()
+
+    c7, c8, c9, c10 = limpio(d[7]), limpio(d[8]), limpio(d[9]), limpio(d[10])
+    # en el nuevo la marca esta en la 8 (lado A) o en la 9 (lado D, si el A no viajo)
+    nuevo_por_marca = c8.isin(MARCAS) | (c9.isin(MARCAS) & ~c7.isin(MARCAS))
+    viejo_por_marca = c7.isin(MARCAS)
+    sin_marca = ~nuevo_por_marca & ~viejo_por_marca
+    # sin marca: codigo en la 8 o descripcion en la 9 -> viejo; texto largo en la 10 -> nuevo
+    nuevo_sin_marca = sin_marca & (c8 == "") & (c9 == "") & (c10.str.len() > 5)
+    viejo = ~(nuevo_por_marca | nuevo_sin_marca)
+
+    def causa(codigo: pd.Series, descripcion: pd.Series) -> pd.Series:
+        c, t = limpio(codigo), limpio(descripcion)
+        return t.where(t != "", c)
+
+    out = pd.DataFrame(index=d.index)
+    out["fecha"] = _parsear_fechas(d[0].str.strip(), res)
+    res.formatos_fecha["esquema viejo"] = int(viejo.sum())
+    res.formatos_fecha["esquema nuevo"] = int((~viejo).sum())
+    out["linea"] = d[1].str.strip()
+    out["tipo_dia"] = d[2].str.strip().replace(TIPO_DIA_2024)
+    out["registro"] = d[3].str.strip()
+    out["orden"] = d[4].str.strip()
+    out["tren"] = d[5].str.strip()
+    out["formacion_A"] = limpio(d[6])
+    out["formacion_D"] = limpio(d[6]).where(viejo, limpio(d[7]))
+    out["modelo_A"] = limpio(d[7]).where(viejo, limpio(d[8]))
+    out["modelo_D"] = limpio(d[7]).where(viejo, limpio(d[9]))
+    out["causa_A"] = causa(d[8], d[9]).where(viejo, limpio(d[10]))
+    out["causa_D"] = causa(d[10], d[11]).where(viejo, limpio(d[11]))
+    for lado, cc, ck, cv, ch in (("A", 12, 14, 16, 18), ("D", 13, 15, 17, 19)):
+        out[f"coches_{lado}"] = pd.to_numeric(d[cc], errors="coerce")
+        out[f"km_{lado}"] = _km(d[ck])
+        out[f"viajo_{lado}"] = d[cv].str.strip().eq("S")
+        out[f"salida_{lado}"] = d[ch].map(a_segundos)
+    out = out[out.fecha.notna()]
+    res.filas = len(out)
+    return out.reset_index(drop=True)
+
+
 def leer(anio: int, res: ResultadoLectura | None = None) -> pd.DataFrame:
     """Lee un CSV anual de formaciones despachadas, ya normalizado.
 
@@ -144,6 +229,8 @@ def leer(anio: int, res: ResultadoLectura | None = None) -> pd.DataFrame:
       viajo_A/D (bool), salida_A/D (segundos desde medianoche)
     """
     r = res if res is not None else ResultadoLectura()
+    if anio == 2024:
+        return _leer_2024(r)
     ruta = CRUDO / f"formaciones-despachadas-{anio}.csv"
     texto, cod = _leer_texto(ruta)
     r.archivo, r.codificacion = ruta.name, cod

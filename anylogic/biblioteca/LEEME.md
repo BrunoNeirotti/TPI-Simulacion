@@ -76,9 +76,13 @@ cruzada: con los mismos insumos, AnyLogic tiene que dar lo mismo dentro del erro
 muestreo. No reemplaza al modelo de AnyLogic, que es el entregable.
 
 ```bash
-./referencia/correr.sh          # 10 replicaciones, unos 10 s en total
+./referencia/correr.sh          # base y variante de la D (D4), 10 replicaciones cada una
 ./referencia/correr.sh --solo C # solo la Linea C
 ```
+
+La variante corre con `--oferta ../../data/processed/variantes/oferta_d_2024_09`: la red,
+las rutas y la demanda son las mismas, y la oferta sale de esa carpeta
+(`Datos.leer(carpeta, carpetaOferta)`).
 
 Deja `data/processed/referencia_*.csv` y genera `reports/13_verificacion_referencia.md`
 con `src/13_verificacion_referencia.py`. Resultados al 21/09/2026: conservación OK en las

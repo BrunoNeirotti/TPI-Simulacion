@@ -165,6 +165,14 @@ for (Oferta.Arranque a : datos.oferta.arranques()) {
         create_Arranque(a.hora - time(), a);
     }
 }
+// si ninguna formacion de la apertura sale de la cabecera, los despachos
+// regulares arrancan igual a la hora de apertura
+for (Oferta.Cabecera c : datos.oferta.cabeceras()) {
+    if ((soloLinea.isEmpty() || c.linea.equals(soloLinea)) && !datos.oferta.arrancaEnCabecera(c)) {
+        double s = datos.oferta.proximaSalida(c, c.apertura, rng);
+        if (s < Double.POSITIVE_INFINITY) create_Despacho(s - time(), c);
+    }
+}
 traceln("Datos leidos: " + datos.rutas.size() + " rutas, "
         + Math.round(datos.demanda.viajesDelDia()) + " viajes/dia");
 ```

@@ -127,6 +127,20 @@ public final class Oferta {
     }
 
     /**
+     * Si alguna formacion de la apertura arranca en la cabecera misma. Cuando no
+     * (pasa en la variante de la D de septiembre de 2024), los despachos regulares
+     * se programan desde la hora de apertura, sin formacion en la cabecera.
+     */
+    public boolean arrancaEnCabecera(Cabecera c) {
+        for (Arranque a : arranques) {
+            if (a.cabecera == c && a.indice == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Intervalo hasta el proximo despacho, muestreado de la empirica de la hora
      * de t por transformada inversa, interpolando entre cuantiles (Law, cap. 6).
      */

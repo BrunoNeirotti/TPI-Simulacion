@@ -123,7 +123,29 @@ La capacidad por coche (179) es un supuesto de la especificación; la ocupación
 | 22 | 9.885 | 19,4 | 262 | 1,471 |
 | 23 | 958 | 17,0 | 246 | 1,290 |
 
-## 5. Lo que este paso no cubre
+## 5. Sensibilidad de D4: la Línea D con la oferta de septiembre de 2024
+
+D4 ajusta la oferta con julio a diciembre de 2025, pero la demanda y los perfiles de carga de SBASE son de septiembre de 2024, cuando la D despachaba bastante más espaciado (282 s en hora pico contra 218 s; `reports/12_ajuste_intervalos.md`, sección 7). Se corre el mismo modelo, con las mismas semillas, cambiando solo la oferta de la D.
+
+| Indicador (toda la red) | Base | D de sept. 2024 |
+|---|---:|---:|
+| Tiempo de viaje medio (s) | 1.110,0 ± 0,9 | 1.116,3 ± 1,1 |
+| Espera media por viaje (s) | 187,9 ± 1,0 | 194,4 ± 1,0 |
+| Pasajeros-vez que no entran en una formación | 3.100 ± 745 | 2.780 ± 875 |
+| Pasajeros vivos a la vez, máximo | 26.872 ± 179 | 26.882 ± 208 |
+
+**Línea D, contra SBASE** (tramos comparables de la D):
+
+| Período | Oferta | Correlación | Error absoluto ponderado | Sesgo | Ocupación media en el tramo más cargado |
+|---|---|---:|---:|---:|---:|
+| HPM | base (2025 jul.–dic.) | 0,978 | 9,7 % | 6,7 % | 48 % |
+| HPM | sept. 2024 | 0,979 | 9,7 % | 6,8 % | 63 % |
+| HPT | base (2025 jul.–dic.) | 0,967 | 6,7 % | 1,7 % | 43 % |
+| HPT | sept. 2024 | 0,968 | 6,6 % | 1,0 % | 57 % |
+
+El flujo por tramo en pasajeros por hora casi no depende de la frecuencia mientras no haya saturación, así que el contraste de carga contra SBASE cambia poco. Lo que sí cambia es la ocupación por formación y la espera: es el efecto que el desfase entre la oferta de 2025 y la demanda de 2024 introduce en el escenario base, y hay que declararlo al comparar contra la Línea F.
+
+## 6. Lo que este paso no cubre
 
 - **Detención fija** (24 s): la endógena y la separación mínima por tramo entran en la calibración (D13, D15).
 - **La espera en andén no tiene contraparte observada**, igual que la aglomeración.

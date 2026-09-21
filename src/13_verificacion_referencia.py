@@ -67,6 +67,47 @@ def metricas(obs: pd.Series, pre: pd.Series) -> dict:
     }
 
 
+def sensibilidad_d(w, res: pd.DataFrame, carga: pd.DataFrame, con: pd.DataFrame,
+                   ruta_resumen: Path) -> None:
+    """Base contra la variante con la oferta de la D de septiembre de 2024 (D4)."""
+    res_v = pd.read_csv(ruta_resumen)
+    carga_v = pd.read_csv(PROCESADO / "referencia_d2024_carga.csv")
+    w("## 5. Sensibilidad de D4: la Línea D con la oferta de septiembre de 2024\n")
+    w("D4 ajusta la oferta con julio a diciembre de 2025, pero la demanda y los perfiles "
+      "de carga de SBASE son de septiembre de 2024, cuando la D despachaba bastante más "
+      "espaciado (282 s en hora pico contra 218 s; `reports/12_ajuste_intervalos.md`, "
+      "sección 7). Se corre el mismo modelo, con las mismas semillas, cambiando solo la "
+      "oferta de la D.\n")
+    w("| Indicador (toda la red) | Base | D de sept. 2024 |")
+    w("|---|---:|---:|")
+    for etiqueta, col, dec in (("Tiempo de viaje medio (s)", "viaje_medio_s", 1),
+                               ("Espera media por viaje (s)", "espera_media_s", 1),
+                               ("Pasajeros-vez que no entran en una formación", "quedaron_abajo", 0),
+                               ("Pasajeros vivos a la vez, máximo", "max_vivos", 0)):
+        mb, hb = ic95(res[col])
+        mv, hv = ic95(res_v[col])
+        w(f"| {etiqueta} | {num(mb, dec)} ± {num(hb, dec)} | {num(mv, dec)} ± {num(hv, dec)} |")
+    w("")
+    w("**Línea D, contra SBASE** (tramos comparables de la D):\n")
+    w("| Período | Oferta | Correlación | Error absoluto ponderado | Sesgo | Ocupación media en el tramo más cargado |")
+    w("|---|---|---:|---:|---:|---:|")
+    cd = con[con.linea == "D"]
+    for per, h in PERIODOS.items():
+        for etiqueta, c in (("base (2025 jul.–dic.)", carga), ("sept. 2024", carga_v)):
+            g = cd[cd.periodo == per].merge(c[c.hora == h], on=["linea", "direction_id", "nodo", "hora"])
+            mt = metricas(g.carga_saliente, g.pasajeros_hora_media)
+            cc = c[(c.linea == "D") & (c.hora == h)]
+            ocup = (cc.pasajeros_hora_media / (cc.formaciones_hora_media * cc.capacidad)).max()
+            w(f"| {per} | {etiqueta} | {num(mt['correlacion'], 3)} | {pc(mt['wape'])} | "
+              f"{pc(mt['sesgo'])} | {pc(ocup, 0)} |")
+    w("")
+    w("El flujo por tramo en pasajeros por hora casi no depende de la frecuencia mientras "
+      "no haya saturación, así que el contraste de carga contra SBASE cambia poco. Lo que "
+      "sí cambia es la ocupación por formación y la espera: es el efecto que el desfase "
+      "entre la oferta de 2025 y la demanda de 2024 introduce en el escenario base, y hay "
+      "que declararlo al comparar contra la Línea F.\n")
+
+
 def main() -> None:
     res = pd.read_csv(PROCESADO / "referencia_resumen.csv")
     carga = pd.read_csv(PROCESADO / "referencia_carga.csv")
@@ -217,7 +258,11 @@ def main() -> None:
           f"{num(r.espera_media_s, 0)} | {num(r.ascensos_por_viaje, 3)} |")
     w("")
 
-    w("## 5. Lo que este paso no cubre\n")
+    variante = PROCESADO / "referencia_d2024_resumen.csv"
+    if variante.exists():
+        sensibilidad_d(w, res, carga, con, variante)
+
+    w("## 6. Lo que este paso no cubre\n")
     w("- **Detención fija** (24 s): la endógena y la separación mínima por tramo "
       "entran en la calibración (D13, D15).")
     w("- **La espera en andén no tiene contraparte observada**, igual que la "

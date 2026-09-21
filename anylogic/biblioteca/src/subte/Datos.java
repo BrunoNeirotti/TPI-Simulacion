@@ -30,8 +30,17 @@ public final class Datos {
     }
 
     public static Datos leer(Path carpeta) {
+        return leer(carpeta, carpeta);
+    }
+
+    /**
+     * Con la oferta de otra carpeta: la red, las rutas y la demanda salen de
+     * {@code carpeta}, y los tres archivos de oferta de {@code carpetaOferta}.
+     * Es como se corren las variantes (p. ej. la D de septiembre de 2024, D4).
+     */
+    public static Datos leer(Path carpeta, Path carpetaOferta) {
         Red red = Red.leer(carpeta);
-        return new Datos(red, Ruta.leer(carpeta, red), Demanda.leer(carpeta), Oferta.leer(carpeta, red));
+        return new Datos(red, Ruta.leer(carpeta, red), Demanda.leer(carpeta), Oferta.leer(carpetaOferta, red));
     }
 
     public static Datos leer(String carpeta) {

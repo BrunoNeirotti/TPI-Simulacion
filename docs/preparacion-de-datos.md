@@ -982,3 +982,12 @@ entre las dos ventanas. Para leer 2026 hubo que tolerar los `Km` redondeados a e
 Además, la forma de los bloques de 15 min del paso 11 pasó a tomarse **sin enero ni
 febrero** (`demanda_estacion_franja_habil_sin_verano.csv`, paso 3): cambian de bloque
 2.377 viajes, el 0,29 % del día. Detalle en `docs/preparacion-d4.md`.
+
+**Despachos de 2024**, para la sensibilidad de D4. `data/raw/formaciones-despachadas-2024.csv`
+(bajado el 21/09/2026 del mismo servidor que 2025 y 2026) mezcla **dos esquemas en el
+mismo archivo**: el viejo (formación, modelo, causa con código y descripción) y el de 2025
+(formación, modelo y causa por lado). Ni el formato de fecha ni el ancho de relleno
+indican cuál es cuál; lo indica el contenido (en qué columna está la marca del tren).
+`lib_despachos` lo resuelve fila por fila. Además, en septiembre de 2024 el lado A de la
+D registraba 10,81 km de recorrido completo y el lado D 10,46: el paso 12 corrige ese
+corrimiento por lado al armar la variante.

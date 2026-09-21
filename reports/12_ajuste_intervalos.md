@@ -193,9 +193,20 @@ La oferta se ajusta con 2025-07-01 a 2025-12-31 y se verifica contra 2026-03-01 
 
 El intervalo en hora pico difiere entre ventanas a lo sumo 4,0 % (mediana 1,4 %).
 
-## 7. Lo que este paso no resuelve
+## 7. Variante para la sensibilidad de D4: la Línea D de septiembre de 2024
+
+D4 prevé correr el escenario base también con la oferta de la **Línea D** del mes de la demanda de SBASE (2024-09-01 a 2024-09-30). La variante está en `data/processed/variantes/oferta_d_2024_09/`: los mismos tres archivos de oferta, iguales a la base salvo la D. Se leyó con `lib_despachos`, que ahora entiende el archivo de 2024 (dos esquemas mezclados; ver su docstring).
+
+| Lado | Días | Intervalo en pico, base (s) | Variante (s) | Última salida, variante | Formaciones en la apertura |
+|---|---:|---:|---:|---|---:|
+| A | 21 | 217,0 | 282,6 | 23:01 | 4 |
+| D | 21 | 218,4 | 281,2 | 23:33 | 4 |
+
+8.745 intervalos; 1 celdas toman la hora vecina por tener menos de 50; la empírica reproduce los datos con D de Kolmogorov-Smirnov máximo 0,012.
+
+## 8. Lo que este paso no resuelve
 
 - **Los intervalos consecutivos no son independientes**: un despacho atrasado acorta el siguiente. Muestrear intervalos independientes pierde esa correlación. Se ve en la verificación del modelo.
 - **La configuración de apertura es la típica**, no la de cada día.
-- **La Línea D en septiembre de 2024** (el mes de la demanda de SBASE) despachaba unos 280 s en pico contra unos 218 s de la ventana de ajuste. D4 prevé una sensibilidad del escenario base con esa oferta; requiere leer los despachos de 2024, que tienen otro esquema.
+- **La variante de la D** (sección 7) es solo la oferta: el efecto se mide corriendo el simulador de referencia con ella (`reports/13_verificacion_referencia.md`).
 - **Las formaciones que se retiran al final del servicio** (horas 0 y 1, con recorrido parcial) quedan fuera: el modelo corta a las 24 h.

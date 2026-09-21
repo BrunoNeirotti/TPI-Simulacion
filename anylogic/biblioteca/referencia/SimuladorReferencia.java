@@ -36,7 +36,7 @@ import subte.Ruta;
  *
  * Uso: java -cp subte.jar;referencia/build SimuladorReferencia
  *        [--datos ../../data/processed] [--salida DIR] [--replicas 10]
- *        [--semilla 1] [--solo C]
+ *        [--semilla 1] [--solo C] [--oferta DIR] [--prefijo referencia]
  */
 public final class SimuladorReferencia {
 
@@ -144,6 +144,13 @@ public final class SimuladorReferencia {
         for (Oferta.Arranque a : datos.oferta.arranques()) {
             if (soloLinea.isEmpty() || a.cabecera.linea.equals(soloLinea)) {
                 programar(a.hora, () -> arranque(a));
+            }
+        }
+        // cabeceras sin formacion propia en la apertura: los despachos regulares
+        // arrancan igual a la hora de apertura
+        for (Oferta.Cabecera c : datos.oferta.cabeceras()) {
+            if ((soloLinea.isEmpty() || c.linea.equals(soloLinea)) && !datos.oferta.arrancaEnCabecera(c)) {
+                programar(c.apertura, () -> programarDespacho(c));
             }
         }
         while (!cola.isEmpty()) {
@@ -301,11 +308,14 @@ public final class SimuladorReferencia {
     public static void main(String[] args) throws IOException {
         Map<String, String> op = new HashMap<>(Map.of(
                 "--datos", "../../data/processed", "--salida", "", "--replicas", "10",
-                "--semilla", "1", "--solo", ""));
+                "--semilla", "1", "--solo", "", "--oferta", "", "--prefijo", "referencia"));
         for (int i = 0; i + 1 < args.length; i += 2) {
             op.put(args[i], args[i + 1]);
         }
-        Datos datos = Datos.leer(Path.of(op.get("--datos")));
+        Path carpetaDatos = Path.of(op.get("--datos"));
+        Datos datos = op.get("--oferta").isEmpty() ? Datos.leer(carpetaDatos)
+                : Datos.leer(carpetaDatos, Path.of(op.get("--oferta")));
+        String prefijo = op.get("--prefijo");
         int replicas = Integer.parseInt(op.get("--replicas"));
         long semilla = Long.parseLong(op.get("--semilla"));
         String solo = op.get("--solo");
@@ -366,9 +376,9 @@ public final class SimuladorReferencia {
         }
         Path salida = Path.of(op.get("--salida"));
         Files.createDirectories(salida);
-        Files.write(salida.resolve("referencia_resumen.csv"), resumen, StandardCharsets.UTF_8);
+        Files.write(salida.resolve(prefijo + "_resumen.csv"), resumen, StandardCharsets.UTF_8);
 
-        try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(salida.resolve("referencia_carga.csv")))) {
+        try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(salida.resolve(prefijo + "_carga.csv")))) {
             w.println("linea,direction_id,orden,nodo,hora,pasajeros_hora_media,pasajeros_hora_desvio,"
                     + "formaciones_hora_media,capacidad,max_a_bordo,max_anden,quedaron_abajo_por_replica");
             for (Recorrido rec : datos.red.recorridos()) {
@@ -389,7 +399,7 @@ public final class SimuladorReferencia {
                 }
             }
         }
-        try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(salida.resolve("referencia_hora.csv")))) {
+        try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(salida.resolve(prefijo + "_hora.csv")))) {
             w.println("hora_ingreso,viajes_por_replica,viaje_medio_s,espera_media_s,ascensos_por_viaje");
             for (int h = 5; h < 24; h++) {
                 if (arrH[h] == 0) {

@@ -33,7 +33,7 @@ contradicciones marcadas.
 
 ---
 
-## 2. Los cinco insumos del modelo
+## 2. Los insumos del modelo
 
 Están todos en `data/processed/`. Los tiempos van en segundos, las distancias en
 kilómetros y la demanda en viajes. Se regeneran corriendo el pipeline; no se editan a
@@ -146,6 +146,36 @@ exacto. Igual conviene leer solo las horas 5 a 23, o normalizar por las dudas.
 
 El perfil es por complejo de origen, no por par. Todos los viajes que salen de un
 complejo en una hora comparten la misma forma dentro de la hora.
+
+### 2.6 La oferta: `intervalos_empiricos.csv`, `cabeceras_despacho.csv` y `apertura_formaciones.csv`
+
+Salen del paso 12 (`src/12_ajuste_intervalos.py`, 21/09/2026). Detalle en
+`reports/12_ajuste_intervalos.md`.
+
+**`intervalos_empiricos.csv`, 114.228 filas.** La distribución empírica de los intervalos
+entre despachos (D17): 501 cuantiles por celda de (línea, cabecera, hora), para las
+horas 5 a 23.
+
+| Columna | Qué es |
+|---|---|
+| `linea` | `A` a `H`, sin el prefijo `Linea` de los nodos |
+| `cabecera` | `A` o `D`, como en el dataset de despachos |
+| `hora` | Hora entera, de 5 a 23 |
+| `p` | Probabilidad acumulada, de 0 a 1 en pasos de 0,002 |
+| `intervalo_s` | Cuantil del intervalo, en segundos |
+
+Se muestrea por transformada inversa, interpolando entre cuantiles (el código está en
+`docs/diseno-modelo-base.md`, 6.5). La celda de la E, cabecera A, 23 h tiene solo 9
+intervalos y usa la de las 22 h.
+
+**`cabeceras_despacho.csv`, 12 filas.** Qué cabecera es cada lado: `nodo_cabecera`,
+`nodo_destino` y el `direction_id` del grafo en que circula. **No suponer que el lado A
+es la cabecera 1 de `cabeceras-estaciones.csv`**: en la E es al revés, y ese archivo
+además está desactualizado.
+
+**`apertura_formaciones.csv`, 50 filas.** Una fila por formación que arranca a las 5:30
+(D16): `nodo_inicio`, `orden_en_recorrido` (0 es la cabecera), `km_desde_cabecera` y
+`frac_dias`, la fracción de días en que arranca una formación desde ahí.
 
 ---
 

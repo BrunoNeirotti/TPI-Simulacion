@@ -35,6 +35,14 @@ Particularidades del formato, verificadas sobre los archivos de 2025 y 2026 el
    programados que no se prestaron.
 6. Las causas vienen en texto con espacios de relleno: "Falta de custodia
    policial" aparece como dos valores distintos si no se recortan.
+7. **`Km A` y `Km D` mezclan tres escrituras** (verificado el 21/09/2026): metros
+   con punto de miles (`9.770`), metros sin separador (`9770`, `649`) y, en 2026,
+   kilometros con coma decimal (`9,77`) o redondeados a entero (`10`, `4`: uno o
+   dos digitos, que en 2025 no aparecen). Leidos con `to_numeric`, `9.770` da 9,77
+   y `649` da 649: escalas mezcladas. Es la distancia que recorre el viaje; el
+   recorrido completo es la moda por linea (9,77 km en la A). Los viajes mas
+   cortos son las formaciones que arrancan desde un punto intermedio, casi todas
+   en la apertura del servicio. `_km` devuelve kilometros.
 
 Este modulo no corrige nada en silencio: devuelve los datos normalizados y deja
 los contadores de lo descartado en `ResultadoLectura`.
@@ -102,6 +110,18 @@ def a_segundos(hora: str) -> int | None:
     return h * 3600 + mi * 60 + s
 
 
+def _km(serie: pd.Series) -> pd.Series:
+    """`Km A`/`Km D` a kilometros. Ver el punto 7 del encabezado."""
+    s = serie.fillna("").astype(str).str.strip()
+    coma = s.str.contains(",")
+    km = pd.to_numeric(s.where(coma).str.replace(",", "."), errors="coerce")
+    entero = ~coma & s.str.fullmatch(r"\d{1,2}")
+    km = km.fillna(pd.to_numeric(s.where(entero), errors="coerce"))
+    resto = ~coma & ~entero
+    metros = pd.to_numeric(s.where(resto).str.replace(".", "", regex=False), errors="coerce")
+    return km.fillna(metros / 1000)
+
+
 def _parsear_fechas(serie: pd.Series, res: ResultadoLectura) -> pd.Series:
     """Parsea las tres variantes de fecha, contando cada una."""
     partes = serie.str.split("/")
@@ -158,7 +178,7 @@ def leer(anio: int, res: ResultadoLectura | None = None) -> pd.DataFrame:
         d[f"coches_{lado}"] = pd.to_numeric(
             d[f"Cantidad coches {lado}"], errors="coerce"
         )
-        d[f"km_{lado}"] = pd.to_numeric(d[f"Km {lado}"], errors="coerce")
+        d[f"km_{lado}"] = _km(d[f"Km {lado}"])
         d[f"viajo_{lado}"] = d[f"Tipo Viaje {lado}"].fillna("").str.strip().eq("S")
         d[f"salida_{lado}"] = d[f"Hora sale {lado}"].map(a_segundos)
 

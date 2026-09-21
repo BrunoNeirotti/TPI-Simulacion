@@ -65,7 +65,10 @@ Enter ──► Delay "detencion" ──► SelectOutput ¿cabecera final? ─�
 ```
 
 - **Enter**: el despachador de la línea toma una formación libre y la inyecta en la
-  cabecera.
+  cabecera. **En la apertura** (5:30) inyecta además las formaciones de
+  `apertura_formaciones.csv` en su estación de arranque (D16): entran al flowchart en
+  `detencion` con el índice de tramo de esa estación, y a partir de ahí recorren igual
+  que cualquier otra.
 - **Delay `detencion`**, en cada estación:
   1. al entrar, libera de `aBordo` a los pasajeros que bajan ahí;
   2. sube pasajeros de la cola del andén, en orden de llegada, hasta llenar la
@@ -142,15 +145,27 @@ la que va adelante, lo que en una vía única es físicamente imposible.
 construcción); mientras la detención sea fija se cuenta cuántas veces ocurriría y se
 verifica que es cero.
 
-### 6.5 Intervalos de despacho de las líneas actuales
+### 6.5 Intervalos de despacho de las líneas actuales: **hecho** (paso 12, D16 a D18)
 
-`intervalos_despacho.csv` es un **resumen** por línea, cabecera y hora (240 filas), no
-los 663.709 intervalos. El ajuste de distribuciones que pide la especificación
-(histograma, máxima verosimilitud, bondad de ajuste) se hace en Python sobre
-`formaciones-despachadas-2025.csv` filtrado igual que en el paso 4, y a AnyLogic entra
-solo la distribución elegida con sus parámetros por línea, cabecera y hora. Es un paso
-nuevo del pipeline (`src/12`), sin decisiones de fondo: el período filtrado ya lo fijan
-las restricciones de D4.
+Resuelto el 21/09/2026 en `src/12_ajuste_intervalos.py` (`reports/12_ajuste_intervalos.md`).
+Lo que entra a AnyLogic:
+
+- **`intervalos_empiricos.csv`**: distribución empírica por línea, cabecera y hora (D17),
+  como tabla de 501 cuantiles por celda. Se muestrea por transformada inversa:
+  ```java
+  double u = uniform();                      // 0..1
+  int i = (int) Math.floor(u * 500);         // tramo de la tabla
+  double f = u * 500 - i;
+  double intervalo = q[i] + f * (q[i + 1] - q[i]);
+  ```
+  con `q` el arreglo de 501 cuantiles de la celda (línea, cabecera, hora vigente).
+- **`cabeceras_despacho.csv`**: qué cabecera es A y cuál D, y en qué `direction_id` del
+  grafo circula cada una. **No suponer que A es la cabecera 1**: en la E es al revés.
+- **`apertura_formaciones.csv`**: desde qué estación arranca cada formación a las 5:30
+  (D16).
+
+Excluidos de los intervalos: la apertura, los viajes de recorrido parcial y los cortes de
+servicio (D18). El período es todo 2025 y depende de D4 (`FILTRO_FECHAS` en el script).
 
 ### 6.6 Capacidad por formación
 
@@ -187,7 +202,8 @@ ruta. Se mide en el primer prototipo.
    (ingresados = arribados + a bordo + en andén) y que la ocupación en hora pico tenga
    el orden de magnitud del perfil de SBASE.
 3. **Las seis líneas con transbordos**, con la demanda completa.
-4. **Ajuste de intervalos de despacho** (6.5) reemplazando los intervalos fijos.
+4. **Intervalos empíricos y apertura** (6.5) reemplazando los intervalos fijos. Los
+   insumos ya están generados.
 5. **Detención endógena y control de adelantamiento** (6.2, 6.4).
 6. **Indicadores y experimento de diez replicaciones.**
 7. D4 y calibración del corredor.

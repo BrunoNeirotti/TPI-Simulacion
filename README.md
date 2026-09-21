@@ -88,7 +88,7 @@ Los documentos de `docs/` que conviene conocer:
 Hace falta Python 3.12 con `pandas`, `numpy`, `networkx` y `matplotlib`.
 
 ```bash
-pip install pandas numpy networkx matplotlib
+pip install pandas numpy networkx matplotlib scipy
 ```
 
 Los scripts se corren en orden y desde la raíz del repositorio. Cada uno deja sus salidas
@@ -104,6 +104,7 @@ python src/07_caminos_minimos.py             # caminos mínimos con penalizació
 python src/09_sbase_od_carga.py              # matriz y perfiles de carga de SBASE
 python src/10_calibracion_penalizacion.py    # calibración de la penalización
 python src/11_demanda_modelo.py              # matriz de demanda del modelo
+python src/12_ajuste_intervalos.py           # oferta: intervalos entre despachos y apertura
 ```
 
 `src/02_figuras_propuesta.py` genera las figuras de la propuesta y no depende del resto.
@@ -115,7 +116,7 @@ está medido en `reports/07_caminos_minimos.md`.
 
 ### Lo que el modelo consume
 
-Al final del pipeline, AnyLogic necesita cinco archivos:
+Al final del pipeline, AnyLogic necesita estos archivos:
 
 | Archivo | Contenido |
 |---|---|
@@ -124,6 +125,9 @@ Al final del pipeline, AnyLogic necesita cinco archivos:
 | `data/processed/caminos_minimos.csv` | La ruta de cada uno de los 6.006 pares |
 | `data/processed/demanda_modelo_od_hora.csv` | 827.289 viajes del día hábil, en 71.686 celdas |
 | `data/processed/demanda_modelo_intrahorario.csv` | Reparto en bloques de 15 minutos |
+| `data/processed/intervalos_empiricos.csv` | Distribución empírica de los intervalos entre despachos, por línea, cabecera y hora (501 cuantiles por celda) |
+| `data/processed/cabeceras_despacho.csv` | Qué cabecera es cada lado (A/D) del dataset de despachos, y su sentido en el grafo |
+| `data/processed/apertura_formaciones.csv` | Desde qué estaciones arrancan las formaciones a las 5:30 |
 
 El detalle de cada columna está en [`docs/guia-del-modelo.md`](docs/guia-del-modelo.md).
 

@@ -233,8 +233,11 @@ sección~\ref{sec:supuestos}).
 \textbf{Proceso de la formación:}
 \begin{enumerate}
   \item Despacho desde una cabecera, con intervalo tomado de la distribución
-    ajustada sobre los intervalos medidos (líneas actuales) o de la variable de
-    escenario de intervalo entre trenes (Línea F, ver sección~\ref{sec:variables}).
+    empírica medida por línea, cabecera y hora (líneas actuales) o de la variable
+    de escenario de intervalo entre trenes (Línea F, ver
+    sección~\ref{sec:variables}). En la apertura del servicio (5:30) las
+    formaciones arrancan desde las estaciones intermedias donde lo hacen en la
+    operación real, medidas en el dataset de despachos.
   \item Recorrido tramo a tramo: tiempo de viaje más detención en cada estación
     intermedia (mínimo de diseño 24~s para las líneas actuales, 30~s para la Línea
     F, endógeno según ascensos/descensos).
@@ -414,9 +417,12 @@ Archivo & Qué aporta al modelo \\
 
 A eso se suman, para el modelo en AnyLogic:
 \begin{itemize}
-  \item \textbf{Distribuciones de intervalos de despacho}, a ajustar sobre los
-    663.709 intervalos medidos, siguiendo el procedimiento de histogramas, máxima
-    verosimilitud y bondad de ajuste visto en la materia.
+  \item \textbf{Distribuciones de intervalos de despacho}: sobre 655.299
+    intervalos medidos se hizo el procedimiento de la materia (histogramas, máxima
+    verosimilitud de cinco familias y bondad de ajuste). La lognormal gana en la
+    mayoría de las celdas, pero la Línea H es bimodal y ninguna familia teórica la
+    reproduce, así que el modelo usa la \textbf{distribución empírica} en todas.
+    Se excluyen los cortes de servicio sin causa registrada.
   \item \textbf{Distribución de llegada de pasajeros}, derivada de la tasa horaria e
     intrahoraria (no homogénea).
   \item \textbf{Parámetros de la Línea F}, tomados directamente del expediente

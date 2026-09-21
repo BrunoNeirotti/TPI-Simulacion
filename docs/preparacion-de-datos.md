@@ -933,3 +933,41 @@ Detalles de implementación que conviene no volver a deducir:
 consistente con el 9,9 % que miden los molinetes y con el 9,0 % y 9,7 % de las matrices
 de SBASE por separado. Mezclar dos matrices podía haber producido un perfil que ninguna
 fuente respalda, y no lo produjo.
+
+## 10. La oferta del modelo (paso 12 del plan)
+
+`src/12_ajuste_intervalos.py`; reporte en `reports/12_ajuste_intervalos.md`; salidas
+`intervalos_empiricos.csv` (lo que consume el modelo), `cabeceras_despacho.csv`,
+`apertura_formaciones.csv` y `distribuciones_despacho.csv` (ajuste teórico, de
+referencia). Hecho el 21/09/2026.
+
+Tres cosas que no se sabían y salieron de la columna `Km` del dataset de despachos, que
+ningún paso anterior había usado:
+
+- **`Km` es la distancia que recorre cada viaje**, y mezcla tres escrituras: metros con
+  punto de miles (`9.770`), metros sin separador (`649`) y, en 2026, kilómetros con coma
+  o redondeados a entero. `lib_despachos` la leía con `to_numeric` y mezclaba escalas;
+  se corrigió (punto 7 de su encabezado). El recorrido completo es la moda por línea.
+- **El dataset llama A y D a las cabeceras sin decir cuál es cuál**, y se puede deducir:
+  las formaciones de la apertura arrancan desde estaciones intermedias y su `Km`
+  coincide con la distancia a la cabecera de destino solo bajo una asignación (error de
+  17 a 74 m contra 99 a 276 m). **En la E el lado A es Retiro**, al revés que en el
+  resto según `cabeceras-estaciones.csv`, que además está desactualizado.
+- **La apertura es a las 5:30 y no arranca desde las cabeceras**: salen a la vez de 2 a
+  5 formaciones por lado, desde estaciones que se repiten casi todos los días. Eso
+  explica los 5.761 intervalos de 0 s que el paso 4 contaba a las 5 h. Los viajes de
+  recorrido parcial fuera de la apertura son menos del 1 % en cada hora.
+
+Y dos cosas sobre los intervalos:
+
+- **Hay cortes de servicio sin causa registrada** dentro de días típicos: 180 intervalos
+  de más de una hora, hasta 7 h, a veces en los dos sentidos a la vez. Se excluyen los
+  intervalos de más de 5 veces la mediana de su celda (324, el 0,05 %).
+- **Ninguna familia teórica ajusta a la Línea H**, que tiene una forma bimodal (picos en
+  205 s y 290 s). El modelo usa la **distribución empírica** en todas las celdas; el
+  ajuste teórico queda como análisis para el informe. Chi-cuadrado y Kolmogorov-Smirnov
+  rechazan casi todo por el tamaño de muestra (unos 3.000 intervalos por celda), así que
+  se informa además el estadístico D.
+
+Las tres decisiones (apertura, empírica y cortes) son D16, D17 y D18 en `decisiones.md`.
+El período de ajuste es todo 2025 y **depende de D4**: se cambia con `FILTRO_FECHAS`.

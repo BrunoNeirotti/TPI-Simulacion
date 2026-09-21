@@ -107,6 +107,13 @@ python src/11_demanda_modelo.py              # matriz de demanda del modelo
 python src/12_ajuste_intervalos.py           # oferta: intervalos entre despachos y apertura
 ```
 
+El paso 13 corre el simulador de referencia (Java, ver `anylogic/biblioteca/LEEME.md`)
+y genera `reports/13_verificacion_referencia.md`:
+
+```bash
+cd anylogic/biblioteca && ./compilar.sh && ./referencia/correr.sh
+```
+
 `src/02_figuras_propuesta.py` genera las figuras de la propuesta y no depende del resto.
 `src/08_generar_pruebas_anylogic.py` genera los modelos de prueba de `anylogic/pruebas/`.
 

@@ -67,6 +67,25 @@ de despachos tiene cola hacia abajo (días con demoras): en la H, cabecera D, la
 es 283 y la media 268. Muestrear intervalos independientes reproduce la media, que es lo
 que corresponde.
 
+## Simulador de referencia
+
+`referencia/SimuladorReferencia.java` es un simulador de eventos discretos en Java plano
+que corre **la misma lógica** que la guía de construcción, con esta biblioteca. Sirve para
+verificar la lógica antes de armarla en AnyLogic y, después, para la verificación
+cruzada: con los mismos insumos, AnyLogic tiene que dar lo mismo dentro del error de
+muestreo. No reemplaza al modelo de AnyLogic, que es el entregable.
+
+```bash
+./referencia/correr.sh          # 10 replicaciones, unos 10 s en total
+./referencia/correr.sh --solo C # solo la Linea C
+```
+
+Deja `data/processed/referencia_*.csv` y genera `reports/13_verificacion_referencia.md`
+con `src/13_verificacion_referencia.py`. Resultados al 21/09/2026: conservación OK en las
+10 réplicas; carga por tramo contra SBASE con correlación 0,993 en hora pico mañana y
+0,983 en la tarde; y un hallazgo, **el pool de 25.000 pasajeros no alcanza** (hasta 27.796
+vivos a la vez), que pasa a 32.000.
+
 ## Rutas con cambio de sentido
 
 142 rutas (6.398 viajes por día, el 0,8 %) van a Alberti o salen de Pasco, que la A

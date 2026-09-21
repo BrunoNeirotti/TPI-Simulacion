@@ -135,14 +135,16 @@ Elementos a agregar en `Main` (paleta *Agent*):
 |---|---|---|
 | Parameter | `soloLinea` | Tipo `String`, valor `"C"` (paso 2) o `""` (paso 3) |
 | Parameter | `carpetaDatos` | Tipo `String`, valor `"../../data/processed"` |
-| Population | `pasajeros` | Tipo `Pasajero`, **cantidad inicial 25000** |
+| Population | `pasajeros` | Tipo `Pasajero`, **cantidad inicial 32000** |
 | Population | `formaciones` | Tipo `Formacion`, **cantidad inicial 150** |
 | Collection | `pasajerosLibres` | `LinkedList` de `Pasajero` |
 | Collection | `formacionesLibres` | `LinkedList` de `Formacion` |
 
-25.000 pasajeros es el pool de la prueba E (la concurrencia máxima medida es de 20.722).
-150 formaciones alcanza con holgura: con los intervalos de hora pico circulan unas 70 a
-la vez en toda la red.
+**32.000 pasajeros, no 25.000.** El simulador de referencia midió una concurrencia máxima
+de 26.647 a 27.796 pasajeros vivos a la vez (`reports/13_verificacion_referencia.md`): con
+las esperas en andén es más que los 20.722 de la asignación estática con que se había
+fijado el pool (D10). La prueba D ya instanció 60.000 sin problemas.
+150 formaciones alcanza con holgura: el simulador de referencia llega a 82 a la vez.
 
 **On startup** de `Main`:
 
@@ -355,14 +357,19 @@ if (arribados > 0) {
 
 ## 8. Qué verificar en el paso 2 (solo la C)
 
+Los valores esperados salen del **simulador de referencia**, que corre esta misma lógica
+en Java plano con la misma biblioteca (`anylogic/biblioteca/referencia/`,
+`reports/13_verificacion_referencia.md`). AnyLogic tiene que dar lo mismo dentro del
+error de muestreo: eso es la verificación cruzada.
+
 | Control | Qué se espera |
 |---|---|
 | Arranca y lee los datos | La consola muestra `6006 rutas, 827289 viajes/dia` |
-| Viajes generados | `ingresados` cerca de **57.134** (Poisson: ± unos 700) |
+| Viajes generados | `ingresados` cerca de **57.134** (en 10 réplicas de referencia: 56.545 a 57.502) |
 | Conservación | `OK` |
 | No se agotan los pools | Sin error de pool |
-| Espera media | Del orden de medio intervalo de la C: unos 100 s en hora pico |
-| Tiempo de viaje | Cerca del `tiempo_s` de las rutas más la espera; Constitución–Retiro son 751 s de viaje |
+| Espera media | **114 a 121 s** (referencia) |
+| Tiempo de viaje medio | **624 a 630 s** (referencia) |
 
 Después, en el paso 3, sin cambiar nada más que `soloLinea = ""`:
 
@@ -370,7 +377,14 @@ Después, en el paso 3, sin cambiar nada más que `soloLinea = ""`:
 |---|---|
 | Viajes generados | `ingresados` cerca de **827.289**, `descartados` 0 |
 | Conservación | `OK` |
-| Pasajeros vivos a la vez | Máximo del orden de 20.000 (el pool es de 25.000) |
+| Pasajeros vivos a la vez | Máximo de **26.600 a 27.800** (el pool es de 32.000) |
+| Formaciones a la vez | Máximo de **76 a 82** |
+| Tiempo de viaje medio | **1.121,6 ± 1,7 s** (referencia, 10 réplicas) |
+| Espera media por viaje | **199,4 ± 1,7 s** |
+| Ascensos por viaje | **1,442** en el día; 1,417 en la hora pico mañana |
+| Carga por tramo contra SBASE | Hora pico mañana: correlación 0,993, error ponderado 7,6 %; tarde: 0,983 y 8,7 % |
+
+Las cifras completas están en `reports/13_verificacion_referencia.md`.
 
 **Sobre las 142 rutas con cambio de sentido** (6.398 viajes por día, el 0,8 %): el
 camino mínimo del paso 6 llega a Alberti y sale de Pasco (servidas en un solo sentido)

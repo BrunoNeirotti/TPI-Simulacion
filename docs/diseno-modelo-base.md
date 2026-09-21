@@ -19,14 +19,14 @@ opciones descartadas para que se vea contra qué se eligió.
 | 200 bloques de flowchart por tipo de agente | Un solo flowchart genérico por tipo de agente. La topología se lee de los CSV, no se dibuja |
 | 10 tipos de agente por modelo | Alcanza: `Main`, `Pasajero`, `Formacion`, y a lo sumo dos o tres auxiliares |
 | 50.000 creaciones dinámicas por corrida | Pasajeros y formaciones salen de poblaciones declaradas y se reciclan con `Enter`/`Exit`. Nunca `Source` |
-| Concurrencia máxima de 20.722 pasajeros vivos | Población declarada de 25.000 pasajeros (prueba E) |
+| Concurrencia máxima de 27.796 pasajeros vivos (simulador de referencia; la estimación estática era 20.722) | Población declarada de **32.000** pasajeros (la prueba D instanció 60.000) |
 
 ## 2. Tipos de agente
 
 | Tipo | Cantidad | Qué guarda |
 |---|---|---|
 | `Main` | 1 | Las tablas leídas de los CSV, los andenes, los generadores, los contadores de indicadores |
-| `Pasajero` | Población de 25.000, reciclada | Origen, destino, hora de generación, la ruta como lista de tramos por línea (subir en X, bajar en Y), el índice de la etapa actual, marcas de tiempo |
+| `Pasajero` | Población de 32.000, reciclada | Origen, destino, hora de generación, la ruta como lista de tramos por línea (subir en X, bajar en Y), el índice de la etapa actual, marcas de tiempo |
 | `Formacion` | Población declarada por línea (flota), reciclada | Línea, sentido, capacidad, ocupación, la lista de pasajeros a bordo, la posición en la línea |
 
 Los **andenes** no son agentes: son objetos Java livianos dentro de `Main` (uno por nodo
@@ -195,10 +195,14 @@ inyecta por `Enter` desde una población, corriendo 20 h. Si pasa, se usa `Event
 corta a las 5 h, se usa el agente reloj. Sirve además para confirmar lo que la prueba E
 dejó pendiente: que `Enter` desde una población no cuenta como creación.
 
-### 7.2 Costo de 20.000 pasajeros activos
+### 7.2 Costo de los pasajeros activos: **medido** con el simulador de referencia
 
-La prueba C tuvo 1.137 activos a la vez. Acá van a ser hasta 20.722, cada uno con su
-ruta. Se mide en el primer prototipo.
+La prueba C tuvo 1.137 activos a la vez. El simulador de referencia
+(`anylogic/biblioteca/referencia/`, 21/09/2026), que corre esta misma lógica en Java
+plano, midió **hasta 27.796 pasajeros vivos a la vez**, más que los 20.722 de la
+asignación estática, porque suma las esperas en andén. Por eso el pool pasa a 32.000. En
+Java plano un día completo tarda alrededor de 1 s; en AnyLogic será más lento, y se mide
+en el primer prototipo.
 
 ## 8. Orden de construcción propuesto
 

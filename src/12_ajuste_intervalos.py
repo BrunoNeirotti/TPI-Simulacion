@@ -647,6 +647,19 @@ def main() -> None:
     tabla, control = tabla_empirica(t)
     vuelta = vuelta_en_cabecera(sentidos)
 
+    # Ultima salida de recorrido completo de cada cabecera, mediana entre dias
+    # (redondeada al minuto): el despachador del modelo deja de despachar ahi.
+    # Las salidas despues de medianoche (horas 0 y 1 de la B y la D) quedan fuera
+    # del horizonte del modelo (D11), que corta a las 24 h.
+    ult = (d[d.completo & (d.salida_s < 24 * 3600)]
+           .groupby(["linea", "cabecera", "fecha"]).salida_s.max()
+           .groupby(["linea", "cabecera"]).median()
+           .rename("ultima_salida_s").reset_index())
+    ult["ultima_salida_s"] = (ult.ultima_salida_s / 60).round().astype(int) * 60
+    sentidos = sentidos.merge(ult, on=["linea", "cabecera"])
+    sentidos["apertura_s"] = sentidos.linea.map(
+        ap_config.groupby("linea").hora_s.first())
+
     sentidos.to_csv(PROCESADO / "cabeceras_despacho.csv", index=False, float_format="%.4g")
     ap_config.to_csv(PROCESADO / "apertura_formaciones.csv", index=False)
     tabla.to_csv(PROCESADO / "intervalos_empiricos.csv", index=False, float_format="%.6g")

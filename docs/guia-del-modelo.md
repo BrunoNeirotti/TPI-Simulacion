@@ -169,7 +169,9 @@ Se muestrea por transformada inversa, interpolando entre cuantiles (el código e
 intervalos y usa la de las 22 h.
 
 **`cabeceras_despacho.csv`, 12 filas.** Qué cabecera es cada lado: `nodo_cabecera`,
-`nodo_destino` y el `direction_id` del grafo en que circula. **No suponer que el lado A
+`nodo_destino` y el `direction_id` del grafo en que circula. Además `apertura_s` (5:30 en
+todas) y `ultima_salida_s`, la mediana de la última salida de recorrido completo (entre
+las 22:57 y las 23:52), donde el modelo deja de despachar. **No suponer que el lado A
 es la cabecera 1 de `cabeceras-estaciones.csv`**: en la E es al revés, y ese archivo
 además está desactualizado.
 

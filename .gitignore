@@ -72,6 +72,9 @@ venv/
 # ---------------------------------------------------------------------------
 anylogic/**/bin/
 anylogic/**/*.jar
+# Excepcion: la biblioteca del modelo se versiona armada, para usarla en
+# AnyLogic sin tener que compilarla (se regenera con anylogic/biblioteca/compilar.sh).
+!anylogic/biblioteca/subte.jar
 anylogic/**/build/
 anylogic/**/export/
 *.alp.bak

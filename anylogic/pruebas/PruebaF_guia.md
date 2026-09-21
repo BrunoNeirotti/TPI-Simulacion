@@ -67,13 +67,42 @@ Con ~300 pasajeros en el `Delay` a la vez y 1.000 en la población, nunca se que
 agentes libres, así que el total esperado es 72.000 (o 72.001 por el evento de tiempo
 cero).
 
+## Variante F2: evento dinámico (agregada el 21/09/2026)
+
+El modelo real no usa un `Event` cíclico sino **eventos dinámicos** (*Dynamic Event*),
+que se reprograman solos con un tiempo distinto cada vez (llegadas de pasajeros,
+despachos). Conviene probar también ese mecanismo. Son cinco minutos más sobre el mismo
+modelo:
+
+1. **Borrar el evento `inyectar`** (o ponerle *Mode*: `Occurs once` con tiempo muy
+   grande, para desactivarlo).
+2. Agregar un **Dynamic Event** (paleta *Agent → Dynamic Event*) en `Main`, nombre
+   `Inyectar`. En *Action*:
+   ```java
+   Pax p = libres.poll();
+   if (p != null) {
+       enter.take(p);
+       inyectados++;
+   }
+   create_Inyectar(1);   // se reprograma dentro de 1 segundo
+   ```
+3. En *On startup* de `Main`, agregar al final:
+   ```java
+   create_Inyectar(0);
+   ```
+4. Correr igual, 72.000 s, y anotar `inyectados`. La lectura de la tabla de arriba es la
+   misma.
+
+Si F pasa y F2 corta a las 5 h (o al revés), anotarlo tal cual: define qué mecanismo usa
+el modelo.
+
 ## Resultado
 
 *(completar al correrla)*
 
-| Dato | Valor |
-|---|---|
-| `inyectados` al final | |
-| Hora del modelo al terminar | |
-| Mensajes | |
-| Conclusión | |
+| Dato | F (`Event` cíclico) | F2 (evento dinámico) |
+|---|---|---|
+| `inyectados` al final | | |
+| Hora del modelo al terminar | | |
+| Mensajes | | |
+| Conclusión | | |

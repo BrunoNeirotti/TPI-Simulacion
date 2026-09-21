@@ -52,9 +52,9 @@ HORA_HPT = 17
 
 # Columna del paso 5 que se usa para el perfil horario. La alternativa es
 # `expandidas_completas`, que descarta el 4,1 % de etapas marcadas
-# `viaje_incompleto`: eso se resuelve corriendo el modelo
-# con las dos, no discutiendola. Aca solo entra como forma de la curva horaria,
-# no como nivel, asi que su efecto es de segundo orden.
+# `viaje_incompleto`. Aca solo entra como forma de la curva horaria, no como
+# nivel: medido el 21/09/2026, cambia de hora el 1,33 % de los viajes del dia.
+# Decision D1: se conservan todas (ver decisiones.md).
 COLUMNA_PASO5 = "expandidas"
 
 

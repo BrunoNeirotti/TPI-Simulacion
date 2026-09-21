@@ -291,8 +291,6 @@ recorren en el análisis de sensibilidad):
   \item Detención de la Línea F, con piso de 30~s.
   \item Criterio de reparto de demanda fuera de las horas pico (perfil por par,
     perfil de red, o perfil por complejo de origen).
-  \item Inclusión o no de las etapas marcadas como incompletas (4,1~\% de la
-    demanda).
 \end{itemize}
 
 % ---------- 9. Parámetros ----------
@@ -468,13 +466,23 @@ informando intervalos de confianza.
     entre 6 coches, unos 179 por coche), aclarando que para las líneas de 5 coches
     es una extrapolación.
   \item \textbf{Detención de las líneas actuales}: endógena (según ascensos y
-    descensos), con piso de 24~s de diseño del GTFS.
+    descensos), con piso de 24~s de diseño del GTFS. El modelo se verifica primero
+    con la detención fija en ese piso, y el término por pasajero se agrega en la
+    calibración, con su coeficiente como supuesto declarado.
   \item \textbf{Comportamiento del pasajero que no aborda}: espera la próxima
     formación de la misma línea y sentido en el mismo andén; no cambia de ruta ni
-    abandona el sistema. Regla declarada, no medida --- falta que el grupo la
-    confirme.
+    abandona el sistema. Regla declarada, no medida, confirmada por el grupo el
+    21/09/2026.
   \item \textbf{Caminata de transbordo}: se usa el tiempo mínimo de combinación del
     GTFS como piso; no es una caminata cronometrada.
+  \item \textbf{Sentido 1 de la Línea E}: en el GTFS publicado, sus distancias son
+    copia de las del sentido 0 y sus tiempos no se corresponden con ellas. Se toman
+    los tiempos del sentido 0, que es lo que hacen las otras cinco líneas del mismo
+    archivo. Afecta al 1,0~\% de los caminos.
+  \item \textbf{Etapas marcadas como incompletas} (4,1~\%): se conservan. Solo
+    entran en la forma de la curva horaria fuera de las horas pico, no en el nivel
+    de la demanda; medido, excluirlas cambia de hora el 1,33~\% de los viajes del
+    día.
   \item \textbf{Asignación de ruta todo-o-nada}: cada par origen-destino manda todo
     su flujo por un único camino precalculado; no se reparte entre alternativas
     cercanas en tiempo.
@@ -521,8 +529,8 @@ informando intervalos de confianza.
     Línea F (cambios en el reparto por línea, en la tasa de transbordo y en los
     tiempos de viaje agregados de la red)?
   \item ¿Qué tan sensibles son los indicadores centrales a los supuestos propios del
-    trabajo: la desagregación temporal fuera de las horas pico, el tratamiento de
-    las etapas incompletas, y la regla de comportamiento del pasajero que no
+    trabajo: la desagregación temporal fuera de las horas pico, el coeficiente de
+    detención por pasajero, y la regla de comportamiento del pasajero que no
     aborda?
 \end{enumerate}
 

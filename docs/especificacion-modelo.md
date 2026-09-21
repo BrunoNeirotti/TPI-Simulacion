@@ -163,7 +163,6 @@ en el análisis de sensibilidad, ver sección 4.3 de `guia-del-modelo.md`):
 - Detención de la Línea F, con piso de 30 s.
 - Criterio de reparto de demanda fuera de las horas pico (perfil por par, perfil de
   red, o perfil por complejo de origen).
-- Inclusión o no de las etapas marcadas como incompletas (4,1 % de la demanda).
 
 ## 9. Parámetros
 
@@ -277,13 +276,22 @@ intervalos de confianza.
   referencia la capacidad por coche de la Línea F (1.075 pasajeros / 6 coches ≈ 179
   por coche), aclarando que para las líneas de 5 coches es una extrapolación.
 - **Detención de las líneas actuales**: endógena (según ascensos y descensos), con
-  piso de 24 s de diseño del GTFS. No hay fuente pública para validar el valor
+  piso de 24 s de diseño del GTFS. El modelo se verifica primero con la detención
+  fija en ese piso, y el término por pasajero se agrega en la calibración, con su
+  coeficiente como supuesto declarado (D13). No hay fuente pública para validar el valor
   resultante.
 - **Comportamiento del pasajero que no aborda**: espera la próxima formación de la
   misma línea y sentido en el mismo andén; no cambia de ruta ni abandona el sistema.
-  Es una regla declarada, no medida (falta que el grupo la confirme, ver sección 16).
+  Es una regla declarada, no medida, confirmada por el grupo el 21/09/2026 (D12).
 - **Caminata de transbordo**: se usa el `min_transfer_time` del GTFS como piso; no es
   una caminata cronometrada.
+- **Sentido 1 de la Línea E** (D6): en el GTFS publicado, sus distancias son copia de
+  las del sentido 0 y sus tiempos no se corresponden con ellas. Se toman los tiempos
+  del sentido 0, que es lo que hacen las otras cinco líneas del mismo archivo. Afecta
+  al 1,0 % de los caminos.
+- **Etapas marcadas como incompletas** (D1, 4,1 %): se conservan. Solo entran en la
+  forma de la curva horaria fuera de las horas pico, no en el nivel de la demanda;
+  medido, excluirlas cambia de hora el 1,33 % de los viajes del día.
 - **Asignación de ruta todo-o-nada** (D9): cada par origen-destino manda todo su
   flujo por un único camino precalculado; no se reparte entre alternativas cercanas
   en tiempo (hay 50 pares, el 0,8 %, con una alternativa a menos de 60 s).
@@ -326,8 +334,9 @@ intervalos de confianza.
    (cambios en el reparto por línea, en la tasa de transbordo y en los tiempos de
    viaje agregados de la red)?
 5. ¿Qué tan sensibles son los indicadores centrales a los supuestos propios del
-   trabajo: la desagregación temporal fuera de las horas pico (D2), el tratamiento de
-   las etapas incompletas, y la regla de comportamiento del pasajero que no aborda?
+   trabajo: la desagregación temporal fuera de las horas pico (D2), el coeficiente de
+   detención por pasajero (D13), y la regla de comportamiento del pasajero que no
+   aborda?
 
 ## 17. Diagrama conceptual final
 

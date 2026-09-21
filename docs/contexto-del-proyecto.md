@@ -544,10 +544,10 @@ conviene reintroducirlas:
 
 ## 7. Decisiones que tomamos
 
-Son once decisiones de método. Ocho están cerradas (dos se cerraron el 16/09/2026:
-profundidad de calibración y headway de la Línea F); las dos que quedan abiertas no
-frenan el modelo, y la que sigue sin poder decidirse por sí sola (D1) se resuelve
-midiendo, no discutiendo.
+Son once decisiones de método. Diez están cerradas: dos se cerraron el 16/09/2026
+(profundidad de calibración e intervalo entre trenes de la Línea F) y dos el 21/09/2026
+(etapas incompletas y sentido 1 de la Línea E). La única abierta, los períodos de ajuste
+y validación, no frena el modelo: se toma cuando haya que calibrar.
 
 Ninguna decisión la toma alguien por su cuenta: se proponen las opciones con sus
 consecuencias, se elige entre todos, y recién ahí se registra con fecha y evidencia.
@@ -628,11 +628,6 @@ reabrirlo.
 
 Ninguna frena el arranque del modelo.
 
-**Qué hacer con el 4,1 % de etapas marcadas como incompletas.** Son 24.057 etapas que
-expanden a 30.491. Se decide corriendo el modelo con las dos versiones y viendo si cambia
-algo, no discutiéndola: `matriz_od.csv` ya trae las dos en columnas separadas,
-`expandidas` y `expandidas_completas`.
-
 **Períodos de ajuste y validación.** Ya no es una elección libre: las dos ventanas tienen
 que ser posteriores a diciembre de 2024 y no pueden tocar marzo de 2025, que no tiene
 datos de despachos, el 10/04/2025, que fue un paro general con cero servicios prestados,
@@ -640,7 +635,15 @@ los 25 días hábiles atípicos ni los 100 días con cancelaciones gremiales. Qu
 `formaciones-despachadas-2026.csv` hasta el 30/06/2026, por si conviene tomar la
 validación en 2026 en vez de partir 2025 en dos.
 
-**Si dejamos el reparo del sentido 1 de la Línea E en el GTFS.** La columna de distancias
+**Decididas el 21/09/2026.** Estas dos estaban abiertas y se cerraron:
+
+**Qué hacer con el 4,1 % de etapas marcadas como incompletas: se conservan todas.** Son
+24.057 etapas que expanden a 30.491. Desde que la matriz de SBASE es la base, no mueven
+el nivel de la demanda: solo la forma horaria fuera de las horas pico. Medido con las dos
+versiones, el total diario y las horas 8 y 17 quedan idénticos, y cambia de hora el
+1,33 % de los viajes del día.
+
+**Sentido 1 de la Línea E en el GTFS: se espeja el sentido 0.** La columna de distancias
 del sentido 1 es copia literal de la del sentido 0, y sus tiempos tienen correlación 0,010
 con esas distancias contra 0,863 en el resto de la red, o sea que el sentido está
 desacoplado de su geometría. El total sí cierra, así que ningún control agregado lo
@@ -651,17 +654,19 @@ promediar una serie buena con una corrupta contamina la buena.
 
 Está aplicada la primera, con el interruptor `REPARAR_LINEA_E` en `src/03_grafo_red.py`.
 Lo medimos: regenerando el grafo sin el reparo cambian 58 pares de 6.006, o sea el 1,0 %,
-y 18 cambian de línea de ascenso. Para la elección de ruta pesa poco, pero sigue abierta
-porque afecta los tiempos de viaje sobre la E, que sí entran al modelo.
+y 18 cambian de línea de ascenso. Se confirmó esa opción: el dato publicado está roto y es
+lo que hacen las otras cinco líneas. Va como supuesto declarado en el informe.
 
-### 7.3 Un tema abierto: Retiro
+### 7.3 Un error declarado: Retiro
 
 El modelo predice que el 69,8 % de los ascensos en Retiro son por la Línea C, pero cuatro
 fuentes dicen otra cosa: SBASE mide 86,0 %, molinetes 85,5 % y `linea_etapa` 83,9 %.
 Durante un tiempo pensamos que el molinete le atribuía de más a la C, pero esa hipótesis se
 cayó cuando llegó SBASE, que es una cuarta fuente y no pasa por molinetes. Lo que
-corresponde es revisar el costo del transbordo entre Retiro de la C y Retiro de la E.
-Queda declarado.
+que queda es un error residual del modelo: se declara y no se corrige a mano, porque
+ajustar el costo del transbordo entre Retiro de la C y Retiro de la E hasta reproducir el
+86 % sería calibrar contra el mismo dato que después se usa para validar. Decidido el
+27/08/2026 y confirmado el 21/09/2026.
 
 ---
 

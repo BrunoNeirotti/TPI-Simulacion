@@ -234,7 +234,6 @@ sensible a este parámetro. El barrido completo está en
 | Intervalo entre trenes de la Línea F | Piso 90 s, techo 189 s (3,15 min, lo mejor que hoy logra la C). Decidido el 16/09/2026, ver `decisiones.md` | No hay plan de servicio y no va a haberlo hasta que haya operador. Es una cita oficial, no una elección nuestra. Los 90 s suponen despachar 2,1 veces más seguido que la mejor línea actual |
 | Detención de la Línea F | Piso de 30 s según el EsIA | El mismo informe dice que el operador va a definir los tiempos finales de detención |
 | Reparto de la demanda fuera de las horas pico | Tres variantes: perfil por par del paso 5 (la base), perfil de la red igual para todos, y perfil por complejo de origen sacado de molinetes | Es el supuesto que pusimos nosotros. Afecta solo a las celdas con `fuente = perfil_paso5`; las horas 8 y 17 son dato medido y quedan fijas |
-| Etapas marcadas como incompletas | Con y sin ellas, son el 4,1 % (30.491 viajes expandidos) | Se resuelve corriendo las dos versiones y midiendo si cambia algo. `matriz_od.csv` ya trae las dos en columnas separadas |
 
 ### 4.4 Supuestos: no existe la medición
 
@@ -348,23 +347,35 @@ Ninguna de estas frena el arranque del modelo.
 
 | Qué falta | Cómo pega en el modelo |
 |---|---|
-| Qué hacer con el 4,1 % de etapas incompletas | Cambia el nivel de la demanda en un 4,1 %. Se decide midiendo |
 | Qué períodos usar para ajustar y para validar | Los dos tienen que ser posteriores a diciembre de 2024, sin marzo de 2025, sin el 10/04/2025, sin los 25 días hábiles atípicos y sin los 100 días con cancelaciones gremiales |
-| Si dejamos el reparo del sentido 1 de la Línea E | Está aplicado (`REPARAR_LINEA_E = True`). Apagarlo cambia 58 pares de 6.006, o sea el 1,0 %. Afecta los tiempos de viaje sobre la E |
 
 Decididas el 16/09/2026 y ya no están abiertas: profundidad de calibración (solo el
 corredor de la Línea F y las líneas que combinan, D3) y rango de intervalo entre
 trenes a recorrer para la Línea F (90 a 189 s, D7). Ver `decisiones.md`.
 
+Decididas el 21/09/2026:
+
+- **Etapas incompletas (D1): se conservan todas.** Desde D2 no mueven el nivel de la
+  demanda, solo la forma horaria fuera de las horas pico, y medido cambian de hora el
+  1,33 % de los viajes del día. Queda fuera del análisis de sensibilidad.
+- **Sentido 1 de la Línea E (D6): se espeja el sentido 0**, como ya estaba aplicado
+  (`REPARAR_LINEA_E = True`). Va como supuesto declarado en el informe.
+
 ---
 
-## 9. Un tema abierto: Retiro
+## 9. Un error declarado: Retiro
 
 El pipeline predice que el 69,8 % de los ascensos en Retiro son por la Línea C, pero
 cuatro fuentes distintas dicen otra cosa: SBASE mide 86,0 %, molinetes 85,5 % y
 `linea_etapa` 83,9 %.
 
 Durante un tiempo pensamos que el molinete le atribuía de más a la C, pero esa hipótesis
-se cayó cuando llegó SBASE, que no pasa por molinetes. Lo que corresponde es revisar el
-costo del transbordo entre Retiro de la C y Retiro de la E. Si el modelo repite el mismo
-sesgo es esperable y ya está declarado; si lo corrige solo, hay que entender por qué.
+se cayó cuando llegó SBASE, que no pasa por molinetes. Ninguna penalización entre 0 y
+300 s llega al valor observado, así que no es un problema del parámetro.
+
+**Queda como error residual del modelo, declarado y sin corrección a mano** (decidido el
+27/08/2026 y confirmado el 21/09/2026). Ajustar el costo del transbordo entre Retiro de
+la C y Retiro de la E hasta reproducir el 86 % sería calibrar contra el mismo dato que
+después se usa para validar. Si el modelo repite el sesgo es lo esperable; si lo
+corrige solo, hay que entender por qué. La alternativa que se anotó y no se siguió está
+en `decisiones.md`.

@@ -76,7 +76,7 @@ y las tres salen de la misma tabla:
    sea el minimo de una de las dos.
 3. **El control independiente empeora en el minimo.** En 30 s el error 
    medio de reparto por linea es 9,00 % contra 
-   7,23 % en 120 s. Tomar el argmin mejoraria 
+   7,23 % en 120 s. Tomar el valor que minimiza el error mejoraria 
    0,26 pp la muestra de calibracion empeorando casi dos puntos un control que no 
    participa del ajuste. Eso es sobreajuste, no calibracion.
 

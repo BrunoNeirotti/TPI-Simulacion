@@ -20,7 +20,7 @@ despachos independientes por cabecera). Resuelve tres cosas:
    hora. Se hace el procedimiento de la materia (histograma, maxima
    verosimilitud para cinco familias, seleccion por AIC, chi-cuadrado y
    Kolmogorov-Smirnov), pero **el modelo usa la distribucion empirica** de cada
-   celda: 39 de 215 celdas, 30 de ellas de la Linea H, no ajustan a ninguna
+   celda: unas 40 de 215 celdas, la mayoria de la Linea H, no ajustan a ninguna
    teorica, y el grupo eligio la empirica en todas (21/09/2026, D17). La
    empirica es la continua lineal por tramos de Law (cap. 6): se muestrea por
    transformada inversa sobre una tabla de cuantiles.
@@ -38,8 +38,13 @@ registrada, a veces en los dos sentidos a la vez). El modelo representa la
 operacion normal, como al excluir los despachos con causa. Decidido con el grupo
 el 21/09/2026 (D18); se conserva el resto del dia.
 
-**Periodo**: todo 2025, como el paso 4. Depende de D4, que sigue abierta: si D4
-reserva parte de 2025 para validar, se cambia `FILTRO_FECHAS`.
+**Periodo (D4, decidida el 21/09/2026, opcion A)**: se ajusta con **julio a
+diciembre de 2025**, el regimen vigente y estable de las seis lineas: deja afuera el
+horario de verano (enero y febrero, intervalos 13 a 36 % mas largos) y los dos
+regimenes anteriores de la Linea D. Los dias con cancelaciones gremiales se excluyen
+**solo de la linea afectada**. La verificacion de la oferta se hace contra **marzo a
+mayo de 2026**, que no se usa para ajustar (junio de 2026 queda afuera por el cambio
+de la B). Ver docs/preparacion-d4.md.
 
 Salidas:
   data/processed/cabeceras_despacho.csv
@@ -85,7 +90,9 @@ VENTANA_APERTURA_S = 120      # despachos del grupo de apertura
 TOLERANCIA_COMPLETO_KM = 0.05
 FACTOR_CORTE = 5              # intervalo > 5 x mediana de la celda: corte
 N_CUANTILES = 501             # tabla de la empirica: paso de 0,2 %
-FILTRO_FECHAS = None          # p. ej. ("2025-04-01", "2025-09-30"), segun D4
+FILTRO_FECHAS = ("2025-07-01", "2025-12-31")      # ajuste (D4)
+VERIFICACION = (2026, "2026-03-01", "2026-05-31")  # verificacion de la oferta (D4)
+CAUSA_GREMIAL = "Huelga|Gremial|Paro"             # mismo criterio que el paso 4
 ALFA = 0.05
 SEMILLA = 20260921
 
@@ -119,11 +126,22 @@ def hhmm(s: float) -> str:
 # Datos
 # --------------------------------------------------------------------------
 
-def despachos() -> tuple[pd.DataFrame, ResultadoLectura]:
-    """Una fila por viaje prestado desde un lado, en dia habil tipico."""
+def despachos(anio: int = paso4.ANIO, fechas: tuple | None = FILTRO_FECHAS,
+              largo: pd.Series | None = None) -> tuple[pd.DataFrame, ResultadoLectura]:
+    """Una fila por viaje prestado desde un lado, en dia habil tipico.
+
+    `largo` es el recorrido completo por linea, en km. Si no se da, se toma la
+    moda de `Km` en los datos leidos. Para 2026 hay que darlo: ahi `Km` a veces
+    viene redondeado a entero (10 en lugar de 9,77 en la A) y la moda puede caer
+    en el valor redondeado.
+    """
     res = ResultadoLectura()
-    crudo = leer(paso4.ANIO, res)
+    crudo = leer(anio, res)
     crudo = crudo[crudo.linea.isin(LINEAS)]
+    # D4: un dia con alguna cancelacion gremial se excluye de esa linea
+    gremial = (crudo.causa_A.str.contains(CAUSA_GREMIAL, case=False)
+               | crudo.causa_D.str.contains(CAUSA_GREMIAL, case=False))
+    dias_gremiales = set(zip(crudo[gremial].linea, crudo[gremial].fecha))
     trozos = []
     for lado in ("A", "D"):
         g = crudo[crudo[f"viajo_{lado}"] & crudo[f"salida_{lado}"].notna()]
@@ -137,13 +155,17 @@ def despachos() -> tuple[pd.DataFrame, ResultadoLectura]:
     por_dia = paso4.marcar_dias_parciales(d)
     parciales = set(zip(por_dia[por_dia.parcial].linea, por_dia[por_dia.parcial].fecha))
     d["parcial"] = [(l, f) in parciales for l, f in zip(d.linea, d.fecha)]
-    d = d[(d.tipo_dia == "Habil") & ~d.parcial].copy()
-    if FILTRO_FECHAS is not None:
-        d = d[(d.fecha >= FILTRO_FECHAS[0]) & (d.fecha <= FILTRO_FECHAS[1])]
+    d["gremial"] = [(l, f) in dias_gremiales for l, f in zip(d.linea, d.fecha)]
+    d = d[(d.tipo_dia == "Habil") & ~d.parcial & ~d.gremial].copy()
+    if fechas is not None:
+        d = d[(d.fecha >= fechas[0]) & (d.fecha <= fechas[1])]
 
-    largo = d.groupby("linea").km.agg(lambda s: s.round(2).mode()[0]).rename("km_linea")
-    d = d.merge(largo, left_on="linea", right_index=True)
-    d["completo"] = d.km >= d.km_linea - TOLERANCIA_COMPLETO_KM
+    if largo is None:
+        largo = d.groupby("linea").km.agg(lambda s: s.round(2).mode()[0])
+    d = d.merge(largo.rename("km_linea"), left_on="linea", right_index=True)
+    # un Km entero es un valor redondeado (2026): se tolera medio kilometro
+    tolerancia = np.where(d.km == d.km.round(), 0.5, TOLERANCIA_COMPLETO_KM)
+    d["completo"] = d.km >= d.km_linea - tolerancia
     d["apertura_s"] = d.groupby(["linea", "cabecera", "fecha"]).salida_s.transform("min")
     d["de_apertura"] = d.salida_s <= d.apertura_s + VENTANA_APERTURA_S
     return d.sort_values(["linea", "cabecera", "fecha", "salida_s"]), res
@@ -387,7 +409,7 @@ def figura(t: pd.DataFrame, linea: str, destino: Path) -> None:
 # Reporte
 # --------------------------------------------------------------------------
 
-def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta) -> None:
+def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta, verif) -> None:
     L: list[str] = []
     w = L.append
     nombre = pd.read_csv(PROCESADO / "grafo_nodos.csv").set_index("nodo_id").nombre
@@ -404,8 +426,9 @@ def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, cont
     w(f"- {res.resumen()}.")
     w(f"- **{mil(conteo['viajes'])} viajes prestados** en días hábiles típicos de "
       "2025 (sin días parciales). Período: "
-      f"{'todo 2025' if FILTRO_FECHAS is None else ' a '.join(FILTRO_FECHAS)}; "
-      "**depende de D4**, que sigue abierta.")
+      f"{FILTRO_FECHAS[0]} a {FILTRO_FECHAS[1]} (D4, opción A: el régimen vigente, sin "
+      "horario de verano; ver `docs/preparacion-d4.md`). Los días con cancelaciones "
+      "gremiales se excluyen solo de la línea afectada.")
     w("- Un despacho desde cabecera es un viaje de **recorrido completo**. La "
       "columna `Km` da la distancia de cada viaje y la moda por línea es el "
       "recorrido completo. Los de recorrido parcial son formaciones que entran "
@@ -584,16 +607,60 @@ def escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, cont
       "flota mayor que la declarada, y eso hay que decirlo al informar los "
       "resultados de ese extremo.\n")
 
-    w("## 6. Lo que este paso no resuelve\n")
+    w("## 6. Ventana de verificación de la oferta (D4)\n")
+    anio, desde, hasta = VERIFICACION
+    w(f"La oferta se ajusta con {FILTRO_FECHAS[0]} a {FILTRO_FECHAS[1]} y se verifica "
+      f"contra {desde} a {hasta}, que no se usa para ajustar. Mismos filtros en las dos "
+      "(día hábil, sin días parciales, sin la línea en días con cancelaciones "
+      "gremiales). Cuando el modelo corra, los despachos simulados se comparan contra "
+      "la columna de verificación; la biblioteca ya lo hace contra la de ajuste.\n")
+    w("| Línea | Lado | Días (ajuste / verif.) | Despachos por día, ajuste | Verificación | Intervalo en pico, ajuste (s) | Verificación (s) |")
+    w("|---|---|---|---:|---:|---:|---:|")
+    for _, r in verif.iterrows():
+        w(f"| {r.linea} | {r.cabecera} | {int(r.dias_ajuste)} / {int(r.dias_verificacion)} | "
+          f"{num(r.despachos_dia_ajuste, 1)} | {num(r.despachos_dia_verificacion, 1)} | "
+          f"{num(r.intervalo_pico_s_ajuste, 1)} | {num(r.intervalo_pico_s_verificacion, 1)} |")
+    dif = (verif.intervalo_pico_s_verificacion / verif.intervalo_pico_s_ajuste - 1).abs()
+    w("")
+    w(f"El intervalo en hora pico difiere entre ventanas a lo sumo {pc(dif.max())} "
+      f"(mediana {pc(dif.median())}).\n")
+
+    w("## 7. Lo que este paso no resuelve\n")
     w("- **Los intervalos consecutivos no son independientes**: un despacho "
       "atrasado acorta el siguiente. Muestrear intervalos independientes pierde "
       "esa correlación. Se ve en la verificación del modelo.")
     w("- **La configuración de apertura es la típica**, no la de cada día.")
-    w("- **El período depende de D4.**")
+    w("- **La Línea D en septiembre de 2024** (el mes de la demanda de SBASE) "
+      "despachaba unos 280 s en pico contra unos 218 s de la ventana de ajuste. D4 "
+      "prevé una sensibilidad del escenario base con esa oferta; requiere leer los "
+      "despachos de 2024, que tienen otro esquema.")
     w("- **Las formaciones que se retiran al final del servicio** (horas 0 y 1, "
       "con recorrido parcial) quedan fuera: el modelo corta a las 24 h.\n")
 
     (REPORTES / "12_ajuste_intervalos.md").write_text("\n".join(L), encoding="utf-8")
+
+
+def resumen_oferta(d: pd.DataFrame, t: pd.DataFrame) -> pd.DataFrame:
+    """Despachos completos por dia e intervalo medio en hora pico, por cabecera."""
+    c = d[d.completo & (d.salida_s < 24 * 3600)]
+    por_dia = c.groupby(["linea", "cabecera", "fecha"]).size()
+    pico = t[t.hora.isin([7, 8, 17, 18])]
+    return pd.DataFrame({
+        "dias": por_dia.groupby(["linea", "cabecera"]).size(),
+        "despachos_dia": por_dia.groupby(["linea", "cabecera"]).mean(),
+        "intervalo_pico_s": pico.groupby(["linea", "cabecera"]).intervalo_s.mean(),
+    })
+
+
+def verificacion_oferta(d: pd.DataFrame, t: pd.DataFrame) -> pd.DataFrame:
+    """La ventana de ajuste contra la de verificacion (D4), con los mismos filtros."""
+    largo = d.groupby("linea").km_linea.first()
+    anio, desde, hasta = VERIFICACION
+    dv, _ = despachos(anio, (desde, hasta), largo)
+    tv, _ = intervalos(dv)
+    a = resumen_oferta(d, t).add_suffix("_ajuste")
+    v = resumen_oferta(dv, tv).add_suffix("_verificacion")
+    return a.join(v).reset_index()
 
 
 def vuelta_en_cabecera(sentidos: pd.DataFrame) -> pd.DataFrame:
@@ -646,6 +713,8 @@ def main() -> None:
     teo, det = ajuste_teorico(t)
     tabla, control = tabla_empirica(t)
     vuelta = vuelta_en_cabecera(sentidos)
+    verif = verificacion_oferta(d, t)
+    verif.to_csv(PROCESADO / "verificacion_despachos.csv", index=False, float_format="%.2f")
 
     # Ultima salida de recorrido completo de cada cabecera, mediana entre dias
     # (redondeada al minuto): el despachador del modelo deja de despachar ahi.
@@ -667,7 +736,7 @@ def main() -> None:
     FIGURAS.mkdir(parents=True, exist_ok=True)
     figura(t, "C", FIGURAS / "ajuste-intervalos-c-pico.png")
     figura(t, "H", FIGURAS / "ajuste-intervalos-h-pico.png")
-    escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta)
+    escribir_reporte(res, conteo, sentidos, ap_config, ap_res, t, teo, det, control, vuelta, verif)
     print(f"viajes={conteo['viajes']:,} intervalos={len(t):,} celdas={len(control)} "
           f"ks_max_empirica={control.ks_d_muestra.max():.4f}")
     print(sentidos[["linea", "cabecera", "direction_id", "error_km_elegido", "error_km_otro"]].to_string())

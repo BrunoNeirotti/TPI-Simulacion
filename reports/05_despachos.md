@@ -81,7 +81,7 @@ Mediana del intervalo, en minutos:
 
 ### 3.3 Contraste con el diseño de la Línea F
 
-El EsIA fija para la Línea F un headway de **1,5 min, 40 trenes por sentido y hora**. La línea más frecuente de la red actual en hora pico es la **C**, con una mediana de 3,15 min, es decir 19,0 trenes por hora y sentido.
+El EsIA fija para la Línea F un intervalo de diseño de **1,5 min, 40 trenes por sentido y hora**. La línea más frecuente de la red actual en hora pico es la **C**, con una mediana de 3,15 min, es decir 19,0 trenes por hora y sentido.
 
 > El diseño de la Línea F supone despachar **2,1 veces más seguido que lo que hoy logra la mejor línea de la red**. No es imposible (es una línea nueva, con señalamiento nuevo) pero **es un supuesto fuerte del escenario futuro y hay que tratarlo como variable de escenario, no como dato**. El documento ya declara 1,5 min como cota superior de frecuencia; este contraste le da la magnitud.
 
@@ -155,6 +155,6 @@ La capacidad por formación no sale de acá (depende del modelo de coche) pero l
 
 - **Corregido en `docs/contexto-del-proyecto.md`, sección 4**: el recurso "Total" está congelado y la historia no es homogénea desde 2015 (sección 1).
 - **Marzo de 2025 no existe en este dataset** (sección 2). Condiciona la elección de períodos: ninguna ventana de ajuste o validación puede tocar marzo.
-- **El headway de 1,5 min de la Línea F es un supuesto fuerte** (sección 3.3), no un dato: exige despachar bastante más seguido que la mejor línea actual. Va como variable de escenario.
+- **El intervalo de diseño de 1,5 min de la Línea F es un supuesto fuerte** (sección 3.3), no un dato: exige despachar bastante más seguido que la mejor línea actual. Va como variable de escenario.
 - **El pendiente de verificación del paso 3 se cierra** (sección 5).
 - **Sigue faltando el contraste GTFS contra operación real**: los tiempos de marcha del GTFS son un perfil nominal único y este paso mide despachos, no tiempos de recorrido. El contraste completo necesita el modelo.

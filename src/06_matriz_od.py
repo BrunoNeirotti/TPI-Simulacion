@@ -347,7 +347,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
       "de estacion, definidos como las componentes conexas del grafo de transbordos del "
       "paso 2. Diez complejos tienen mas de un nodo.\n")
     A("Teniamos registrado como residuo de ambiguedad que las estaciones superpuestas de "
-      "un mismo complejo se confunden al matchear por cercania: Correo Central [E], "
+      "un mismo complejo se confunden al asignar por cercania: Correo Central [E], "
       "Corrientes [H] y Santa Fe [H] no aparecen nunca, y 9 de Julio [D], Diagonal Norte [C] "
       "e Independencia [C] no aparecen como origen. **Al nivel del complejo el problema no "
       "existe**, porque las estaciones que se confunden son exactamente las que el complejo "
@@ -355,7 +355,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
       "lugar fisico, y por que linea circula es resultado de la asignacion de ruta, no dato "
       "de entrada. Mismo criterio que usamos con los andenes.\n")
 
-    A("### 1.1 El matcheo es univoco\n")
+    A("### 1.1 La asignacion es univoca\n")
     A(f"Los **{len(cen)} centroides h3 distintos** se asignan al complejo del nodo mas "
       f"cercano. Distancia mediana **{cen.dist_m.median():.0f} m**, maxima "
       f"**{cen.dist_m.max():.0f} m**.\n")
@@ -370,7 +370,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
         A(f"| {nombre[r.complejo]} | {r.dist_m:.0f} m | {nombre[r.complejo_rival]} | "
           f"{r.margen_m:.0f} m |")
     A("")
-    A("> Matchear contra el centroide promedio del complejo en lugar del nodo mas cercano "
+    A("> Asignar contra el centroide promedio del complejo en lugar del nodo mas cercano "
       "reduce ese margen minimo de 89 m a **9 m** y deja el par Avenida de Mayo / Lima "
       "contra Piedras practicamente empatado. Los complejos grandes se extienden mas de "
       "200 m y su promedio no representa a ninguna de sus estaciones. Es la clase de "
@@ -517,7 +517,7 @@ def escribir_reporte(e, e_util, cen, cat, nombre, matriz, mol,
     A("2. **El par San Pedrito / San Jose de Flores no es un desvio de nivel sino de "
       "asignacion.** Son estaciones vecinas de la Linea A, a 664 m. La matriz le pone a "
       "San Jose de Flores 15.495 ingresos de mas y a San Pedrito 14.848 de menos: el neto "
-      "de las dos es -647, es decir que **el par cierra**. El matcheo esta descartado como "
+      "de las dos es -647, es decir que **el par cierra**. La asignacion esta descartada como "
       "causa: cada centroide cae a 55 m de su estacion y a mas de 600 m de la otra. Es la "
       "regla de imputacion por parada mas cercana declarada por el organismo publicador, "
       "con su tolerancia de 2,2 km, actuando sobre dos estaciones proximas. **Este solo "

@@ -23,7 +23,7 @@ resolucion intrahoraria; entra solo como forma, no como nivel |
 - **827.289 viajes** en el dia habil, sobre 
   5.839 pares de 
   complejos y 71.686 celdas de (par, hora).
-- Perfil intrahorario: 6.140 filas de (complejo, hora, bloque).
+- Perfil intrahorario: 6.132 filas de (complejo, hora, bloque).
 - **El total cierra con la matriz diaria de SBASE**: diferencia de 0,000000 
   viajes, que es error de redondeo de punto flotante.
 - **La hora pico mañana reproduce exactamente la matriz de SBASE**: 
@@ -38,7 +38,7 @@ resolucion intrahoraria; entra solo como forma, no como nivel |
 
 ## 3. Perfil horario resultante
 
-| Hora | Viajes | Share | Origen del valor |
+| Hora | Viajes | Proporción | Origen del valor |
 |---:|---:|---:|---|
 | 05 | 4.179 | 0,5 % | paso 5, reescalado |
 | 06 | 25.317 | 3,1 % | paso 5, reescalado |

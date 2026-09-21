@@ -141,10 +141,10 @@ Elementos a agregar en `Main` (paleta *Agent*):
 | Collection | `formacionesLibres` | `LinkedList` de `Formacion` |
 
 **32.000 pasajeros, no 25.000.** El simulador de referencia midió una concurrencia máxima
-de 26.647 a 27.796 pasajeros vivos a la vez (`reports/13_verificacion_referencia.md`): con
+de 26.499 a 27.240 pasajeros vivos a la vez (`reports/13_verificacion_referencia.md`): con
 las esperas en andén es más que los 20.722 de la asignación estática con que se había
 fijado el pool (D10). La prueba D ya instanció 60.000 sin problemas.
-150 formaciones alcanza con holgura: el simulador de referencia llega a 82 a la vez.
+150 formaciones alcanza con holgura: el simulador de referencia llega a 83 a la vez.
 
 **On startup** de `Main`:
 
@@ -365,11 +365,11 @@ error de muestreo: eso es la verificación cruzada.
 | Control | Qué se espera |
 |---|---|
 | Arranca y lee los datos | La consola muestra `6006 rutas, 827289 viajes/dia` |
-| Viajes generados | `ingresados` cerca de **57.134** (en 10 réplicas de referencia: 56.545 a 57.502) |
+| Viajes generados | `ingresados` cerca de **57.134** (en 10 réplicas de referencia: 56.645 a 57.611) |
 | Conservación | `OK` |
 | No se agotan los pools | Sin error de pool |
-| Espera media | **114 a 121 s** (referencia) |
-| Tiempo de viaje medio | **624 a 630 s** (referencia) |
+| Espera media | **110 a 119 s** (referencia) |
+| Tiempo de viaje medio | **619 a 629 s** (referencia) |
 
 Después, en el paso 3, sin cambiar nada más que `soloLinea = ""`:
 
@@ -377,12 +377,12 @@ Después, en el paso 3, sin cambiar nada más que `soloLinea = ""`:
 |---|---|
 | Viajes generados | `ingresados` cerca de **827.289**, `descartados` 0 |
 | Conservación | `OK` |
-| Pasajeros vivos a la vez | Máximo de **26.600 a 27.800** (el pool es de 32.000) |
-| Formaciones a la vez | Máximo de **76 a 82** |
-| Tiempo de viaje medio | **1.121,6 ± 1,7 s** (referencia, 10 réplicas) |
-| Espera media por viaje | **199,4 ± 1,7 s** |
-| Ascensos por viaje | **1,442** en el día; 1,417 en la hora pico mañana |
-| Carga por tramo contra SBASE | Hora pico mañana: correlación 0,993, error ponderado 7,6 %; tarde: 0,983 y 8,7 % |
+| Pasajeros vivos a la vez | Máximo de **26.500 a 27.300** (el pool es de 32.000) |
+| Formaciones a la vez | Máximo de **80 a 83** |
+| Tiempo de viaje medio | **1.110,0 ± 0,9 s** (referencia, 10 réplicas) |
+| Espera media por viaje | **187,9 ± 1,0 s** |
+| Ascensos por viaje | **1,443** en el día; 1,419 en la hora pico mañana |
+| Carga por tramo contra SBASE | Hora pico mañana: correlación 0,993, error ponderado 7,6 %; tarde: 0,985 y 8,3 % |
 
 Las cifras completas están en `reports/13_verificacion_referencia.md`.
 

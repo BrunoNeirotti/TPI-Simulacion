@@ -15,7 +15,7 @@ Generado por `src/04_demanda_molinetes.py` sobre `data/raw/molinetes-2025.zip`. 
 - Descartados por con fecha fuera de 2025: ninguno.
 - Descartados por con franja inválida: ninguno.
 
-Los no-matcheos residuales, uno por uno:
+Los registros sin cruzar que quedan, uno por uno:
 
 | Línea | Estación | Pasajeros |
 |---|---|---:|
@@ -25,7 +25,7 @@ Los no-matcheos residuales, uno por uno:
 | LineaE | Loria | 12 |
 | LineaC | Loria | 3 |
 
-Son la estación espuria *Loria* que el paso 1 ya había identificado en las seis líneas. **80 pasajeros sobre 206,6 millones**: el mismo residuo que informó el paso 1, ahora con el Premetro correctamente separado y no contado como no-matcheo.
+Son la estación espuria *Loria* que el paso 1 ya había identificado en las seis líneas. **80 pasajeros sobre 206,6 millones**: el mismo residuo que informó el paso 1, ahora con el Premetro correctamente separado y no contado como registro sin cruzar.
 
 ## 2. Tipos de día, huecos de datos y días atípicos
 

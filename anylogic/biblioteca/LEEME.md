@@ -83,8 +83,8 @@ muestreo. No reemplaza al modelo de AnyLogic, que es el entregable.
 Deja `data/processed/referencia_*.csv` y genera `reports/13_verificacion_referencia.md`
 con `src/13_verificacion_referencia.py`. Resultados al 21/09/2026: conservación OK en las
 10 réplicas; carga por tramo contra SBASE con correlación 0,993 en hora pico mañana y
-0,983 en la tarde; y un hallazgo, **el pool de 25.000 pasajeros no alcanza** (hasta 27.796
-vivos a la vez), que pasa a 32.000.
+0,985 en la tarde; y un hallazgo, **el pool de 25.000 pasajeros no alcanza** (hasta unos
+27.000 vivos a la vez), que pasa a 32.000.
 
 ## Rutas con cambio de sentido
 

@@ -149,12 +149,11 @@ def construir_od_hora(sbase: dict, p5: pd.DataFrame, red: pd.Series) -> pd.DataF
 def construir_intrahorario(de_nodo_a_comp: dict) -> pd.DataFrame:
     """Reparto de cada hora en cuatro bloques de 15 min, por complejo de origen.
 
-    Sale de molinetes en dias habiles tipicos (paso 3). Es el unico lugar del
-    armado donde entra molinetes, y entra solo como **forma**: el nivel lo fija
-    la matriz de SBASE.
+    Sale de molinetes en dias habiles tipicos (paso 3), **sin enero ni febrero**
+    (D4, 21/09/2026: horario de verano). Es el unico lugar del armado donde entra
+    molinetes, y entra solo como **forma**: el nivel lo fija la matriz de SBASE.
     """
-    d = pd.read_csv(PROCESADO / "demanda_estacion_franja.csv")
-    d = d[d.tipo_dia == "habil"].copy()
+    d = pd.read_csv(PROCESADO / "demanda_estacion_franja_habil_sin_verano.csv")
     d["complejo"] = d.nodo_id.map(de_nodo_a_comp)
     d["hora"] = d.franja.str.slice(0, 2).astype(int)
     g = (d.groupby(["complejo", "hora", "franja"], as_index=False)
@@ -227,7 +226,7 @@ def escribir_reporte(od_hora, intra, sbase, red, nombre, de_nodo_a_comp) -> None
     w("")
 
     w("\n## 3. Perfil horario resultante\n")
-    w("| Hora | Viajes | Share | Origen del valor |")
+    w("| Hora | Viajes | Proporción | Origen del valor |")
     w("|---:|---:|---:|---|")
     for h, v in por_hora.items():
         fuente = "**SBASE, medido**" if h in (HORA_HPM, HORA_HPT) else "paso 5, reescalado"

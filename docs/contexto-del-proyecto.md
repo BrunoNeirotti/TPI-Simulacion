@@ -138,7 +138,7 @@ futuro.
 ### 3.4 Parámetros operativos
 
 Son dato oficial, no supuestos nuestros. Todos están en la ficha del expediente con
-número de página: 1.075 pasajeros por formación, 40 trenes por sentido y hora, headway de
+número de página: 1.075 pasajeros por formación, 40 trenes por sentido y hora, intervalo de diseño de
 1,5 min, detención de 30 s, velocidades de 90, 70 y 45 km/h, aceleración de 1 m/s²,
 frenado de 1,1 m/s², flota de 25 formaciones, andén central y combinación peatonal de
 hasta 100 m.
@@ -256,7 +256,7 @@ veces.
 | `stops.txt` (709) | 108 estaciones, 214 andenes y 386 accesos, con `parent_station`. Los andenes van codificados por sentido |
 | `pathways.txt` (967) | Recorridos internos de estación |
 | `routes.txt` | 6 líneas más el Premetro, que queda fuera de alcance |
-| `frequencies.txt` (150) | No lo usamos. Los headways van de 170 a 1160 s y son prepandemia |
+| `frequencies.txt` (150) | No lo usamos. Los intervalos van de 170 a 1160 s y son prepandemia |
 
 Sobre la vigencia: `feed_info.txt` declara `feed_end_date=20191231` y `calendar.txt`
 termina el 20211231. El portal avisa que "todos los datasets con Formato API y GTFS, están
@@ -298,7 +298,7 @@ no corresponde citarla como si valiera un tercio del nivel.
 El ID de molinete codifica el andén, con formato tipo `LineaB_Gardel_S_Turn02`, lo que
 permitiría trabajar la demanda por andén. El problema es que el formato es inconsistente:
 hay `N`, `S`, `E` y `O`, también `Oeste` y `Este` escritos completos, `HALL`, `NE`, y
-molinetes sin sufijo. Lo normalizamos con reporte de los que no matchean.
+molinetes sin sufijo. Lo normalizamos con reporte de los que no se pueden cruzar.
 
 ### 4.3 Trenes despachados
 
@@ -544,10 +544,11 @@ conviene reintroducirlas:
 
 ## 7. Decisiones que tomamos
 
-Son once decisiones de método. Diez están cerradas: dos se cerraron el 16/09/2026
-(profundidad de calibración e intervalo entre trenes de la Línea F) y dos el 21/09/2026
-(etapas incompletas y sentido 1 de la Línea E). La única abierta, los períodos de ajuste
-y validación, no frena el modelo: se toma cuando haya que calibrar.
+Las once decisiones de método originales están cerradas: dos se cerraron el 16/09/2026
+(profundidad de calibración e intervalo entre trenes de la Línea F) y tres el 21/09/2026
+(etapas incompletas, sentido 1 de la Línea E y períodos de ajuste y validación). El
+21/09/2026 se sumaron además D12 a D19, decisiones de diseño del modelo (ver
+`docs/diseno-modelo-base.md` y `decisiones.md`). **No queda ninguna abierta.**
 
 Ninguna decisión la toma alguien por su cuenta: se proponen las opciones con sus
 consecuencias, se elige entre todos, y recién ahí se registra con fecha y evidencia.
@@ -612,7 +613,7 @@ resto de la red —B y E— con verificación agregada, sin el mismo ajuste tram
 la confirmamos: calibrar las seis líneas por igual no es viable en el cuatrimestre y no
 aporta donde el trabajo necesita precisión, que es el corredor que cambia con la Línea F.
 
-**Rango de headway de la Línea F: variable de escenario, entre 90 y 189 s.** Cerrada el
+**Rango de intervalo entre trenes de la Línea F: variable de escenario, entre 90 y 189 s.** Cerrada el
 16/09/2026. El EsIA fija 1,5 min (90 s) y 40 trenes por sentido y hora, y el
 IF-2026-37530623 agrega 100 s "de requerirse". Medimos que la mejor línea actual en hora
 pico es la C con 3,15 min (189 s), o sea que el diseño supone despachar 2,1 veces más
@@ -624,18 +625,15 @@ SBASE 2019 que llegó después (ver 3.6 y 5.5) simuló el tramo troncal de la L�
 100 s, una tercera fuente que converge dentro del mismo rango sin dar motivo para
 reabrirlo.
 
-### 7.2 Abiertas
+### 7.2 Cerradas el 21/09/2026
 
-Ninguna frena el arranque del modelo.
-
-**Períodos de ajuste y validación.** Ya no es una elección libre: las dos ventanas tienen
-que ser posteriores a diciembre de 2024 y no pueden tocar marzo de 2025, que no tiene
-datos de despachos, el 10/04/2025, que fue un paro general con cero servicios prestados,
-los 25 días hábiles atípicos ni los 100 días con cancelaciones gremiales. Queda disponible
-`formaciones-despachadas-2026.csv` hasta el 30/06/2026, por si conviene tomar la
-validación en 2026 en vez de partir 2025 en dos.
-
-**Decididas el 21/09/2026.** Estas dos estaban abiertas y se cerraron:
+**Períodos de ajuste y validación.** La demanda, la calibración y la validación de carga ya
+tenían fecha fija (el día de septiembre de 2024 de SBASE), así que la decisión quedó sobre
+la oferta. Se ajusta con **julio a diciembre de 2025**, el régimen vigente: deja afuera el
+horario de verano (enero y febrero, con intervalos 13 a 36 % más largos) y los regímenes
+anteriores de la Línea D. Se verifica contra **marzo a mayo de 2026**. Los días con
+cancelaciones gremiales se excluyen solo de la línea afectada. Detalle en
+`docs/preparacion-d4.md`.
 
 **Qué hacer con el 4,1 % de etapas marcadas como incompletas: se conservan todas.** Son
 24.057 etapas que expanden a 30.491. Desde que la matriz de SBASE es la base, no mueven
@@ -674,7 +672,7 @@ ajustar el costo del transbordo entre Retiro de la C y Retiro de la E hasta repr
 
 1. Tabla maestra de estaciones. Hecho. `src/01_tabla_maestra_estaciones.py`, reporte en
    `reports/01_tabla_maestra.md`. Cruzamos 90 de 90 estaciones sin ninguna huérfana, y los
-   no-matcheos residuales suman 80 pasajeros sobre 206,5 millones. Las 12 equivalencias
+   registros sin cruzar que quedan suman 80 pasajeros sobre 206,5 millones. Las 12 equivalencias
    están declaradas a mano en `src/lib_normalizacion.py`, así que el cruce es
    determinístico y sin comparación difusa. Dos hallazgos que cambian decisiones: siete
    estaciones aparecen con dos nombres simultáneos y hay que consolidarlas o la demanda
@@ -701,7 +699,7 @@ ajustar el costo del transbordo entre Retiro de la C y Retiro de la E hasta repr
    expandidas. Cuatro hallazgos:
    - La unidad espacial es el complejo de estación y no el nodo. Los 90 nodos se agrupan
      en 78 complejos, que son las componentes conexas del grafo de transbordos. Eso
-     disuelve la ambigüedad que teníamos al matchear por cercanía, porque las estaciones
+     disuelve la ambigüedad que teníamos al asignar por cercanía, porque las estaciones
      que se confundían son justo las que el complejo agrupa.
    - `linea_etapa` determina el nodo exacto de origen: en las 587.980 etapas, sin una sola
      excepción, la línea de ascenso pertenece al complejo asignado. Es además una

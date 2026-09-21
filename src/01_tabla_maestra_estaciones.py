@@ -1,7 +1,7 @@
 """Paso 1 del plan de trabajo: tabla maestra de estaciones.
 
 Cruza los nombres de estacion del dataset de molinetes contra los stop_id del
-GTFS, con reporte explicito de los no matcheos. Ademas normaliza el sufijo de
+GTFS, con reporte explicito de lo que no se pudo cruzar. Ademas normaliza el sufijo de
 anden que codifica el identificador de molinete.
 
 Salidas:
@@ -205,7 +205,7 @@ def main() -> None:
     )
 
     escribir_reporte(inv, tabla, sin_match, huerfanas, gtfs, res)
-    print(f"Estaciones matcheadas: {len(tabla)} / {len(gtfs)} del GTFS")
+    print(f"Estaciones cruzadas: {len(tabla)} / {len(gtfs)} del GTFS")
     print(f"Nombres sin match: {len(sin_match)} | Estaciones GTFS huerfanas: {len(huerfanas)}")
 
 

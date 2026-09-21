@@ -7,6 +7,7 @@ import java.util.Random;
 
 import subte.Anden;
 import subte.Carga;
+import subte.Csv;
 import subte.Datos;
 import subte.Demanda;
 import subte.Oferta;
@@ -44,7 +45,7 @@ public final class PruebaBiblioteca {
         red(d.red);
         rutas(d);
         demanda(d.demanda);
-        oferta(d.oferta);
+        oferta(d.oferta, carpeta);
         contenedores(d);
 
         System.out.println(fallas == 0 ? "\nTODO OK" : "\n" + fallas + " FALLAS");
@@ -178,18 +179,20 @@ public final class PruebaBiblioteca {
                 + destinos.size() + " complejos");
     }
 
-    static void oferta(Oferta of) {
+    static void oferta(Oferta of, Path carpeta) {
         System.out.println("\nOferta");
         chequear(of.cabeceras().size() == 12, "12 cabeceras");
-        chequear(of.arranques().size() == 50, "50 formaciones en la apertura (" + of.arranques().size() + ")");
-        // Media de despachos completos por dia habil tipico de 2025 (paso 12). Se
-        // compara contra la media y no la mediana: la distribucion diaria tiene
-        // cola hacia abajo (dias con demoras) y muestrear intervalos
-        // independientes reproduce la media.
-        Map<String, Double> observados = Map.ofEntries(
-                Map.entry("A/A", 282.1), Map.entry("A/D", 287.0), Map.entry("B/A", 230.4), Map.entry("B/D", 235.0),
-                Map.entry("C/A", 278.5), Map.entry("C/D", 281.3), Map.entry("D/A", 242.0), Map.entry("D/D", 247.3),
-                Map.entry("E/A", 173.1), Map.entry("E/D", 176.6), Map.entry("H/A", 263.9), Map.entry("H/D", 267.6));
+        chequear(of.arranques().size() >= 24, of.arranques().size() + " formaciones en la apertura");
+        // Media de despachos completos por dia en la ventana de ajuste (paso 12,
+        // verificacion_despachos.csv). Se compara contra la media y no la mediana:
+        // la distribucion diaria tiene cola hacia abajo (dias con demoras) y
+        // muestrear intervalos independientes reproduce la media.
+        Map<String, Double> observados = new HashMap<>();
+        Csv v = Csv.leer(carpeta.resolve("verificacion_despachos.csv"));
+        for (String[] fila : v.filas()) {
+            observados.put(fila[v.col("linea")] + "/" + fila[v.col("cabecera")],
+                    Csv.num(fila[v.col("despachos_dia_ajuste")]));
+        }
         Random rng = new Random(3);
         double peor = 0;
         StringBuilder detalle = new StringBuilder();

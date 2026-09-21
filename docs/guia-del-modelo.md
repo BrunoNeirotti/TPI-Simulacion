@@ -127,7 +127,10 @@ La columna `fuente` sirve para el análisis de sensibilidad. Las celdas `sbase_p
 demanda medida y quedan fijas; las `perfil_paso5` son el supuesto que pusimos nosotros y
 son las que hay que variar. Ver 4.3.
 
-### 2.5 `demanda_modelo_intrahorario.csv`, 6.140 filas
+### 2.5 `demanda_modelo_intrahorario.csv`, 6.132 filas
+
+Desde el 21/09/2026 (D4) la forma sale de los días hábiles típicos de 2025 **sin enero ni
+febrero** (horario de verano).
 
 Cómo se reparte cada hora en cuatro bloques de 15 minutos.
 
@@ -175,7 +178,7 @@ las 22:57 y las 23:52), donde el modelo deja de despachar. **No suponer que el l
 es la cabecera 1 de `cabeceras-estaciones.csv`**: en la E es al revés, y ese archivo
 además está desactualizado.
 
-**`apertura_formaciones.csv`, 50 filas.** Una fila por formación que arranca a las 5:30
+**`apertura_formaciones.csv`, 51 filas.** Una fila por formación que arranca a las 5:30
 (D16): `nodo_inicio`, `orden_en_recorrido` (0 es la cabecera), `km_desde_cabecera` y
 `frac_dias`, la fracción de días en que arranca una formación desde ahí.
 

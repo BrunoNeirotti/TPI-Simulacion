@@ -24,7 +24,7 @@ elegidas en lugar de un anglicismo. El registro histórico de `CLAUDE.md` y
 | **Capacidad de formación** | Coches por formación (medidos: A 5, B 6, C 5, D 6, E 5, H 6) por 179 pasajeros por coche (supuesto, tomado de la Línea F: 1.075 / 6). Línea F: 1.075 por formación. |
 | **Combinación** | Estación física donde se cruzan dos o más líneas. Nodo con `es_combinacion = True` (22 nodos). Ver *transbordo*. |
 | **Complejo** | Estación física: componente conexa del grafo de transbordos. Los 90 nodos forman **78 complejos**. Es la unidad de la demanda y de las rutas; el pasajero entra y sale del sistema por un complejo. Acceso y egreso dentro del complejo valen cero. |
-| **Corte de servicio** | Intervalo anormalmente largo entre despachos en un día típico, sin causa registrada (hasta 7 h). Se excluyen del ajuste los de más de 5 veces la mediana de su celda: 324 intervalos, 0,05 % (D18). |
+| **Corte de servicio** | Intervalo anormalmente largo entre despachos en un día típico, sin causa registrada (hasta 7 h). Se excluyen del ajuste los de más de 5 veces la mediana de su celda: 144 intervalos en la ventana de ajuste, julio a diciembre de 2025 (D18, D4). |
 | **Despacho** | Salida de una formación desde una cabecera. Se mide en cabecera; el intervalo en estaciones intermedias es salida del modelo. |
 | **Detención** | Tiempo que la formación queda detenida en una parada intermedia: 24 s de diseño del GTFS (idéntico en toda la red, no medido), 30 s en la Línea F (EsIA). Primero fija, después endógena en la calibración (D13). Va por parada intermedia, no por tramo. **(reemplaza a *dwell time*)** |
 | **Día hábil típico** | Día hábil que no está entre los 25 atípicos, el paro general del 10/04/2025, los días con datos parciales ni los días con cancelaciones gremiales. Base de los perfiles y de los intervalos. |
@@ -97,7 +97,7 @@ Nombres propios de la herramienta y de campos de datos: **se conservan en inglé
 | **Event** | Evento estático de AnyLogic (por tiempo, cíclico o único). Probado en la prueba F. |
 | **Flowchart** | Diagrama de bloques de PML por el que pasan los agentes. Se conserva por ser el nombre del elemento; en el texto puede decirse *diagrama de flujo de proceso*. Tope de 200 bloques por tipo de agente. |
 | **`min_transfer_time`** | Campo del GTFS con el tiempo mínimo de transbordo entre andenes (42 a 258 s). Mínimo de diseño, no caminata medida. |
-| **Pool (población reciclada)** | Población declarada de agentes que se reutilizan con `Enter`/`Exit` en vez de crearse y destruirse: 25.000 pasajeros y 150 formaciones. Las poblaciones declaradas no cuentan contra el tope de 50.000 creaciones (prueba D). |
+| **Pool (población reciclada)** | Población declarada de agentes que se reutilizan con `Enter`/`Exit` en vez de crearse y destruirse: 32.000 pasajeros (la concurrencia medida llega a unos 27.000) y 150 formaciones. Las poblaciones declaradas no cuentan contra el tope de 50.000 creaciones (prueba D). |
 | **Population** | Población de agentes de AnyLogic con cantidad inicial fija. |
 | **`SelectOutput`** | Bloque PML que deriva al agente según una condición (¿llegó?, ¿cabecera final?). |
 | **`Source` / `Sink`** | Bloques PML que crean y destruyen agentes. **No se usan** en el modelo (cuentan contra el tope de creaciones); son el plan B con grupos de 25 pasajeros. |
@@ -123,17 +123,27 @@ Nombres propios de la herramienta y de campos de datos: **se conservan en inglé
 
 ---
 
-## 6. Anglicismos pendientes en textos vigentes
+## 6. Anglicismos en textos vigentes
 
-Relevados el 21/09/2026. Solo se listan; no se corrigieron. No incluye `CLAUDE.md` ni
-`decisiones.md`, que son registro histórico.
+**Corregidos el 21/09/2026**, en los documentos, en los reportes y en los scripts que
+escriben esos reportes (los reportes se corrigieron a mano, sin regenerarlos, para no
+pisar retoques previos):
 
-| Término | Dónde | Sugerencia |
-|---|---|---|
-| *headway* | `docs/especificacion-modelo.md:164` y `:311` (el `.tex` ya dice "intervalo entre trenes") | intervalo entre trenes |
-| *headway* | `docs/contexto-del-proyecto.md:141` y `:615` | intervalo entre trenes / intervalo de diseño |
-| *headway* | `reports/05_despachos.md:84` y `:158` (generado por `src/05_despachos.py`) | intervalo de diseño |
-| *argmin* | `reports/10_calibracion_penalizacion.md:79` | el valor que minimiza el error |
-| *matchear*, *matchean*, *matcheos* | `docs/contexto-del-proyecto.md:301`, `:677`, `:704`; `reports/04_demanda.md`, `reports/06_matriz_od.md` | cruzar, cruce, no cruzados |
-| *share* (en el texto) | `docs/diseno-modelo-base.md:85`, `docs/guia-del-modelo.md`, `reports/11_demanda_modelo.md` | proporción (el nombre de columna `share` se conserva) |
-| *dataset*, *pipeline*, *feed* | frecuente en `README.md`, `docs/contexto-del-proyecto.md`, `docs/guia-del-modelo.md` y `reports/` | conjunto de datos, cadena de procesamiento, archivo GTFS. Muy extendidos en el repo: conviene decidir si se aceptan como tecnicismos |
+| Término | Se reemplazó por |
+|---|---|
+| *headway* | intervalo entre trenes; intervalo de diseño cuando es el valor de la fuente oficial |
+| *matchear*, *matcheo*, *no-matcheos* | cruzar, asignar, registros sin cruzar |
+| *argmin* | el valor que minimiza el error |
+| *share* en el texto corrido | proporción (la columna `share` se conserva) |
+
+Los identificadores de código se conservan (`HEADWAY_F_S`, `matchear_centroides`, el
+`argmin` de numpy): son nombres técnicos.
+
+**Tecnicismos que se aceptan en inglés** (decidido el 21/09/2026), por estar muy
+extendidos y sin un equivalente corto que se use en el área:
+
+| Término | Qué es en este proyecto |
+|---|---|
+| *dataset* | Conjunto de datos publicado como unidad en BA Data (p. ej. "Subte: Trenes despachados"), con uno o varios recursos |
+| *pipeline* | La cadena de scripts `src/01` a `src/13`, que va de los datos crudos a los insumos del modelo |
+| *feed* | La publicación GTFS del Subte (los 14 archivos `.txt`) |

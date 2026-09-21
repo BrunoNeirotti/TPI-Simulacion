@@ -43,10 +43,10 @@ ZIP con los 14 `.txt`. Ya está desanidado en `data/raw/gtfs/`.
 ## 1. Tabla maestra de estaciones
 
 **Objetivo.** Mapear los nombres de estación del dataset de molinetes contra los
-`stop_id` del GTFS, con reporte explícito de los no-matcheos.
+`stop_id` del GTFS, con reporte explícito de lo que no se pudo cruzar.
 
 **Resultado: 90 de 90 estaciones de subte cruzadas, ninguna huérfana.** Los
-no-matcheos residuales suman 80 pasajeros sobre 206 millones.
+registros sin cruzar que quedan suman 80 pasajeros sobre 206 millones.
 
 ### 1.1 Lo que costó: el formato de molinetes está bastante roto
 
@@ -508,7 +508,7 @@ degradarse por acumulación: eso es salida del modelo, no entrada.
 | B | 4,13 min | 4,38 min | 14,5 |
 | E | 5,22 min | 5,88 min | 11,5 |
 
-**Contraste con la Línea F.** El EsIA le fija un headway de **1,5 min, 40 trenes
+**Contraste con la Línea F.** El EsIA le fija un intervalo de diseño de **1,5 min, 40 trenes
 por sentido y hora**. La mejor línea actual en hora pico es la C con 3,15 min:
 **el diseño de la F supone despachar 2,1 veces más seguido que lo que hoy logra
 la mejor línea de la red**. No es imposible (línea nueva, señalamiento nuevo) pero
@@ -595,7 +595,7 @@ expandidas** del 16/10/2024.
 ### 5.1 La unidad espacial es el complejo, y eso disuelve el residuo de ambigüedad
 
 Registrábamos como residuo real de ambigüedad que las estaciones
-superpuestas de un mismo complejo de combinación se confunden al matchear por
+superpuestas de un mismo complejo de combinación se confunden al asignar por
 cercanía: Correo Central [E], Corrientes [H] y Santa Fe [H] no aparecen nunca, y
 9 de Julio [D], Diagonal Norte [C] e Independencia [C] no aparecen como origen.
 
@@ -610,7 +610,7 @@ Los 89 centroides h3 se asignan al complejo del **nodo más cercano**. Mediana
 47 m, máximo 183 m, y (el control que importa) **margen mínimo de 89 m** contra
 el complejo distinto más próximo.
 
-> **Detalle que no es cosmético.** Matchear contra el centroide promedio del
+> **Detalle que no es cosmético.** Asignar contra el centroide promedio del
 > complejo en lugar del nodo más cercano baja ese margen mínimo de 89 m a **9 m**
 > y deja Avenida de Mayo/Lima contra Piedras prácticamente empatado. Los
 > complejos grandes se extienden más de 200 m y su promedio no representa a
@@ -652,7 +652,7 @@ Es el hallazgo del paso. La matriz le pone a **San José de Flores 15.495
 ingresos de más** y a **San Pedrito 14.848 de menos**; el neto del par es −647,
 o sea que **el par cierra**. Son estaciones vecinas de la Línea A, a 664 m.
 
-El matcheo está descartado como causa: cada centroide cae a 55 m de su estación
+La asignación está descartada como causa: cada centroide cae a 55 m de su estación
 y a más de 600 m de la otra. Es la regla de imputación por parada más cercana
 declarada por el organismo publicador, con tolerancia de 2,2 km, actuando sobre
 dos estaciones próximas. **Este solo par explica el 35 % de todo el desvío
@@ -895,7 +895,7 @@ carga del paso 7 dejaría de ser validación y pasaría a ser verificación circ
 **El resultado es que el dato no identifica el parámetro.** Entre 30 y 300 s el error
 se mueve 0,26 puntos porcentuales; la muestra de calibración elige 30 s y la de reserva
 elige 270 s; y el control de reparto por línea, que no participa del ajuste, empeora de
-7,23 % a 9,00 % si se toma el argmin. Lo único que el dato fija es una **cota inferior
+7,23 % a 9,00 % si se toma el valor que minimiza el error. Lo único que el dato fija es una **cota inferior
 dura de 30 s**: por debajo, el modelo manda gente a combinar por caminos que nadie usa
 y el reparto de Retiro por la Línea C se desploma a 29,4 %.
 
@@ -960,9 +960,10 @@ ningún paso anterior había usado:
 
 Y dos cosas sobre los intervalos:
 
-- **Hay cortes de servicio sin causa registrada** dentro de días típicos: 180 intervalos
-  de más de una hora, hasta 7 h, a veces en los dos sentidos a la vez. Se excluyen los
-  intervalos de más de 5 veces la mediana de su celda (324, el 0,05 %).
+- **Hay cortes de servicio sin causa registrada** dentro de días típicos: intervalos de
+  más de una hora, hasta 7 h, a veces en los dos sentidos a la vez. Se excluyen los
+  intervalos de más de 5 veces la mediana de su celda: 144 en la ventana de ajuste (72
+  de más de una hora); eran 324 con 2025 completo.
 - **Ninguna familia teórica ajusta a la Línea H**, que tiene una forma bimodal (picos en
   205 s y 290 s). El modelo usa la **distribución empírica** en todas las celdas; el
   ajuste teórico queda como análisis para el informe. Chi-cuadrado y Kolmogorov-Smirnov
@@ -970,4 +971,14 @@ Y dos cosas sobre los intervalos:
   se informa además el estadístico D.
 
 Las tres decisiones (apertura, empírica y cortes) son D16, D17 y D18 en `decisiones.md`.
-El período de ajuste es todo 2025 y **depende de D4**: se cambia con `FILTRO_FECHAS`.
+
+**Período (D4, decidida el 21/09/2026).** Se ajusta con **julio a diciembre de 2025**
+(`FILTRO_FECHAS`), el régimen vigente de las seis líneas: deja afuera el horario de
+verano y los regímenes anteriores de la Línea D (282 s en pico en septiembre de 2024,
+244 s en abril–junio de 2025, 218 s desde julio). Los días con cancelaciones gremiales
+se excluyen solo de la línea afectada. La oferta simulada se verifica contra **marzo a
+mayo de 2026** (`verificacion_despachos.csv`): el intervalo en pico difiere a lo sumo 4 %
+entre las dos ventanas. Para leer 2026 hubo que tolerar los `Km` redondeados a entero.
+Además, la forma de los bloques de 15 min del paso 11 pasó a tomarse **sin enero ni
+febrero** (`demanda_estacion_franja_habil_sin_verano.csv`, paso 3): cambian de bloque
+2.377 viajes, el 0,29 % del día. Detalle en `docs/preparacion-d4.md`.

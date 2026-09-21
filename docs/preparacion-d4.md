@@ -1,5 +1,8 @@
 # Preparación de D4: períodos de ajuste y validación
 
+> **Decidida el 21/09/2026: opción A**, con los dos agregados de la recomendación. Ver
+> `decisiones.md`. Lo que sigue es el documento con que se decidió.
+
 Documento de trabajo del 21/09/2026. **No decide D4**: ordena qué depende del período
 elegido, mide las ventanas candidatas y deja opciones con sus consecuencias para que el
 grupo elija. Cuando se elija, se registra en `decisiones.md` y se aplica en

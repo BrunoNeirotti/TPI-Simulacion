@@ -60,7 +60,7 @@ PENALIZACIONES_S = list(range(0, 301, 10))
 # es plana, mientras que la muestra de reserva apunta a 270 s y el control de
 # reparto por linea empeora casi dos puntos en 30 s. Cuando dos muestras del
 # mismo fenomeno apuntan a extremos opuestos de un rango plano, lo que el dato
-# dice es que **no identifica el parametro**, no que el optimo sea el argmin de
+# dice es que **no identifica el parametro**, no que el optimo sea el minimo de
 # una de las dos. Lo que si identifica es una **cota inferior dura**: por debajo
 # de 30 s el modelo se rompe. Dentro de la zona plana decide el argumento
 # fisico del paso 6 (la espera esperada es la mitad del intervalo, entre 95 y
@@ -227,7 +227,7 @@ def escribir_reporte(barrido: pd.DataFrame, elegida: int, argmin_hpm: int,
     w("   sea el minimo de una de las dos.")
     w(f"3. **El control independiente empeora en el minimo.** En {argmin_hpm} s el error ")
     w(f"   medio de reparto por linea es {pc(f_hpm.err_reparto_medio, 2)} contra ")
-    w(f"   {pc(f_e.err_reparto_medio, 2)} en {elegida} s. Tomar el argmin mejoraria ")
+    w(f"   {pc(f_e.err_reparto_medio, 2)} en {elegida} s. Tomar el valor que minimiza el error mejoraria ")
     w("   0,26 pp la muestra de calibracion empeorando casi dos puntos un control que no ")
     w("   participa del ajuste. Eso es sobreajuste, no calibracion.")
     w("")

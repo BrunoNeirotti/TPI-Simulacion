@@ -161,7 +161,7 @@ indicadores):
 **Variables de decisión / de escenario** (se fijan antes de cada corrida y se recorren
 en el análisis de sensibilidad, ver sección 4.3 de `guia-del-modelo.md`):
 
-- Headway de la Línea F, entre 90 y 189 s (D7).
+- Intervalo entre trenes de la Línea F, entre 90 y 189 s (D7).
 - Detención de la Línea F, con piso de 30 s.
 - Criterio de reparto de demanda fuera de las horas pico (perfil por par, perfil de
   red, o perfil por complejo de origen).
@@ -245,8 +245,8 @@ Los cinco archivos que el pipeline de datos deja listos (ver README y
 
 A eso se suman, para el modelo en AnyLogic:
 
-- **Distribuciones de intervalos de despacho** (paso 12): sobre 655.299 intervalos
-  medidos se hizo el procedimiento de la materia (histogramas, máxima verosimilitud
+- **Distribuciones de intervalos de despacho** (paso 12): sobre 319.792 intervalos
+  medidos entre julio y diciembre de 2025 (D4) se hizo el procedimiento de la materia (histogramas, máxima verosimilitud
   de cinco familias y bondad de ajuste). La lognormal gana en la mayoría de las
   celdas, pero la Línea H es bimodal y ninguna familia teórica la reproduce, así que
   el modelo usa la **distribución empírica** en todas (D17). Se excluyen los cortes
@@ -308,7 +308,7 @@ intervalos de confianza.
   intervalo medido, 95–157 s).
 - **Profundidad de calibración diferenciada** (D3): corredor Línea F + A/C/D/H a
   fondo, B y E con verificación agregada.
-- **Headway de la Línea F como variable de escenario, no como dato fijo** (D7): la
+- **Intervalo entre trenes de la Línea F como variable de escenario, no como dato fijo** (D7): la
   fuente oficial dice explícitamente que el plan de servicio no existe.
 - **Demanda futura de la Línea F**: no hay medición posible; la nota técnica *Análisis
   de Demanda Línea F* (SBASE, 2019) —obtenida en fuente primaria por la solicitud

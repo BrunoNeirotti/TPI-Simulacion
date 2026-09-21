@@ -28,6 +28,7 @@ entradas a la red, no abordajes.
 
 Salidas:
   data/processed/demanda_estacion_franja.csv
+  data/processed/demanda_estacion_franja_habil_sin_verano.csv  (forma para el modelo, D4)
   data/processed/demanda_diaria.csv
   data/processed/concentracion_horaria.csv
   data/processed/demanda_anden.csv
@@ -302,6 +303,33 @@ def tabla_celdas(d: Datos, diaria: pd.DataFrame) -> pd.DataFrame:
     ].sort_values(["tipo_dia", "linea", "nombre", "franja_idx"], ignore_index=True)
 
 
+def tabla_forma_habil_sin_verano(d: Datos, diaria: pd.DataFrame) -> pd.DataFrame:
+    """Perfil medio de dia habil tipico sin enero ni febrero (D4, 21/09/2026).
+
+    Es lo que usa el paso 11 para repartir cada hora en bloques de 15 min. Enero
+    y febrero son horario de verano, con entre 28 y 36 % menos demanda y otra
+    oferta (docs/preparacion-d4.md); la forma dentro de la hora se toma del
+    resto del anio. `demanda_estacion_franja.csv` no cambia: la siguen usando los
+    controles del paso 3.
+    """
+    base = dt.date(ANIO, 1, 1)
+    idx = dias_tipicos(d, diaria, "habil")
+    idx = np.array([i for i in idx if (base + dt.timedelta(days=int(i))).month not in (1, 2)], dtype=int)
+    sub = d.m[idx]
+    media = sub.mean(axis=0)
+    total = sub.sum(axis=0)
+    franjas, nod = np.nonzero(total)
+    t = pd.DataFrame({
+        "tipo_dia": "habil",
+        "franja_idx": franjas,
+        "nodo_id": [d.nodos[j] for j in nod],
+        "pax_medio": media[franjas, nod].round(2),
+        "n_dias": len(idx),
+    })
+    t["franja"] = t.franja_idx.map(etiqueta_franja)
+    return t[["tipo_dia", "franja", "franja_idx", "nodo_id", "pax_medio", "n_dias"]]
+
+
 def _metricas_perfil(perfil: np.ndarray) -> dict | None:
     """Concentracion horaria de un perfil de 96 franjas."""
     tot = perfil.sum()
@@ -439,7 +467,7 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
             w(f"- Descartados por {etiqueta}: ninguno.")
     if d.claves_sin_match:
         w("")
-        w("Los no-matcheos residuales, uno por uno:\n")
+        w("Los registros sin cruzar que quedan, uno por uno:\n")
         w("| Línea | Estación | Pasajeros |")
         w("|---|---|---:|")
         for (l, e), p in d.claves_sin_match.most_common(10):
@@ -448,7 +476,7 @@ def escribir_reporte(d, res, diaria, conc, celdas, anden, por_linea, por_estacio
         w("Son la estación espuria *Loria* que el paso 1 ya había identificado en "
           "las seis líneas. **80 pasajeros sobre 206,6 millones**: el mismo "
           "residuo que informó el paso 1, ahora con el Premetro correctamente "
-          "separado y no contado como no-matcheo.\n")
+          "separado y no contado como registro sin cruzar.\n")
 
     # --- 2 -----------------------------------------------------------------
     w("## 2. Tipos de día, huecos de datos y días atípicos\n")
@@ -747,6 +775,9 @@ def main() -> None:
     celdas.to_csv(
         PROCESADO / "demanda_estacion_franja.csv", index=False, encoding="utf-8"
     )
+    tabla_forma_habil_sin_verano(d, diaria).to_csv(
+        PROCESADO / "demanda_estacion_franja_habil_sin_verano.csv", index=False,
+        encoding="utf-8")
     anden.to_csv(PROCESADO / "demanda_anden.csv", index=False, encoding="utf-8")
     por_estacion.to_csv(
         PROCESADO / "concentracion_por_estacion.csv", index=False, encoding="utf-8"

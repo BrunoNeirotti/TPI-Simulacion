@@ -1,51 +1,52 @@
 linea,cabecera,direction_id,hora_s,orden_en_recorrido,nodo_inicio,estacion,km_desde_cabecera,frac_dias
-A,A,1,19800,0,LineaA:1059,San Pedrito,0.0,0.959
-A,A,1,19800,4,LineaA:1063,Primera Junta,2.91,0.968
-A,A,1,19800,8,LineaA:1067,Loria,5.58,0.604
-A,A,1,19800,10,LineaA:1070,Pasco,7.15,0.995
-A,A,1,19800,14,LineaA:1074,Piedras,8.98,0.995
-A,D,0,19800,0,LineaA:1076,Plaza de Mayo,0.0,0.986
-A,D,0,19800,5,LineaA:1071,Congreso,1.96,0.856
-A,D,0,19800,8,LineaA:1067,Loria,4.05,0.788
-A,D,0,19800,10,LineaA:1065,Rio de Janeiro,5.46,0.604
-A,D,0,19800,14,LineaA:1061,Carabobo,8.22,0.802
-B,A,1,19800,0,LineaB:1077,Juan Manuel de Rosas,0.0,0.982
-B,A,1,19800,4,LineaB:1081,Federico Lacroze,3.42,0.671
-B,A,1,19800,6,LineaB:1084,Malabia,5.27,0.757
-B,A,1,19800,8,LineaB:1085,Medrano,7.05,0.658
-B,A,1,19800,13,LineaB:1090,Uruguay,10.21,0.423
-B,D,0,19800,0,LineaB:1093,Leandro N. Alem,0.0,0.986
-B,D,0,19800,2,LineaB:1091,Carlos Pellegrini,1.03,0.671
-B,D,0,19800,6,LineaB:1087,Pueyrredon,3.23,0.671
-B,D,0,19800,9,LineaB:1083,angel Gallardo,5.61,0.658
-B,D,0,19800,12,LineaB:1081,Federico Lacroze,8.35,0.676
-C,A,1,19800,0,LineaC:1094,Constitucion,0.0,0.968
-C,A,1,19800,3,LineaC:1097,Moreno,1.69,0.991
-C,A,1,19800,6,LineaC:1100,Lavalle,3.04,0.995
-C,D,0,19800,0,LineaC:1102,Retiro,0.0,0.995
-C,D,0,19800,4,LineaC:1098,Avenida de Mayo,2.18,0.833
-D,A,1,19800,0,LineaD:1103,Congreso de Tucuman,0.0,0.946
-D,A,1,19800,4,LineaD:1107,Ministro Carranza,3.35,0.955
-D,A,1,19800,8,LineaD:1111,Bulnes,5.97,0.937
-D,A,1,19800,10,LineaD:1113,Pueyrredon,7.03,0.959
-D,A,1,19800,14,LineaD:1117,9 de Julio,9.62,0.959
-D,D,0,19800,0,LineaD:1118,Catedral,0.0,0.946
-D,D,0,19800,3,LineaD:1115,Callao,1.96,0.946
-D,D,0,19800,6,LineaD:1112,Agüero,3.78,0.617
-D,D,0,19800,9,LineaD:1109,Plaza Italia,5.47,0.563
-E,A,0,19800,0,LineaE:1164,Retiro,0.0,0.919
-E,A,0,19800,4,LineaE:1120,Belgrano,3.12,0.964
-E,A,0,19800,10,LineaE:1126,General Urquiza,7.09,0.986
-E,A,0,19800,14,LineaE:1130,Emilio Mitre,9.54,0.991
-E,D,1,19800,0,LineaE:1133,Plaza de los Virreyes,0.0,0.811
-E,D,1,19800,3,LineaE:1130,Emilio Mitre,2.17,0.824
-E,D,1,19800,6,LineaE:1127,Boedo,4.06,0.824
-E,D,1,19800,10,LineaE:1123,Entre Rios,6.3,0.82
-E,D,1,19800,14,LineaE:1119,Bolivar,9.49,0.964
-H,A,0,19800,0,LineaH:1163,Facultad de Derecho,0.0,0.982
+A,A,1,19800,0,LineaA:1059,San Pedrito,0.0,0.973
+A,A,1,19800,4,LineaA:1063,Primera Junta,2.91,0.965
+A,A,1,19800,8,LineaA:1067,Loria,5.58,0.655
+A,A,1,19800,10,LineaA:1070,Pasco,7.15,1.0
+A,A,1,19800,14,LineaA:1074,Piedras,8.98,1.0
+A,D,0,19800,0,LineaA:1076,Plaza de Mayo,0.0,0.982
+A,D,0,19800,5,LineaA:1071,Congreso,1.96,0.761
+A,D,0,19800,8,LineaA:1067,Loria,4.05,0.664
+A,D,0,19800,10,LineaA:1065,Rio de Janeiro,5.46,0.664
+A,D,0,19800,14,LineaA:1061,Carabobo,8.22,1.0
+B,A,1,19800,0,LineaB:1077,Juan Manuel de Rosas,0.0,0.986
+B,A,1,19800,4,LineaB:1081,Federico Lacroze,3.42,0.771
+B,A,1,19800,6,LineaB:1084,Malabia,5.27,0.729
+B,A,1,19800,8,LineaB:1085,Medrano,7.05,0.771
+B,A,1,19800,13,LineaB:1090,Uruguay,10.21,0.4
+B,D,0,19800,0,LineaB:1093,Leandro N. Alem,0.0,1.0
+B,D,0,19800,2,LineaB:1091,Carlos Pellegrini,1.03,0.771
+B,D,0,19800,6,LineaB:1087,Pueyrredon,3.23,0.757
+B,D,0,19800,9,LineaB:1083,angel Gallardo,5.61,0.771
+B,D,0,19800,12,LineaB:1081,Federico Lacroze,8.35,0.771
+C,A,1,19800,0,LineaC:1094,Constitucion,0.0,0.98
+C,A,1,19800,3,LineaC:1097,Moreno,1.69,1.0
+C,A,1,19800,6,LineaC:1100,Lavalle,3.04,1.0
+C,D,0,19800,0,LineaC:1102,Retiro,0.0,1.0
+C,D,0,19800,4,LineaC:1098,Avenida de Mayo,2.18,1.0
+D,A,1,19800,0,LineaD:1103,Congreso de Tucuman,0.0,0.94
+D,A,1,19800,4,LineaD:1107,Ministro Carranza,3.35,0.957
+D,A,1,19800,8,LineaD:1111,Bulnes,5.97,0.957
+D,A,1,19800,10,LineaD:1113,Pueyrredon,7.03,0.957
+D,A,1,19800,14,LineaD:1117,9 de Julio,9.62,0.957
+D,D,0,19800,0,LineaD:1118,Catedral,0.0,0.94
+D,D,0,19800,3,LineaD:1115,Callao,1.96,0.931
+D,D,0,19800,7,LineaD:1111,Bulnes,4.32,0.612
+D,D,0,19800,10,LineaD:1108,Palermo,6.05,0.672
+D,D,0,19800,13,LineaD:1105,Jose Hernandez,8.81,0.879
+E,A,0,19800,0,LineaE:1164,Retiro,0.0,0.915
+E,A,0,19800,4,LineaE:1120,Belgrano,3.12,0.975
+E,A,0,19800,10,LineaE:1126,General Urquiza,7.09,0.975
+E,A,0,19800,14,LineaE:1130,Emilio Mitre,9.54,0.992
+E,D,1,19800,0,LineaE:1133,Plaza de los Virreyes,0.0,0.771
+E,D,1,19800,3,LineaE:1130,Emilio Mitre,2.17,1.0
+E,D,1,19800,6,LineaE:1127,Boedo,4.06,1.0
+E,D,1,19800,10,LineaE:1123,Entre Rios,6.3,0.992
+E,D,1,19800,14,LineaE:1119,Bolivar,9.49,0.966
+H,A,0,19800,0,LineaH:1163,Facultad de Derecho,0.0,0.981
 H,A,0,19800,4,LineaH:1141,Corrientes,2.6,0.991
-H,A,0,19800,6,LineaH:1139,Venezuela,3.87,0.824
-H,A,0,19800,9,LineaH:1136,Caseros,6.16,0.995
-H,D,1,19800,0,LineaH:1134,Hospitales,0.0,0.982
-H,D,1,19800,2,LineaH:1136,Caseros,1.66,0.824
-H,D,1,19800,4,LineaH:1138,Humberto 1,3.04,0.986
+H,A,0,19800,6,LineaH:1139,Venezuela,3.87,0.991
+H,A,0,19800,9,LineaH:1136,Caseros,6.16,0.991
+H,D,1,19800,0,LineaH:1134,Hospitales,0.0,0.972
+H,D,1,19800,2,LineaH:1136,Caseros,1.66,0.981
+H,D,1,19800,4,LineaH:1138,Humberto 1,3.04,0.972

@@ -6,9 +6,9 @@ Generado por `src/06_matriz_od.py`. Dia relevado: **16/10/2024**, un miercoles h
 
 La red tiene **90 nodos** (par linea-estacion) agrupados en **78 complejos** de estacion, definidos como las componentes conexas del grafo de transbordos del paso 2. Diez complejos tienen mas de un nodo.
 
-Teniamos registrado como residuo de ambiguedad que las estaciones superpuestas de un mismo complejo se confunden al matchear por cercania: Correo Central [E], Corrientes [H] y Santa Fe [H] no aparecen nunca, y 9 de Julio [D], Diagonal Norte [C] e Independencia [C] no aparecen como origen. **Al nivel del complejo el problema no existe**, porque las estaciones que se confunden son exactamente las que el complejo agrupa. Es ademas la unidad correcta desde el modelo: el pasajero entra y sale de un lugar fisico, y por que linea circula es resultado de la asignacion de ruta, no dato de entrada. Mismo criterio que usamos con los andenes.
+Teniamos registrado como residuo de ambiguedad que las estaciones superpuestas de un mismo complejo se confunden al asignar por cercania: Correo Central [E], Corrientes [H] y Santa Fe [H] no aparecen nunca, y 9 de Julio [D], Diagonal Norte [C] e Independencia [C] no aparecen como origen. **Al nivel del complejo el problema no existe**, porque las estaciones que se confunden son exactamente las que el complejo agrupa. Es ademas la unidad correcta desde el modelo: el pasajero entra y sale de un lugar fisico, y por que linea circula es resultado de la asignacion de ruta, no dato de entrada. Mismo criterio que usamos con los andenes.
 
-### 1.1 El matcheo es univoco
+### 1.1 La asignacion es univoca
 
 Los **89 centroides h3 distintos** se asignan al complejo del nodo mas cercano. Distancia mediana **47 m**, maxima **183 m**.
 
@@ -21,7 +21,7 @@ Los dos casos mas ajustados de la red:
 | Avenida de Mayo / Lima | 61 m | Piedras | 89 m |
 | Piedras | 53 m | Avenida de Mayo / Lima | 119 m |
 
-> Matchear contra el centroide promedio del complejo en lugar del nodo mas cercano reduce ese margen minimo de 89 m a **9 m** y deja el par Avenida de Mayo / Lima contra Piedras practicamente empatado. Los complejos grandes se extienden mas de 200 m y su promedio no representa a ninguna de sus estaciones. Es la clase de detalle que un control agregado no detecta.
+> Asignar contra el centroide promedio del complejo en lugar del nodo mas cercano reduce ese margen minimo de 89 m a **9 m** y deja el par Avenida de Mayo / Lima contra Piedras practicamente empatado. Los complejos grandes se extienden mas de 200 m y su promedio no representa a ninguna de sus estaciones. Es la clase de detalle que un control agregado no detecta.
 
 ### 1.2 La linea de ascenso resuelve el nodo exacto
 
@@ -156,7 +156,7 @@ Entre las 6 y las 22 h el factor se mueve entre **1,035** y **1,082**, sin ningu
 Hay **tres fenomenos distintos** metidos en la dispersion por estacion, y solo el primero es un desvio de nivel:
 
 1. **Los cuatro nodos de trasbordo ferroviario subregistran de forma sistematica y ordenada** por importancia del ferrocarril: Constitucion (Roca) 1,221, Retiro 1,140, Once / Plaza Miserere 1,123, Federico Lacroze 1,066. Concentran 17,5 % de los ingresos del dia y explican la mayor parte del desvio de la Linea C, que es la unica linea fuera de norma en la seccion 4.1. Es consistente con que el dataset O-D reconstruya el viaje a partir de la transaccion SUBE y pierda parte de la etapa de subte cuando el viaje empieza en el ferrocarril.
-2. **El par San Pedrito / San Jose de Flores no es un desvio de nivel sino de asignacion.** Son estaciones vecinas de la Linea A, a 664 m. La matriz le pone a San Jose de Flores 15.495 ingresos de mas y a San Pedrito 14.848 de menos: el neto de las dos es -647, es decir que **el par cierra**. El matcheo esta descartado como causa: cada centroide cae a 55 m de su estacion y a mas de 600 m de la otra. Es la regla de imputacion por parada mas cercana declarada por el organismo publicador, con su tolerancia de 2,2 km, actuando sobre dos estaciones proximas. **Este solo par explica el 35 % de todo el desvio absoluto de la red.**
+2. **El par San Pedrito / San Jose de Flores no es un desvio de nivel sino de asignacion.** Son estaciones vecinas de la Linea A, a 664 m. La matriz le pone a San Jose de Flores 15.495 ingresos de mas y a San Pedrito 14.848 de menos: el neto de las dos es -647, es decir que **el par cierra**. La asignacion esta descartada como causa: cada centroide cae a 55 m de su estacion y a mas de 600 m de la otra. Es la regla de imputacion por parada mas cercana declarada por el organismo publicador, con su tolerancia de 2,2 km, actuando sobre dos estaciones proximas. **Este solo par explica el 35 % de todo el desvio absoluto de la red.**
 3. **Los complejos de combinacion no se comportan como grupo.** Su factor promedio (1,090) esconde un recorrido de 0,945 a 1,635: 9 de Julio / Carlos Pellegrini / Diagonal Norte e Independencia subregistran fuerte, mientras Bolivar / Catedral / Peru y Correo Central / Leandro N. Alem sobreregistran. **La categoria no predice nada** y no sirve como criterio.
 
 ### 5.3 El residuo no alcanza para elegir

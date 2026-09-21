@@ -54,7 +54,7 @@ nuestros.
 | Capacidad por formación | 1.075 pasajeros | por unidad |
 | Circulación máxima | 40 trenes por sentido y por hora | |
 | Capacidad de transporte | unos 43.000 pas./sentido/hora | 40 × 1.075, verificado |
-| Frecuencia entre formaciones | 1,5 min (90 s) | headway de diseño |
+| Frecuencia entre formaciones | 1,5 min (90 s) | intervalo de diseño |
 | Tiempo de detención en estación | 30 s | ascenso y descenso |
 | Velocidad de diseño | 90 km/h en recta; 70 y 45 km/h según curvatura | |
 | Aceleración | 1 m/s² | el original escribe "1 m²/s", que es una errata evidente |
@@ -66,7 +66,7 @@ nuestros.
 | Configuración de andén | andén central en todas las estaciones | ídem |
 | Túneles | 2 túneles independientes, 1 vía cada uno; diámetro exterior 5,95 m; separación entre vías 12,96 m | doc 0010 § 3.1.1, pág. 13 |
 
-Los números cierran entre sí: 25 formaciones con headway de 90 s implican un tiempo de
+Los números cierran entre sí: 25 formaciones con un intervalo de 90 s implican un tiempo de
 ciclo de unos 37,5 min, compatible con 2 × 10,9 km más maniobras en cabecera.
 
 Hay una inconsistencia de redacción. El doc 0013, pág. 97, dice que "se prevén 40

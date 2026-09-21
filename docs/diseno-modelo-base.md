@@ -19,7 +19,7 @@ opciones descartadas para que se vea contra qué se eligió.
 | 200 bloques de flowchart por tipo de agente | Un solo flowchart genérico por tipo de agente. La topología se lee de los CSV, no se dibuja |
 | 10 tipos de agente por modelo | Alcanza: `Main`, `Pasajero`, `Formacion`, y a lo sumo dos o tres auxiliares |
 | 50.000 creaciones dinámicas por corrida | Pasajeros y formaciones salen de poblaciones declaradas y se reciclan con `Enter`/`Exit`. Nunca `Source` |
-| Concurrencia máxima de 27.796 pasajeros vivos (simulador de referencia; la estimación estática era 20.722) | Población declarada de **32.000** pasajeros (la prueba D instanció 60.000) |
+| Concurrencia máxima de unos 27.000 pasajeros vivos (simulador de referencia; la estimación estática era 20.722) | Población declarada de **32.000** pasajeros (la prueba D instanció 60.000) |
 
 ## 2. Tipos de agente
 
@@ -82,7 +82,7 @@ Enter ──► Delay "detencion" ──► SelectOutput ¿cabecera final? ─�
 
 - Un generador por complejo de origen, no por par: 78 procesos de llegada en lugar de
   ~5.800. La tasa de cada complejo en cada bloque de 15 min es
-  `viajes de la hora × share del bloque / 900 s` (de `demanda_modelo_od_hora.csv` y
+  `viajes de la hora × proporción del bloque / 900 s` (columna `share`) (de `demanda_modelo_od_hora.csv` y
   `demanda_modelo_intrahorario.csv`).
 - Llegadas de **Poisson no homogéneo**: tiempo entre llegadas exponencial con la tasa del
   bloque vigente. Es lo que la especificación declara (sección 13).
@@ -171,7 +171,8 @@ Lo que entra a AnyLogic:
   (D16).
 
 Excluidos de los intervalos: la apertura, los viajes de recorrido parcial y los cortes de
-servicio (D18). El período es todo 2025 y depende de D4 (`FILTRO_FECHAS` en el script).
+servicio (D18). El período es julio a diciembre de 2025, verificado contra marzo a mayo
+de 2026 (D4).
 
 ### 6.6 Capacidad por formación
 
@@ -199,7 +200,7 @@ dejó pendiente: que `Enter` desde una población no cuenta como creación.
 
 La prueba C tuvo 1.137 activos a la vez. El simulador de referencia
 (`anylogic/biblioteca/referencia/`, 21/09/2026), que corre esta misma lógica en Java
-plano, midió **hasta 27.796 pasajeros vivos a la vez**, más que los 20.722 de la
+plano, midió **hasta unos 27.000 pasajeros vivos a la vez** (27.240 con la oferta de D4), más que los 20.722 de la
 asignación estática, porque suma las esperas en andén. Por eso el pool pasa a 32.000. En
 Java plano un día completo tarda alrededor de 1 s; en AnyLogic será más lento, y se mide
 en el primer prototipo.

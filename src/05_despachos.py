@@ -10,7 +10,7 @@ Produce:
 1. La distribucion de intervalos entre despachos por linea, cabecera y hora, en
    dia habil tipico. Es la oferta observada, contra la que se contrasta el
    servicio nominal del GTFS.
-2. El contraste contra el headway de diseno de la Linea F, que el EsIA fija en
+2. El contraste contra el intervalo de diseno de la Linea F, que el EsIA fija en
    1,5 min (40 trenes por sentido y hora).
 3. Los despachos con causa registrada, que se separan del resto porque son
    servicio no prestado y no ruido de la operacion normal.
@@ -51,7 +51,7 @@ LINEAS = ("A", "B", "C", "D", "E", "H")  # P es Premetro, fuera de alcance
 # un dia de servicio reducido: es un dia con datos incompletos.
 UMBRAL_PARCIAL = 0.60
 
-# Headway de diseno de la Linea F, del EsIA (doc 0010): 40 trenes por sentido y
+# Intervalo de diseno de la Linea F, del EsIA (doc 0010): 40 trenes por sentido y
 # hora, 1,5 min entre trenes.
 HEADWAY_F_S = 90
 TRENES_F_HORA = 40
@@ -293,7 +293,7 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
             continue
         if mejor is None or p.median() < mejor[1]:
             mejor = (l, p.median())
-    w(f"El EsIA fija para la Línea F un headway de **1,5 min, {TRENES_F_HORA} "
+    w(f"El EsIA fija para la Línea F un intervalo de diseño de **1,5 min, {TRENES_F_HORA} "
       "trenes por sentido y hora**. La línea más frecuente de la red actual en "
       f"hora pico es la **{mejor[0]}**, con una mediana de "
       f"{num(mejor[1] / 60, 2)} min, es decir {num(3600 / mejor[1])} trenes por "
@@ -405,7 +405,7 @@ def escribir_reporte(res, crudo, servicios, desp, por_dia, inter, tipicos,
       "está congelado y la historia no es homogénea desde 2015 (sección 1).")
     w("- **Marzo de 2025 no existe en este dataset** (sección 2). Condiciona "
       "la elección de períodos: ninguna ventana de ajuste o validación puede tocar marzo.")
-    w("- **El headway de 1,5 min de la Línea F es un supuesto fuerte** "
+    w("- **El intervalo de diseño de 1,5 min de la Línea F es un supuesto fuerte** "
       "(sección 3.3), no un dato: exige despachar bastante más seguido que la "
       "mejor línea actual. Va como variable de escenario.")
     w("- **El pendiente de verificación del paso 3 se cierra** (sección 5).")

@@ -35,16 +35,23 @@ están en la biblioteca.
 
 1. `File → New → Model`. Nombre `RedSubte`, carpeta **`anylogic/modelo/`** del
    repositorio. *Model time units*: **seconds**.
-2. Agregar la biblioteca: clic en el modelo en el panel *Projects* → en sus propiedades,
-   sección **Dependencies** → *Jar files and class folders* → **Add** →
-   `anylogic/biblioteca/subte.jar`. (Si AnyLogic ofrece copiarlo dentro del modelo,
-   elegir que **no**: así, al recompilar la biblioteca, el modelo toma la versión nueva.)
+2. La biblioteca va **dentro del modelo**, como clases Java del proyecto (panel *Projects*,
+   clic derecho en el modelo → *New → Java class*, una por archivo de
+   `anylogic/biblioteca/src/subte/`, sin la línea `package`: quedan en el paquete del modelo).
+   El generador las escribe solas; el `.alp` no depende de ningún jar. `subte.jar` se compila
+   solo para el simulador de referencia y la prueba de la biblioteca.
 3. Los CSV se leen de `data/processed/` del repositorio, con ruta relativa a la
-   carpeta del modelo: `../../data/processed`. No hay que copiarlos.
+   carpeta del modelo: `../../../data/processed`. No hay que copiarlos.
 
 ---
 
 ## 2. Tipos de agente
+
+> Los campos y métodos que siguen son **variables y funciones del agente** (paleta *Agent*:
+> *Variable* y *Function*), no código adicional: aparecen en el árbol del proyecto y en el
+> lienzo de cada tipo. El generador los escribe desde las listas `VARIABLES_*` y
+> `FUNCIONES_*` de `generar_alp.py`. `andenDe` tiene dos versiones con nombre propio,
+> `andenDePasajero` y `andenDeFormacion`, porque las funciones de AnyLogic no se sobrecargan.
 
 ### `Pasajero`
 
@@ -102,6 +109,15 @@ void iniciar(Recorrido r, int desde, int capacidad) {
 
 ## 3. `Main`: datos, poblaciones y colecciones
 
+> Igual que en los agentes: lo que acá figura como *Additional class code* son hoy variables
+> y funciones de `Main`. Además hay un parámetro **`escenario`** (0 = red actual sin la
+> Línea F; 1 a 5 = con la F a 90, 100, 120, 150 y 189 s) del que salen `intervaloF()`,
+> `carpetaInsumos()` (`data/processed` o `data/processed/escenario_f/I<nnn>`) y
+> `carpetaOferta()`; y cinco **salidas** (*Output*: `viajeMedio_s`, `esperaMedia_s`,
+> `ascensosPorViaje`, `noEntranTotal`, `enSistemaFinal`) que recogen los experimentos.
+> En los modelos sin mapa, dos gráficos temporales en el lienzo muestran pasajeros en andén,
+> a bordo y caminando, y el viaje y la espera medios acumulados.
+
 **Imports section** de `Main`: `import subte.*;` y `import java.util.*;`.
 
 **Additional class code** de `Main`:
@@ -149,7 +165,7 @@ fijado el pool (D10). La prueba D ya instanció 60.000 sin problemas.
 **On startup** de `Main`:
 
 ```java
-rng = getDefaultRandomNumberGenerator();
+rng = getEngine().getDefaultRandomGenerator();
 datos = Datos.leer(carpetaDatos);
 andenes = datos.crearAndenes();
 for (Pasajero p : pasajeros) pasajerosLibres.add(p);
@@ -281,7 +297,7 @@ pasajero.
 En `Main`. En todos los bloques, *Agent type*: `Formacion`.
 
 ```
-enterFormacion ─► detencion ─► final ─(true)─► saleFormacion
+enterFormacion ─► detencion ─► esFinal ─(true)─► saleFormacion
                      ▲            │ (false)
                      └── tramo ◄──┘
 ```
@@ -290,7 +306,7 @@ enterFormacion ─► detencion ─► final ─(true)─► saleFormacion
 |---|---|---|
 | `enterFormacion` | `Enter` | — |
 | `detencion` | `Delay` | *Delay time*: ver abajo. *Capacity*: **maximum capacity**. *On enter* y *On exit*: ver abajo |
-| `final` | `SelectOutput` | *Condition*: `agent.indice == agent.recorrido.largo() - 1` |
+| `esFinal` | `SelectOutput` | *Condition*: `agent.indice == agent.recorrido.largo() - 1` |
 | `tramo` | `Delay` | *Delay time*: `agent.recorrido.tramo[agent.indice]` segundos. *Capacity*: **maximum capacity**. *On exit*: `agent.indice++;` |
 | `saleFormacion` | `Exit` | *On enter*: ver abajo |
 
@@ -339,6 +355,30 @@ sentido contrario (las 142 rutas con cambio de sentido, ver sección 8), la cami
 
 ---
 
+### Cambios del 06/10/2026: detención endógena (D13) y separación por tramo (D15)
+
+El flowchart de la formación pasó de 5 a 7 bloques; **el modelo vigente es el que genera
+`generar_alp.py`**, y esta sección describe qué cambió respecto de lo anterior:
+
+```
+enterFormacion ─► llegada ─► detencion ─► retencion ─► esFinal ─(true)─► saleFormacion
+                     ▲                                   │ (false)
+                     └───────────────── tramo ◄──────────┘
+```
+
+- `llegada` (`Delay`, 0 s): al salir, bajan los que llegaron y se calcula `agent.dwell`
+  con `Detencion.segundos` (D13: TCQSM, 1,85 s por pasajero que baja y 2,1 s por el que
+  sube, por canal de puerta; piso oficial 24 s).
+- `detencion` (`Delay`, `agent.dwell`): al salir, pide el tramo siguiente con
+  `tramos.reservar` y guarda la espera en `agent.espera` (D15).
+- `retencion` (`Delay`, `agent.espera`): la formación espera ahí si el tramo está ocupado;
+  al salir suben los pasajeros (antes era al salir de `detencion`).
+- La salida del experimento agrega al final `retenciones;segundos_retenidos;detencion_media`.
+- Con los parámetros decididos la detención media da 24,00 s en las líneas actuales
+  (el piso domina) y la separación retiene unas 39 veces por día, 9,5 s cada una.
+
+---
+
 ## 7. Experimento
 
 En el experimento `Simulation`:
@@ -347,6 +387,14 @@ En el experimento `Simulation`:
   `time()` son segundos desde medianoche, que es lo que usa la biblioteca.
 - *Randomness*: **Fixed seed**, para que las corridas de verificación se puedan repetir.
 - *Execution mode*: **virtual time**.
+
+Hay además dos experimentos de variación de parámetros, con histogramas de las salidas de
+`Main` (viaje medio, espera media, ascensos por viaje) y una línea por corrida en la consola:
+
+- **`Replicas20`**: veinte corridas del mismo escenario (`REP;` + `resumen()`).
+- **`VariacionEscenario`**: recorre `escenario` de 1 a 5, una corrida por intervalo de la
+  Línea F (`ESC;escenario;intervalo;` + `resumen()`). Necesita las cinco carpetas
+  `escenario_f/I<nnn>` y `oferta_I<nnn>`.
 
 **On destroy** de `Main` (control de conservación):
 
@@ -404,9 +452,73 @@ vuelta pagara costo de transbordo solo 4 pares cambiarían de camino.
 
 ---
 
+**Resultado del paso 2 (05/10/2026, AnyLogic 8.9.9 PLE, `RedSubte.alp` generado por
+`generar_alp.py`, semilla fija 1):** datos `6006 rutas, 827289 viajes/dia`; ingresados
+57.307, arribados 57.301, en el sistema 6; conservación OK; espera media 118 s; viaje
+medio 628 s; los dos pools se recuperan completos. Dentro de los rangos de la referencia.
+
+---
+
 ## 9. Lo que viene después
 
 - Paso 5 del orden: detención endógena y separación mínima por tramo (D13, D15).
 - Indicadores (ocupación por tramo, espera, aglomeración de andén) y el experimento de
   diez replicaciones.
 - Paso 8: la Línea F entra como un recorrido más en los CSV; la biblioteca no cambia.
+
+## 10. Capa visual: el mapa de la red
+
+Vive solo en `RedSubte_mapa` y la genera `mapa_alp.py` (lo llama el generador):
+
+```
+python generar_alp.py --mapa                 # RedSubte_mapa/, escenario 2 (Línea F a 100 s)
+python generar_alp.py --mapa --escenario 0   # el mismo modelo con la red actual por defecto
+```
+
+El escenario se cambia también desde la interfaz, en el parámetro `escenario` de `Main`.
+
+**Está hecha con los elementos de AnyLogic**, en el lienzo de `Main` (marco de 1200 × 780 px:
+panel a la izquierda, mapa esquemático oficial de `mapa_esquematico.csv` y `mapa_tramos.csv`,
+leyenda debajo). Lo que no cambia se escribe como figura con sus valores; lo que cambia durante
+la corrida se expresa con las **propiedades dinámicas** de cada figura (color, grosor,
+visibilidad, texto, radio, posición), que leen variables o llaman funciones de `Main`:
+
+- **Tramos**: una *Polyline* por tramo del trazado, con el color de la línea; en los modos de
+  carga queda fina y gris (grosor y color dinámicos).
+- **Bandas de carga**: una *Polyline* por tramo y sentido, corrida a la derecha de la marcha;
+  grosor `anchoDeBanda(clave)` y color `colorDeBanda(clave)`, visibles solo en los modos 1 y 2.
+- **Estaciones**: un *Oval* por nodo con el borde del color de la línea; relleno y radio
+  dinámicos según los que esperan; *On click* llama `seleccionar(nodo)`. El anillo de la
+  estación elegida es otro *Oval* con posición dinámica.
+- **Rótulos**: *Text* sobre un *Rectangle* blanco; los que no entran por defecto se muestran
+  con la casilla *Nombres de todas las estaciones*.
+- **Formaciones**: la **animación del agente `Formacion`** (un rectángulo con el relleno
+  según la ocupación y una proa blanca). El evento cíclico `animar` (cada 2 s simulados) las
+  ubica sobre el trazado con `setXY` y `setRotation`, y cada 8 cuadros recalcula lo demás.
+- **Panel**: textos con `TextCode` (reloj, pasajeros en el sistema, formaciones, promedios,
+  una fila por línea, ficha de la estación elegida, comparación sin la F → con la F a la
+  hora en curso), un **grupo de opciones** enlazado a la variable `modo`, **casillas**
+  enlazadas a `nombresTodos` y a `verA` … `verF`, y un **TimePlot** con los pasajeros en
+  el sistema a lo largo del día.
+- **Leyendas**: un *Group* por modo, visible según `modo`.
+
+El Java que queda es cálculo y vive en variables y funciones de `Main` (`cargarMapa`,
+`trazoDe`, `sobreTrazo`, `actualizarBandas`, `actualizarEstacion`, `actualizarComparacion`,
+`actualizarMapa`, `registrarSalida`, que el gancho `GANCHOS_MAPA` agrega al *On exit* de
+`retencion`) y de `Formacion` (`largoTren`, `colorTren`, `trenVisible`). La comparación con
+la red actual usa la carga del simulador de referencia (`escenario_f/informe/base_carga.csv`
+y `f<intervalo>_carga.csv`, con `f100` si no existe el intervalo).
+
+En el editor, los bloques, variables, funciones y eventos de `Main` están a la derecha del
+marco (x > 1300) para no pisar el mapa; en la ventana de simulación no se muestran.
+
+**Herramientas sin AnyLogic.**
+
+- `python comprobar_java.py [--sin-mapa]`: compila todo el Java del modelo (clases de la
+  biblioteca, variables y funciones, acciones de los bloques, eventos, arranque, experimentos
+  y cada expresión dinámica de las figuras) con el JDK 17 de AnyLogic contra
+  `com.anylogic.engine*.jar`. Detecta errores de sintaxis y de tipos antes de abrir el
+  modelo; no ejecuta nada.
+- `python previsualizar_mapa.py [--hora 8] [--modo 0|1|2] [--estacion LineaC:1094] [--nombres]
+  [--base]`: PNG con la misma composición, en `reports/figuras/`, para revisar el diseño y
+  para las figuras del informe.

@@ -2,12 +2,15 @@
 
 Iniciada el 21/09/2026. La lógica del modelo que no depende de AnyLogic, en Java 17
 plano: lee los insumos de `data/processed/`, arma rutas, demanda y oferta, y ofrece los
-contenedores del andén y de la formación. AnyLogic la usa como dependencia
-(`subte.jar`); cómo se conecta está en `anylogic/modelo/GUIA_CONSTRUCCION.md`.
+contenedores del andén y de la formación. **Los modelos de AnyLogic la llevan adentro**:
+el generador escribe cada archivo de `src/subte/` como una clase Java del proyecto
+(árbol de AnyLogic), así que el `.alp` no depende de ningún jar; cómo se conecta está en
+`anylogic/modelo/GUIA_CONSTRUCCION.md`. `subte.jar` se compila solo para el simulador
+de referencia y la prueba de esta carpeta.
 
-**Por qué está afuera de AnyLogic.** Se puede compilar y probar contra los datos reales
-sin abrir la interfaz, y el modelo queda con muy poco código propio: dos flowcharts de
-seis bloques y tres eventos. Con el tope de 200 bloques por tipo de agente, la
+**Por qué es una biblioteca y no bloques.** Se puede compilar y probar contra los datos
+reales sin abrir la interfaz, y el modelo queda con muy poco código propio: dos flowcharts
+de seis bloques y tres eventos. Con el tope de 200 bloques por tipo de agente, la
 topología no puede vivir en el dibujo (D11); vive acá.
 
 ## Clases

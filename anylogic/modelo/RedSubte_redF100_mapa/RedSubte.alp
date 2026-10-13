@@ -1,0 +1,4157 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<AnyLogicWorkspace WorkspaceVersion="1.9" AnyLogicVersion="8.9.9.202607020720" AlpVersion="8.9.9">
+	<Model>
+		<Id>1791260000101</Id>
+		<Name>RedSubte</Name>
+		<EngineVersion>6</EngineVersion>
+		<JavaPackageName>redsubte</JavaPackageName>
+		<ModelTimeUnit>Second</ModelTimeUnit>
+		<Folders>
+	</Folders>
+		<ActiveObjectClasses>
+			<ActiveObjectClass>
+				<Id>1791253830826</Id>
+				<Name>Main</Name>
+				<StartupCode>rng = getEngine().getDefaultRandomGenerator();
+datos = carpetaOferta.isEmpty() ? Datos.leer(carpetaDatos)
+        : Datos.leer(java.nio.file.Path.of(carpetaDatos), java.nio.file.Path.of(carpetaOferta));
+modeloDetencion = Detencion.porDefecto();
+tramos = new Tramos(true);
+andenes = datos.crearAndenes();
+for (Pasajero p : pasajeros) pasajerosLibres.add(p);
+for (Formacion f : formaciones) formacionesLibres.add(f);
+
+// demanda: un solo proceso de llegadas para toda la red
+double t0 = datos.demanda.proximaLlegadaRed(time(), rng);
+if (t0 &lt; Demanda.FIN_S) create_LlegadaPasajero(t0 - time());
+
+// apertura (D16): cada formacion arranca en su estacion a las 5:30
+for (Oferta.Arranque a : datos.oferta.arranques()) {
+    if (soloLinea.isEmpty() || a.cabecera.linea.equals(soloLinea)) {
+        create_Arranque(a.hora - time(), a);
+    }
+}
+// si ninguna formacion de la apertura sale de la cabecera, los despachos
+// regulares arrancan igual a la hora de apertura
+for (Oferta.Cabecera c : datos.oferta.cabeceras()) {
+    if ((soloLinea.isEmpty() || c.linea.equals(soloLinea)) &amp;&amp; !datos.oferta.arrancaEnCabecera(c)) {
+        double s = datos.oferta.proximaSalida(c, c.apertura, rng);
+        if (s &lt; Double.POSITIVE_INFINITY) create_Despacho(s - time(), c);
+    }
+}
+traceln("Datos leidos: " + datos.rutas.size() + " rutas, "
+        + Math.round(datos.demanda.viajesDelDia()) + " viajes/dia");
+if (!mapa.isEmpty()) {
+    dibujarMapa();
+    create_Animar(0);
+}</StartupCode>
+				<AdditionalClassCode>Datos datos;
+Detencion modeloDetencion;   // D13: detencion endogena
+Tramos tramos;               // D15: separacion minima por tramo
+Map&lt;String, Anden&lt;Pasajero&gt;&gt; andenes;
+Random rng;
+
+// contadores de verificacion
+long ingresados, arribados, descartados, ascensos, maxVivos, maxFormaciones;
+double sumaTiempoViaje, sumaEspera, sumaDetencion;
+long paradas;
+
+Anden&lt;Pasajero&gt; andenDe(Pasajero p) {
+    return andenes.get(Datos.claveAnden(p.etapaActual()));
+}
+
+Anden&lt;Pasajero&gt; andenDe(Formacion f) {
+    return andenes.get(Datos.claveAnden(f.recorrido, f.indice));
+}
+
+boolean correEnEstaCorrida(Ruta r) {
+    if (soloLinea.isEmpty()) return true;
+    return r.etapas.length == 1 &amp;&amp; r.etapas[0].recorrido.linea.equals(soloLinea);
+}
+
+long noEntran() {
+    long n = 0;
+    for (Anden&lt;Pasajero&gt; a : andenes.values()) n += a.quedaronAbajo();
+    return n;
+}
+
+String noEntranPorLinea() {
+    Map&lt;String, Long&gt; m = new TreeMap&lt;&gt;();
+    for (Map.Entry&lt;String, Anden&lt;Pasajero&gt;&gt; e : andenes.entrySet())
+        m.merge(e.getKey().split("/")[0], e.getValue().quedaronAbajo(), Long::sum);
+    return m.toString().replace(", ", ",");
+}
+
+// una linea por corrida: ingresados;arribados;viaje_s;espera_s;ascensos_por_viaje;
+// no_entran;max_vivos;max_formaciones
+String resumen() {
+    return ingresados + ";" + arribados + ";"
+        + String.format(Locale.ROOT, "%.1f;%.1f;%.4f;", sumaTiempoViaje / arribados,
+                        sumaEspera / arribados, (double) ascensos / ingresados)
+        + noEntran() + ";" + maxVivos + ";" + maxFormaciones + ";" + noEntranPorLinea() + ";"
+        + tramos.retenciones + ";" + Math.round(tramos.segundosRetenidos) + ";"
+        + String.format(Locale.ROOT, "%.2f", paradas == 0 ? 0 : sumaDetencion / paradas);
+}
+
+void lanzarFormacion(Oferta.Cabecera c, int desde) {
+    Formacion f = formacionesLibres.poll();
+    if (f == null) error("Se agoto el pool de formaciones a las " + time());
+    maxFormaciones = Math.max(maxFormaciones, formaciones.size() - formacionesLibres.size());
+    f.iniciar(c.recorrido, desde, Datos.capacidad(c.linea));
+    enterFormacion.take(f);
+}
+// ---- capa visual: mapa esquematico oficial, formaciones, andenes, panel y filtro por linea;
+// ---- ficha de la estacion al hacer clic, carga por tramo en vivo y comparacion con la red actual
+static final String LINEAS_MAPA = "ABCDEHF";
+static final double VENTANA_CARGA_S = 900;     // "carga ahora": ultimos 15 min, llevados a pas./h
+static final double LADO_MAPA = 3.5;           // separacion de los dos sentidos, en pixeles
+static final double LADO_BANDA = 5.0;          // eje de la banda de carga, a la derecha de la marcha
+static final double ANCHO_BANDA_MAX = 9.0;
+static final double ESCALA_BANDA = 12000;      // pas./h que llenan el ancho maximo de la banda
+static final double ESCALA_DIFERENCIA = 6000;  // diferencia (pas./h) que llena el ancho maximo
+static final double X_PANEL = 16, ANCHO_PANEL = 296;
+static final double X_GRAF = 16, Y_GRAF = 606, ALTO_GRAF = 50, PASO_GRAF = 1.2;
+static final double Y_LEYENDA = 676;           // franja bajo el mapa
+static final double ANCHO_MARCO = 1200;
+static final String REF_F_SIN_INTERVALO = "f100";   // referencia con F que usa el modelo de la red actual
+
+Map&lt;String, double[]&gt; posNodo = new HashMap&lt;&gt;();
+Map&lt;String, String&gt; nombreNodo = new HashMap&lt;&gt;();
+Map&lt;String, double[][]&gt; trazoTramo = new HashMap&lt;&gt;();     // "de&gt;a" -&gt; polilinea
+Map&lt;String, List&lt;com.anylogic.engine.presentation.Shape&gt;&gt; deLinea = new HashMap&lt;&gt;();
+Map&lt;String, ShapeOval&gt; marcaNodo = new HashMap&lt;&gt;();
+Map&lt;String, List&lt;Anden&lt;Pasajero&gt;&gt;&gt; andenesDeNodo = new HashMap&lt;&gt;();
+List&lt;List&lt;Anden&lt;Pasajero&gt;&gt;&gt; andenesDeLinea = new ArrayList&lt;&gt;();
+Map&lt;String, String&gt; padreNodo = new HashMap&lt;&gt;();          // union-find de los complejos
+boolean[] lineaVisible = {true, true, true, true, true, true, true};
+ShapeLine[] trenBorde = new ShapeLine[150], trenCuerpo = new ShapeLine[150];
+ShapeOval[] trenProa = new ShapeOval[150];
+List&lt;com.anylogic.engine.presentation.Shape&gt; trazoLineas = new ArrayList&lt;&gt;();
+List&lt;String&gt; lineaDeTrazo = new ArrayList&lt;&gt;();
+List&lt;com.anylogic.engine.presentation.Shape&gt; etiquetasExtra = new ArrayList&lt;&gt;();
+List&lt;List&lt;com.anylogic.engine.presentation.Shape&gt;&gt; leyendaModo = new ArrayList&lt;&gt;();
+ShapeText relojMapa, cuentaMapa, formacionesMapa, promediosMapa, tituloEstacion, tituloComparacion;
+ShapeText[] filaLinea = new ShapeText[7], filaEstacion = new ShapeText[8], filaComparacion = new ShapeText[8];
+ShapeLine[] barra = new ShapeLine[240];
+ShapeOval anillo;
+String nodoSeleccionado = null;
+int modo = 0;                                  // 0 lineas, 1 carga ahora, 2 con la F frente a la red actual
+int cuadroMapa, ultimaMuestra = -1;
+Set&lt;String&gt; nodosRed = new HashSet&lt;&gt;();
+
+// bandas de carga: una por tramo y sentido
+class Banda {
+    String linea, clave;                       // clave = linea/sentido/orden, la del anden de salida
+    ShapePolyLine forma;
+}
+List&lt;Banda&gt; bandas = new ArrayList&lt;&gt;();
+Map&lt;String, ArrayDeque&lt;double[]&gt;&gt; salidasTramo = new HashMap&lt;&gt;();   // clave -&gt; {t, a bordo}
+Map&lt;String, double[]&gt; refBase = new HashMap&lt;&gt;(), refF = new HashMap&lt;&gt;();   // clave -&gt; pas./h por hora
+double[][] refHoraBase = new double[24][], refHoraF = new double[24][];    // hora -&gt; {viaje, espera}
+String escenario = "", intervaloF = "";
+
+static java.awt.Color colorLinea(String l) {
+    switch (l) {
+        case "A": return new java.awt.Color(24, 190, 230);
+        case "B": return new java.awt.Color(230, 28, 0);
+        case "C": return new java.awt.Color(0, 114, 187);
+        case "D": return new java.awt.Color(0, 160, 60);
+        case "E": return new java.awt.Color(109, 32, 120);
+        case "H": return new java.awt.Color(240, 200, 0);
+        default:  return new java.awt.Color(245, 130, 32);   // F
+    }
+}
+
+static final java.awt.Color VERDE = new java.awt.Color(46, 160, 67), AMBAR = new java.awt.Color(240, 173, 0),
+        ROJO = new java.awt.Color(220, 50, 47), AZUL = new java.awt.Color(40, 100, 200),
+        GRIS = new java.awt.Color(120, 120, 120), GRIS_OSCURO = new java.awt.Color(60, 60, 60),
+        NARANJA = new java.awt.Color(245, 130, 32), GRIS_CLARO = new java.awt.Color(200, 200, 200);
+
+static java.awt.Color colorOcupacion(double u) {
+    if (u &lt; 0.3) return VERDE;
+    if (u &lt; 0.7) return AMBAR;
+    return ROJO;
+}
+
+static String miles(double v) {
+    return String.format(Locale.ROOT, "%,.0f", v).replace(',', '.');
+}
+
+/** Polilinea de a hacia b: la del trazado oficial, invertida si hace falta, o recta. */
+double[][] trazoDe(String a, String b) {
+    double[][] p = trazoTramo.get(a + "&gt;" + b);
+    if (p != null) return p;
+    p = trazoTramo.get(b + "&gt;" + a);
+    if (p != null) {
+        double[][] q = new double[p.length][];
+        for (int i = 0; i &lt; p.length; i++) q[i] = p[p.length - 1 - i];
+        return q;
+    }
+    return new double[][] {posNodo.get(a), posNodo.get(b)};
+}
+
+/** {x, y, tx, ty}: punto a una fraccion u del trazo, corrido a la derecha de la marcha. */
+double[] sobreTrazo(double[][] p, double u) {
+    double total = 0;
+    for (int i = 0; i + 1 &lt; p.length; i++) total += Math.hypot(p[i + 1][0] - p[i][0], p[i + 1][1] - p[i][1]);
+    double s = Math.max(0, Math.min(1, u)) * total, acum = 0;
+    for (int i = 0; i + 1 &lt; p.length; i++) {
+        double dx = p[i + 1][0] - p[i][0], dy = p[i + 1][1] - p[i][1], l = Math.hypot(dx, dy);
+        if (s &lt;= acum + l || i + 2 == p.length) {
+            double k = l == 0 ? 0 : Math.min(1, (s - acum) / l);
+            double tx = l == 0 ? 1 : dx / l, ty = l == 0 ? 0 : dy / l;
+            // a la derecha del sentido de marcha (en pantalla, con y hacia abajo)
+            return new double[] {p[i][0] + dx * k - ty * LADO_MAPA, p[i][1] + dy * k + tx * LADO_MAPA, tx, ty};
+        }
+        acum += l;
+    }
+    return new double[] {p[0][0], p[0][1], 1, 0};
+}
+
+/** La polilinea corrida d pixeles a la derecha de la marcha, con los vertices en la bisectriz. */
+double[][] desplazar(double[][] p, double d) {
+    int n = p.length;
+    double[][] q = new double[n][];
+    double[][] nrm = new double[n - 1][];
+    for (int i = 0; i + 1 &lt; n; i++) {
+        double dx = p[i + 1][0] - p[i][0], dy = p[i + 1][1] - p[i][1], l = Math.hypot(dx, dy);
+        nrm[i] = l == 0 ? new double[] {0, 0} : new double[] {-dy / l, dx / l};
+    }
+    for (int i = 0; i &lt; n; i++) {
+        double nx, ny;
+        if (i == 0) { nx = nrm[0][0]; ny = nrm[0][1]; }
+        else if (i == n - 1) { nx = nrm[n - 2][0]; ny = nrm[n - 2][1]; }
+        else {
+            nx = nrm[i - 1][0] + nrm[i][0];
+            ny = nrm[i - 1][1] + nrm[i][1];
+            double l = Math.hypot(nx, ny);
+            if (l &lt; 1e-6) { nx = nrm[i][0]; ny = nrm[i][1]; }
+            else {
+                nx /= l; ny /= l;
+                double cos = nx * nrm[i][0] + ny * nrm[i][1];   // alargar en la bisectriz, con tope
+                double k = Math.min(2.0, 1 / Math.max(cos, 1e-3));
+                nx *= k; ny *= k;
+            }
+        }
+        q[i] = new double[] {p[i][0] + nx * d, p[i][1] + ny * d};
+    }
+    return q;
+}
+
+void agregarDeLinea(String linea, com.anylogic.engine.presentation.Shape s) {
+    deLinea.computeIfAbsent(linea, k -&gt; new ArrayList&lt;&gt;()).add(s);
+}
+
+String raiz(String x) {
+    while (!padreNodo.get(x).equals(x)) x = padreNodo.get(x);
+    return x;
+}
+
+String lineaDe(String nodo) {
+    return nodo.substring(5, 6);
+}
+
+/** Etiqueta con halo blanco, en el primer lugar libre; false si no hay. */
+boolean etiquetar(String texto, double px, double py, int tam, boolean negrita, java.awt.Color color,
+                  List&lt;double[]&gt; ocupados, String linea, List&lt;com.anylogic.engine.presentation.Shape&gt; destino) {
+    double w = texto.length() * (tam * 0.62) + 6, h = tam + 6;
+    double[][] cand = {{8, -2, 0}, {8, -h - 2, 0}, {-8, -2, 1}, {-8, -h - 2, 1}, {0, 8, 2}, {0, -h - 8, 2},
+                       {12, 8, 0}, {-12, 8, 1}, {12, -h - 10, 0}, {-12, -h - 10, 1}};
+    for (double[] c : cand) {
+        double x0 = c[2] == 0 ? px + c[0] : c[2] == 1 ? px + c[0] - w : px - w / 2;
+        double y0 = py + c[1];
+        boolean libre = x0 &gt; 322 &amp;&amp; x0 + w &lt; ANCHO_MARCO - 4 &amp;&amp; y0 &gt; 2 &amp;&amp; y0 + h &lt; Y_LEYENDA - 6;
+        for (double[] o : ocupados) {
+            if (x0 &lt; o[0] + o[2] &amp;&amp; x0 + w &gt; o[0] &amp;&amp; y0 &lt; o[1] + o[3] &amp;&amp; y0 + h &gt; o[1]) { libre = false; break; }
+        }
+        if (!libre) continue;
+        ocupados.add(new double[] {x0, y0, w, h});
+        // halo blanco: cuatro copias desplazadas, para que se lea sobre las lineas
+        for (int k = 0; k &lt; 5; k++) {
+            ShapeText t = new ShapeText();
+            double dx = k == 4 ? 0 : (k % 2 == 0 ? -1.2 : 1.2), dy = k == 4 ? 0 : (k &lt; 2 ? -1.2 : 1.2);
+            t.setPos(x0 + 3 + dx, y0 + 2 + dy);
+            t.setText(texto);
+            t.setColor(k == 4 ? color : java.awt.Color.WHITE);
+            t.setFont(new java.awt.Font("SansSerif", negrita ? java.awt.Font.BOLD : java.awt.Font.PLAIN, tam));
+            presentation.add(t);
+            if (linea != null) agregarDeLinea(linea, t);
+            if (destino != null) destino.add(t);
+        }
+        return true;
+    }
+    return false;
+}
+
+void alternarLinea(String linea, boolean visible) {
+    lineaVisible[LINEAS_MAPA.indexOf(linea)] = visible;
+    List&lt;com.anylogic.engine.presentation.Shape&gt; l = deLinea.get(linea);
+    if (l != null) for (com.anylogic.engine.presentation.Shape s : l) s.setVisible(visible);
+    aplicarModo();
+}
+
+ShapeText texto(double x, double y, int tam, boolean negrita, java.awt.Color color) {
+    ShapeText t = new ShapeText();
+    t.setPos(x, y);
+    t.setFont(new java.awt.Font("SansSerif", negrita ? java.awt.Font.BOLD : java.awt.Font.PLAIN, tam));
+    t.setColor(color);
+    presentation.add(t);
+    return t;
+}
+
+ShapeText texto(double x, double y, int tam, boolean negrita, java.awt.Color color, String contenido) {
+    ShapeText t = texto(x, y, tam, negrita, color);
+    t.setText(contenido);
+    return t;
+}
+
+void separador(double y) {
+    ShapeLine l = new ShapeLine();
+    l.setPos(X_PANEL, y);
+    l.setDx(ANCHO_PANEL);
+    l.setDy(0);
+    l.setColor(GRIS_CLARO);
+    l.setLineWidth(1);
+    presentation.add(l);
+}
+
+/** Muestra de color con texto, para las leyendas; devuelve el x donde termina. */
+double muestra(double x, double y, java.awt.Color color, boolean relleno, String t,
+               List&lt;com.anylogic.engine.presentation.Shape&gt; destino) {
+    ShapeRectangle r = new ShapeRectangle();
+    r.setPos(x, y + 1);
+    r.setWidth(14);
+    r.setHeight(10);
+    r.setFillColor(relleno ? color : java.awt.Color.WHITE);
+    r.setLineColor(relleno ? color : color);
+    r.setLineWidth(relleno ? 0 : 2);
+    presentation.add(r);
+    destino.add(r);
+    ShapeText s = texto(x + 18, y, 11, false, GRIS_OSCURO, t);
+    destino.add(s);
+    return x + 18 + t.length() * 6.4 + 14;
+}
+
+void aplicarModo() {
+    for (int i = 0; i &lt; trazoLineas.size(); i++)
+        trazoLineas.get(i).setVisible(modo == 0 &amp;&amp; lineaVisible[LINEAS_MAPA.indexOf(lineaDeTrazo.get(i))]);
+    for (Banda b : bandas) b.forma.setVisible(modo != 0 &amp;&amp; lineaVisible[LINEAS_MAPA.indexOf(b.linea)]);
+    for (int m = 0; m &lt; leyendaModo.size(); m++)
+        for (com.anylogic.engine.presentation.Shape s : leyendaModo.get(m)) s.setVisible(m == modo);
+    actualizarBandas();
+}
+
+Csv leerSiExiste(java.nio.file.Path p) {
+    return java.nio.file.Files.exists(p) ? Csv.leer(p) : null;
+}
+
+/** Carga de referencia por tramo y hora (simulador de referencia, 10 replicas). */
+void leerReferencia(java.nio.file.Path informe, String prefijo, Map&lt;String, double[]&gt; destino, double[][] horaDestino) {
+    Csv c = leerSiExiste(informe.resolve(prefijo + "_carga.csv"));
+    if (c != null) {
+        int cL = c.col("linea"), cS = c.col("direction_id"), cO = c.col("orden"), cH = c.col("hora"), cP = c.col("pasajeros_hora_media");
+        for (String[] f : c.filas()) {
+            double[] v = destino.computeIfAbsent(f[cL] + "/" + f[cS] + "/" + f[cO], k -&gt; new double[24]);
+            v[(int) Csv.num(f[cH])] = Csv.num(f[cP]);
+        }
+    }
+    Csv h = leerSiExiste(informe.resolve(prefijo + "_hora.csv"));
+    if (h != null) {
+        int cH = h.col("hora_ingreso"), cV = h.col("viaje_medio_s"), cE = h.col("espera_media_s");
+        for (String[] f : h.filas()) {
+            int hora = (int) Csv.num(f[cH]);
+            if (hora &gt;= 0 &amp;&amp; hora &lt; 24) horaDestino[hora] = new double[] {Csv.num(f[cV]), Csv.num(f[cE])};
+        }
+    }
+}
+
+void registrarSalida(Formacion f) {
+    if (f.indice + 1 &gt;= f.recorrido.largo()) return;
+    salidasTramo.computeIfAbsent(Datos.claveAnden(f.recorrido, f.indice), k -&gt; new ArrayDeque&lt;&gt;())
+            .addLast(new double[] {time(), f.carga.aBordo()});
+}
+
+void seleccionar(String nodo) {
+    nodoSeleccionado = nodo;
+    double[] p = posNodo.get(nodo);
+    anillo.setPos(p[0], p[1]);
+    anillo.setVisible(true);
+    actualizarEstacion();
+}
+
+void dibujarMapa() {
+    for (Recorrido r : datos.red.recorridos()) for (String n : r.nodos) nodosRed.add(n);
+    java.nio.file.Path dir = java.nio.file.Path.of(carpetaMapa.isEmpty() ? carpetaDatos : carpetaMapa);
+    Csv c = Csv.leer(dir.resolve("mapa_esquematico.csv"));
+    int cN = c.col("nodo_id"), cX = c.col("x"), cY = c.col("y"), cNom = c.col("nombre");
+    for (String[] f : c.filas()) {
+        if (!nodosRed.contains(f[cN])) continue;
+        posNodo.put(f[cN], new double[] {Csv.num(f[cX]), Csv.num(f[cY])});
+        nombreNodo.put(f[cN], f[cNom]);
+    }
+    Csv t = Csv.leer(dir.resolve("mapa_tramos.csv"));
+    int tD = t.col("de_nodo"), tA = t.col("a_nodo"), tX = t.col("x"), tY = t.col("y");
+    Map&lt;String, List&lt;double[]&gt;&gt; acumulado = new LinkedHashMap&lt;&gt;();
+    for (String[] f : t.filas()) {
+        if (!nodosRed.contains(f[tD]) || !nodosRed.contains(f[tA])) continue;
+        acumulado.computeIfAbsent(f[tD] + "&gt;" + f[tA], k -&gt; new ArrayList&lt;&gt;())
+                .add(new double[] {Csv.num(f[tX]), Csv.num(f[tY])});
+    }
+    for (Map.Entry&lt;String, List&lt;double[]&gt;&gt; e : acumulado.entrySet()) {
+        trazoTramo.put(e.getKey(), e.getValue().toArray(new double[0][]));
+    }
+
+    // escenario y referencia (simulador de referencia) para la comparacion
+    java.util.regex.Matcher m = java.util.regex.Pattern.compile("I(\\d{3})").matcher(carpetaDatos);
+    boolean conF = false;
+    for (Recorrido r : datos.red.recorridos()) if (r.linea.equals("F")) conF = true;
+    if (conF &amp;&amp; m.find()) {
+        intervaloF = String.valueOf(Integer.parseInt(m.group(1)));
+        escenario = "Escenario: con la Linea F, intervalo de " + intervaloF + " s";
+    } else {
+        escenario = "Escenario: red actual, sin la Linea F";
+    }
+    String prefF = conF &amp;&amp; !intervaloF.isEmpty() ? String.format("f%03d", Integer.parseInt(intervaloF)) : REF_F_SIN_INTERVALO;
+    java.nio.file.Path informe = dir.resolve("informe");
+    if (!java.nio.file.Files.isDirectory(informe)) informe = dir.resolve("..").resolve("informe");
+    leerReferencia(informe, "base", refBase, refHoraBase);
+    if (!java.nio.file.Files.exists(informe.resolve(prefF + "_carga.csv"))) prefF = REF_F_SIN_INTERVALO;
+    leerReferencia(informe, prefF, refF, refHoraF);
+
+    // complejos: union-find sobre los transbordos
+    for (String n : posNodo.keySet()) padreNodo.put(n, n);
+    Set&lt;String&gt; unidos = new HashSet&lt;&gt;();
+    List&lt;String[]&gt; pasillos = new ArrayList&lt;&gt;();
+    for (String k : datos.red.transbordos().keySet()) {
+        String[] ab = k.split("&gt;");
+        if (!posNodo.containsKey(ab[0]) || !posNodo.containsKey(ab[1])) continue;
+        padreNodo.put(raiz(ab[0]), raiz(ab[1]));
+        String clave = ab[0].compareTo(ab[1]) &lt; 0 ? k : ab[1] + "&gt;" + ab[0];
+        if (unidos.add(clave)) pasillos.add(ab);
+    }
+    // combinaciones: pasillo (borde oscuro y centro blanco) entre los nodos que se conectan a pie
+    for (String[] ab : pasillos) {
+        double[] pa = posNodo.get(ab[0]), pb = posNodo.get(ab[1]);
+        for (int cap = 0; cap &lt; 2; cap++) {
+            ShapeLine l = new ShapeLine();
+            l.setPos(pa[0], pa[1]);
+            l.setDx(pb[0] - pa[0]);
+            l.setDy(pb[1] - pa[1]);
+            l.setColor(cap == 0 ? GRIS_OSCURO : java.awt.Color.WHITE);
+            l.setLineWidth(cap == 0 ? 9 : 5);
+            presentation.add(l);
+        }
+    }
+
+    // bandas de carga por tramo y sentido (debajo del trazado; se ven en los modos 1 y 2)
+    for (Recorrido r : datos.red.recorridos()) {
+        for (int i = 0; i + 1 &lt; r.largo(); i++) {
+            double[][] p = desplazar(trazoDe(r.nodos[i], r.nodos[i + 1]), LADO_BANDA);
+            double[] dx = new double[p.length], dy = new double[p.length];
+            for (int j = 0; j &lt; p.length; j++) { dx[j] = p[j][0] - p[0][0]; dy[j] = p[j][1] - p[0][1]; }
+            Banda b = new Banda();
+            b.linea = r.linea;
+            b.clave = Datos.claveAnden(r, i);
+            b.forma = new ShapePolyLine(true, p[0][0], p[0][1], GRIS_CLARO, null, p.length, dx, dy, false, 1,
+                    LineStyle.LINE_STYLE_SOLID);
+            b.forma.setVisible(false);
+            presentation.add(b.forma);
+            bandas.add(b);
+        }
+    }
+
+    // trazado oficial por tramos: primero la F (abajo), despues las demas
+    for (int pasada = 0; pasada &lt; 2; pasada++) {
+        for (Map.Entry&lt;String, double[][]&gt; e : trazoTramo.entrySet()) {
+            String linea = e.getKey().substring(5, 6);
+            if (linea.equals("F") != (pasada == 0)) continue;
+            double[][] p = e.getValue();
+            // en los modos de carga el trazado queda como guia fina y gris (debajo del color)
+            double[] dx = new double[p.length], dy = new double[p.length];
+            for (int j = 0; j &lt; p.length; j++) { dx[j] = p[j][0] - p[0][0]; dy[j] = p[j][1] - p[0][1]; }
+            ShapePolyLine guia = new ShapePolyLine(false, p[0][0], p[0][1], GRIS_CLARO, null, p.length, dx, dy, false, 1,
+                    LineStyle.LINE_STYLE_SOLID);
+            presentation.add(guia);
+            agregarDeLinea(linea, guia);
+            for (int i = 0; i + 1 &lt; p.length; i++) {
+                ShapeLine l = new ShapeLine();
+                l.setPos(p[i][0], p[i][1]);
+                l.setDx(p[i + 1][0] - p[i][0]);
+                l.setDy(p[i + 1][1] - p[i][1]);
+                l.setColor(colorLinea(linea));
+                l.setLineWidth(linea.equals("F") ? 9 : 4);
+                presentation.add(l);
+                agregarDeLinea(linea, l);
+                trazoLineas.add(l);
+                lineaDeTrazo.add(linea);
+            }
+        }
+    }
+
+    // estaciones: un ovalo por nodo, con clic; crece y se enrojece con los que esperan
+    for (Map.Entry&lt;String, double[]&gt; e : posNodo.entrySet()) {
+        final String id = e.getKey();
+        ShapeOval o = new ShapeOval(true, e.getValue()[0], e.getValue()[1], 0, colorLinea(lineaDe(id)),
+                java.awt.Color.WHITE, 4, 4, 2, LineStyle.LINE_STYLE_SOLID) {
+            @Override
+            public boolean onClick(double cx, double cy) {
+                seleccionar(id);
+                return true;
+            }
+        };
+        presentation.add(o);
+        marcaNodo.put(id, o);
+        agregarDeLinea(lineaDe(id), o);
+    }
+    anillo = new ShapeOval();
+    anillo.setRadius(13);
+    anillo.setFillColor(null);
+    anillo.setLineColor(GRIS_OSCURO);
+    anillo.setLineWidth(2.5);
+    anillo.setVisible(false);
+    presentation.add(anillo);
+
+    // etiquetas: la F primero, despues las combinaciones, despues las cabeceras; el resto, a pedido
+    List&lt;double[]&gt; ocupados = new ArrayList&lt;&gt;();
+    Set&lt;String&gt; etiquetados = new HashSet&lt;&gt;();
+    for (int n = 1; n &lt;= 12; n++) {
+        String id = String.format("LineaF:F%02d", n);
+        if (!posNodo.containsKey(id)) continue;
+        if (etiquetar(nombreNodo.get(id), posNodo.get(id)[0], posNodo.get(id)[1], 12, true,
+                new java.awt.Color(150, 70, 0), ocupados, "F", null)) etiquetados.add(raiz(id));
+    }
+    Map&lt;String, List&lt;String&gt;&gt; complejos = new TreeMap&lt;&gt;();
+    for (String n : posNodo.keySet()) complejos.computeIfAbsent(raiz(n), k -&gt; new ArrayList&lt;&gt;()).add(n);
+    for (List&lt;String&gt; g : complejos.values()) {
+        if (g.size() &lt; 2 || etiquetados.contains(raiz(g.get(0)))) continue;
+        Collections.sort(g);
+        String rep = g.get(0);
+        if (etiquetar(nombreNodo.get(rep), posNodo.get(rep)[0], posNodo.get(rep)[1], 10, false,
+                new java.awt.Color(50, 50, 50), ocupados, null, null)) etiquetados.add(raiz(rep));
+    }
+    for (Recorrido r : datos.red.recorridos()) {
+        if (r.sentido != 0 || r.linea.equals("F")) continue;
+        for (String n : new String[] {r.nodos[0], r.nodos[r.largo() - 1]}) {
+            if (etiquetados.contains(raiz(n))) continue;
+            if (etiquetar(nombreNodo.get(n), posNodo.get(n)[0], posNodo.get(n)[1], 10, false,
+                    new java.awt.Color(90, 90, 90), ocupados, null, null)) etiquetados.add(raiz(n));
+        }
+    }
+    List&lt;double[]&gt; ocupadosExtra = new ArrayList&lt;&gt;(ocupados);
+    for (String n : new TreeSet&lt;&gt;(posNodo.keySet())) {
+        if (etiquetados.contains(raiz(n))) continue;
+        if (etiquetar(nombreNodo.get(n), posNodo.get(n)[0], posNodo.get(n)[1], 9, false,
+                GRIS, ocupadosExtra, lineaDe(n), etiquetasExtra)) etiquetados.add(raiz(n));
+    }
+    for (com.anylogic.engine.presentation.Shape s : etiquetasExtra) s.setVisible(false);
+
+    for (int i = 0; i &lt; LINEAS_MAPA.length(); i++) andenesDeLinea.add(new ArrayList&lt;&gt;());
+    for (Recorrido r : datos.red.recorridos()) {
+        for (int i = 0; i &lt; r.largo(); i++) {
+            Anden&lt;Pasajero&gt; an = andenes.get(Datos.claveAnden(r, i));
+            andenesDeNodo.computeIfAbsent(r.nodos[i], k -&gt; new ArrayList&lt;&gt;()).add(an);
+            andenesDeLinea.get(LINEAS_MAPA.indexOf(r.linea)).add(an);
+        }
+    }
+
+    // formaciones: un cuerpo alargado en el sentido de marcha y una proa blanca
+    for (int i = 0; i &lt; trenCuerpo.length; i++) {
+        trenBorde[i] = new ShapeLine();
+        trenBorde[i].setColor(java.awt.Color.BLACK);
+        trenBorde[i].setLineWidth(6);
+        trenBorde[i].setVisible(false);
+        presentation.add(trenBorde[i]);
+        trenCuerpo[i] = new ShapeLine();
+        trenCuerpo[i].setLineWidth(3.6);
+        trenCuerpo[i].setVisible(false);
+        presentation.add(trenCuerpo[i]);
+        trenProa[i] = new ShapeOval();
+        trenProa[i].setRadius(1.4);
+        trenProa[i].setFillColor(java.awt.Color.WHITE);
+        trenProa[i].setLineColor(java.awt.Color.BLACK);
+        trenProa[i].setLineWidth(1);
+        trenProa[i].setVisible(false);
+        presentation.add(trenProa[i]);
+    }
+
+    // ---- panel izquierdo
+    double y = 12;
+    texto(X_PANEL, y, 15, true, GRIS_OSCURO, "Red de Subte de Buenos Aires");
+    texto(X_PANEL, y + 20, 12, true, escenario.contains("con la Linea F") ? new java.awt.Color(190, 95, 0) : GRIS,
+            escenario);
+    separador(y + 40);
+    relojMapa = texto(X_PANEL, y + 46, 34, true, GRIS_OSCURO, "05:00");
+    cuentaMapa = texto(X_PANEL + 118, y + 50, 12, false, GRIS_OSCURO, "en el sistema: 0");
+    formacionesMapa = texto(X_PANEL + 118, y + 68, 12, false, GRIS_OSCURO, "formaciones en circulacion: 0");
+    promediosMapa = texto(X_PANEL, y + 92, 11, false, GRIS, "viaje medio: --   espera media: --");
+    separador(y + 110);
+
+    y = 128;
+    texto(X_PANEL, y, 12, true, GRIS_OSCURO, "Que muestran los tramos");
+    ShapeRadioButtonGroup rg = new ShapeRadioButtonGroup(this, true, X_PANEL, y + 16, ANCHO_PANEL, 60,
+            java.awt.Color.WHITE, GRIS_OSCURO, new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12), true,
+            new String[] {"Lineas y trenes", "Carga de pasajeros ahora (ultimos 15 min)",
+                          "Con la Linea F frente a la red actual (referencia)"}) {
+        @Override
+        public void action() {
+            modo = getValue();
+            aplicarModo();
+        }
+    };
+    presentation.add(rg);
+    ShapeCheckBox cbNombres = new ShapeCheckBox(this, true, X_PANEL, y + 80, ANCHO_PANEL, 18, java.awt.Color.WHITE,
+            GRIS_OSCURO, new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12), "Nombres de todas las estaciones") {
+        @Override
+        public void action() {
+            for (com.anylogic.engine.presentation.Shape s : etiquetasExtra) s.setVisible(isSelected());
+        }
+    };
+    cbNombres.setSelected(false, false);
+    presentation.add(cbNombres);
+    separador(y + 104);
+
+    y = 240;
+    texto(X_PANEL, y, 12, true, GRIS_OSCURO, "Lineas  (tildar para mostrar)");
+    for (int i = 0; i &lt; LINEAS_MAPA.length(); i++) {
+        final String linea = LINEAS_MAPA.substring(i, i + 1);
+        ShapeCheckBox cb = new ShapeCheckBox(this, true, X_PANEL, y + 16 + i * 20, 40, 18, colorLinea(linea),
+                java.awt.Color.WHITE, new java.awt.Font("SansSerif", java.awt.Font.BOLD, 12), linea) {
+            @Override
+            public void action() {
+                alternarLinea(linea, isSelected());
+            }
+        };
+        cb.setSelected(true, false);
+        presentation.add(cb);
+        filaLinea[i] = texto(X_PANEL + 48, y + 18 + i * 20, 11, false, colorLinea(linea).darker());
+    }
+    separador(y + 160);
+
+    y = 408;
+    tituloEstacion = texto(X_PANEL, y, 12, true, GRIS_OSCURO, "Estacion  (hace clic en el mapa)");
+    for (int i = 0; i &lt; filaEstacion.length; i++) filaEstacion[i] = texto(X_PANEL, y + 18 + i * 13, 10, false, GRIS_OSCURO);
+    separador(y + 128);
+
+    // ---- grafico: pasajeros en el sistema a lo largo del dia (una barra cada 5 min)
+    texto(X_GRAF, Y_GRAF - ALTO_GRAF - 16, 12, true, GRIS_OSCURO, "Pasajeros en el sistema  (tope 30.000)");
+    ShapeLine eje = new ShapeLine();
+    eje.setPos(X_GRAF - 2, Y_GRAF);
+    eje.setDx(barra.length * PASO_GRAF + 4);
+    eje.setDy(0);
+    eje.setColor(GRIS);
+    eje.setLineWidth(1);
+    presentation.add(eje);
+    for (int h : new int[] {5, 8, 12, 16, 20, 24}) {
+        texto(X_GRAF + (h - 5) * 12 * PASO_GRAF - 6, Y_GRAF + 3, 10, false, GRIS, h + "h");
+    }
+    for (int i = 0; i &lt; barra.length; i++) {
+        barra[i] = new ShapeLine();
+        barra[i].setPos(X_GRAF + i * PASO_GRAF, Y_GRAF);
+        barra[i].setDx(0);
+        barra[i].setDy(0);
+        barra[i].setColor(new java.awt.Color(80, 140, 200));
+        barra[i].setLineWidth(PASO_GRAF);
+        presentation.add(barra[i]);
+    }
+    separador(Y_GRAF + 20);
+
+    // ---- comparacion a la hora en curso: simulador de referencia, sin la F y con la F
+    y = Y_GRAF + 28;
+    tituloComparacion = texto(X_PANEL, y, 12, true, GRIS_OSCURO, "Sin la F  -&gt;  con la F, a esta hora");
+    texto(X_PANEL, y + 15, 10, false, GRIS, "referencia, 10 replicas; carga maxima por tramo, pas./h");
+    for (int i = 0; i &lt; 7; i++) filaComparacion[i] = texto(X_PANEL + (i % 2) * 150, y + 31 + (i / 2) * 13, 10, false, GRIS_OSCURO);
+    filaComparacion[7] = texto(X_PANEL, y + 31 + 4 * 13, 10, false, GRIS_OSCURO);
+
+    // ---- leyenda bajo el mapa, una por modo
+    for (int k = 0; k &lt; 3; k++) leyendaModo.add(new ArrayList&lt;&gt;());
+    double x0 = 332;
+    List&lt;com.anylogic.engine.presentation.Shape&gt; L = leyendaModo.get(0);
+    L.add(texto(x0, Y_LEYENDA, 11, true, GRIS_OSCURO, "Formacion, ocupacion:"));
+    double x = muestra(x0 + 140, Y_LEYENDA, VERDE, true, "menos del 30 %", L);
+    x = muestra(x, Y_LEYENDA, AMBAR, true, "30 a 70 %", L);
+    x = muestra(x, Y_LEYENDA, ROJO, true, "mas del 70 %", L);
+    L.add(texto(x0, Y_LEYENDA + 18, 11, true, GRIS_OSCURO, "Estacion, esperan:"));
+    x = muestra(x0 + 140, Y_LEYENDA + 18, GRIS, false, "menos de 30", L);
+    x = muestra(x, Y_LEYENDA + 18, new java.awt.Color(255, 214, 140), true, "30 a 150", L);
+    x = muestra(x, Y_LEYENDA + 18, new java.awt.Color(235, 90, 70), true, "mas de 150", L);
+    L.add(texto(x + 10, Y_LEYENDA + 18, 11, false, GRIS_OSCURO, "pasillo blanco: combinacion a pie"));
+
+    L = leyendaModo.get(1);
+    L.add(texto(x0, Y_LEYENDA, 11, true, GRIS_OSCURO, "Banda por tramo y sentido, a la derecha de la marcha."));
+    L.add(texto(x0 + 352, Y_LEYENDA, 11, false, GRIS_OSCURO,
+            "ancho = pasajeros por hora en los ultimos 15 min (lleno a " + miles(ESCALA_BANDA) + ")"));
+    L.add(texto(x0, Y_LEYENDA + 18, 11, false, GRIS_OSCURO, "color = ocupacion media de los trenes que pasaron:"));
+    x = muestra(x0 + 300, Y_LEYENDA + 18, VERDE, true, "&lt; 30 %", L);
+    x = muestra(x, Y_LEYENDA + 18, AMBAR, true, "30 a 70 %", L);
+    x = muestra(x, Y_LEYENDA + 18, ROJO, true, "&gt; 70 %", L);
+
+    L = leyendaModo.get(2);
+    L.add(texto(x0, Y_LEYENDA, 11, true, GRIS_OSCURO,
+            "Diferencia de carga por tramo a esta hora, con la F menos sin la F (simulador de referencia, 10 replicas):"));
+    x = muestra(x0, Y_LEYENDA + 18, AZUL, true, "menos pasajeros con la F", L);
+    x = muestra(x, Y_LEYENDA + 18, ROJO, true, "mas pasajeros con la F", L);
+    x = muestra(x, Y_LEYENDA + 18, NARANJA, true, "tramo nuevo de la F", L);
+    L.add(texto(x, Y_LEYENDA + 18, 11, false, GRIS_OSCURO, "ancho lleno = " + miles(ESCALA_DIFERENCIA) + " pas./h"));
+
+    aplicarModo();
+    actualizarComparacion(5);
+}
+
+void actualizarBandas() {
+    if (modo == 0) return;
+    double t = time();
+    int hora = Math.max(0, Math.min(23, (int) (t / 3600)));
+    for (Banda b : bandas) {
+        if (!lineaVisible[LINEAS_MAPA.indexOf(b.linea)]) continue;
+        double ancho = 1;
+        java.awt.Color color = GRIS_CLARO;
+        if (modo == 1) {
+            ArrayDeque&lt;double[]&gt; cola = salidasTramo.get(b.clave);
+            double pas = 0;
+            int trenes = 0;
+            if (cola != null) {
+                while (!cola.isEmpty() &amp;&amp; cola.peekFirst()[0] &lt; t - VENTANA_CARGA_S) cola.pollFirst();
+                for (double[] s : cola) { pas += s[1]; trenes++; }
+            }
+            double pasHora = pas * 3600 / VENTANA_CARGA_S;
+            if (trenes &gt; 0) {
+                ancho = 1 + ANCHO_BANDA_MAX * Math.min(1, pasHora / ESCALA_BANDA);
+                color = colorOcupacion(pas / (trenes * Datos.capacidad(b.linea)));
+            }
+        } else {
+            double[] vb = refBase.get(b.clave), vf = refF.get(b.clave);
+            double f = vf == null ? Double.NaN : vf[hora], base = vb == null ? Double.NaN : vb[hora];
+            if (Double.isNaN(f)) {
+                ancho = 1;
+            } else if (Double.isNaN(base)) {
+                ancho = 1 + ANCHO_BANDA_MAX * Math.min(1, f / ESCALA_BANDA);
+                color = NARANJA;
+            } else {
+                double d = f - base;
+                ancho = 1 + ANCHO_BANDA_MAX * Math.min(1, Math.abs(d) / ESCALA_DIFERENCIA);
+                color = Math.abs(d) &lt; 150 ? GRIS_CLARO : d &lt; 0 ? AZUL : ROJO;
+            }
+        }
+        b.forma.setLineWidth(ancho);
+        b.forma.setLineColor(color);
+    }
+}
+
+void actualizarEstacion() {
+    if (nodoSeleccionado == null) return;
+    List&lt;String&gt; grupo = new ArrayList&lt;&gt;();
+    for (String n : posNodo.keySet()) if (raiz(n).equals(raiz(nodoSeleccionado))) grupo.add(n);
+    Collections.sort(grupo);
+    StringBuilder lineas = new StringBuilder();
+    for (String n : grupo) lineas.append(lineaDe(n));
+    tituloEstacion.setText(nombreNodo.get(nodoSeleccionado) + "  [" + lineas + "]");
+    int fila = 0;
+    for (String n : grupo) {
+        for (Anden&lt;Pasajero&gt; an : andenesDeNodo.get(n)) {
+            if (an.indice + 1 &gt;= an.recorrido.largo() || fila &gt;= filaEstacion.length) continue;
+            String hacia = nombreNodo.get(an.recorrido.nodos[an.recorrido.largo() - 1]);
+            if (hacia.length() &gt; 16) hacia = hacia.substring(0, 15) + ".";
+            filaEstacion[fila].setColor(colorLinea(an.recorrido.linea).darker());
+            filaEstacion[fila].setText(String.format("%s hacia %-16s esperan %4d   max. %4d   no entraron %d",
+                    an.recorrido.linea, hacia, an.esperando(), an.maximo(), an.quedaronAbajo()));
+            fila++;
+        }
+    }
+    for (; fila &lt; filaEstacion.length; fila++) filaEstacion[fila].setText("");
+}
+
+void actualizarComparacion(int hora) {
+    hora = Math.max(0, Math.min(23, hora));
+    double[] maxBase = new double[7], maxF = new double[7];
+    for (Map.Entry&lt;String, double[]&gt; e : refBase.entrySet()) {
+        int li = LINEAS_MAPA.indexOf(e.getKey().substring(0, 1));
+        maxBase[li] = Math.max(maxBase[li], e.getValue()[hora]);
+    }
+    for (Map.Entry&lt;String, double[]&gt; e : refF.entrySet()) {
+        int li = LINEAS_MAPA.indexOf(e.getKey().substring(0, 1));
+        maxF[li] = Math.max(maxF[li], e.getValue()[hora]);
+    }
+    tituloComparacion.setText(String.format("Sin la F  -&gt;  con la F, de %d a %d h", hora, hora + 1));
+    for (int li = 0; li &lt; 7; li++) {
+        String L = LINEAS_MAPA.substring(li, li + 1);
+        String fila;
+        if (maxF[li] == 0 &amp;&amp; maxBase[li] == 0) fila = L + "   sin datos";
+        else if (maxBase[li] == 0) fila = L + "   --  -&gt;  " + miles(maxF[li]) + "  (nueva)";
+        else fila = String.format("%s   %s -&gt; %s  (%+.0f %%)", L, miles(maxBase[li]), miles(maxF[li]),
+                100 * (maxF[li] / maxBase[li] - 1));
+        filaComparacion[li].setText(fila);
+        filaComparacion[li].setColor(colorLinea(L).darker());
+    }
+    double[] vb = refHoraBase[hora], vf = refHoraF[hora];
+    filaComparacion[7].setText(vb == null || vf == null ? "" : String.format(
+            "viaje medio %s -&gt; %s s      espera media %s -&gt; %s s", miles(vb[0]), miles(vf[0]), miles(vb[1]), miles(vf[1])));
+}
+
+void actualizarMapa() {
+    double t = time();
+    for (Formacion f : formaciones) {
+        int k = f.getIndex();
+        int li = LINEAS_MAPA.indexOf(f.recorrido == null ? "A" : f.recorrido.linea);
+        if (!f.activa || !lineaVisible[li]) {
+            trenBorde[k].setVisible(false);
+            trenCuerpo[k].setVisible(false);
+            trenProa[k].setVisible(false);
+            continue;
+        }
+        double[] q;
+        if (f.enMarcha &amp;&amp; f.indice + 1 &lt; f.recorrido.largo()) {
+            double u = (t - f.tSalida) / f.recorrido.tramo[f.indice];
+            q = sobreTrazo(trazoDe(f.recorrido.nodos[f.indice], f.recorrido.nodos[f.indice + 1]), u);
+        } else if (f.indice + 1 &lt; f.recorrido.largo()) {
+            q = sobreTrazo(trazoDe(f.recorrido.nodos[f.indice], f.recorrido.nodos[f.indice + 1]), 0);
+        } else {
+            q = sobreTrazo(trazoDe(f.recorrido.nodos[f.indice - 1], f.recorrido.nodos[f.indice]), 1);
+        }
+        double largo = Datos.COCHES.get(f.recorrido.linea) * 2.3;
+        double x0 = q[0] - q[2] * largo / 2, y0 = q[1] - q[3] * largo / 2;
+        java.awt.Color c = colorOcupacion((double) f.carga.aBordo() / Datos.capacidad(f.recorrido.linea));
+        trenBorde[k].setPos(x0, y0);
+        trenBorde[k].setDx(q[2] * largo);
+        trenBorde[k].setDy(q[3] * largo);
+        trenCuerpo[k].setPos(x0, y0);
+        trenCuerpo[k].setDx(q[2] * largo);
+        trenCuerpo[k].setDy(q[3] * largo);
+        trenCuerpo[k].setColor(c);
+        trenProa[k].setPos(q[0] + q[2] * largo / 2, q[1] + q[3] * largo / 2);
+        trenBorde[k].setVisible(true);
+        trenCuerpo[k].setVisible(true);
+        trenProa[k].setVisible(true);
+    }
+    if (cuadroMapa++ % 8 != 0) return;
+
+    for (Map.Entry&lt;String, ShapeOval&gt; e : marcaNodo.entrySet()) {
+        int n = 0;
+        for (Anden&lt;Pasajero&gt; an : andenesDeNodo.get(e.getKey())) n += an.esperando();
+        e.getValue().setRadius(4 + Math.min(10, Math.sqrt(n) * 0.35));
+        e.getValue().setFillColor(n &lt; 30 ? java.awt.Color.WHITE
+                : n &lt; 150 ? new java.awt.Color(255, 214, 140) : new java.awt.Color(235, 90, 70));
+    }
+    int enSistema = enAnden.size() + aBordo.size() + caminata.size();
+    int hora = (int) (t / 3600);
+    relojMapa.setText(String.format("%02d:%02d", hora, (int) (t % 3600 / 60)));
+    cuentaMapa.setText("en el sistema: " + miles(enSistema));
+    formacionesMapa.setText("formaciones en circulacion: " + (formaciones.size() - formacionesLibres.size()));
+    promediosMapa.setText(arribados == 0 ? "viaje medio: --   espera media: --"
+            : "viaje medio: " + miles(sumaTiempoViaje / arribados) + " s   espera media: "
+              + miles(sumaEspera / arribados) + " s   (" + miles(arribados) + " viajes)");
+
+    int[] trenes = new int[7];
+    double[] sumaOc = new double[7], maxOc = new double[7];
+    for (Formacion f : formaciones) {
+        if (!f.activa) continue;
+        int li = LINEAS_MAPA.indexOf(f.recorrido.linea);
+        double u = (double) f.carga.aBordo() / Datos.capacidad(f.recorrido.linea);
+        trenes[li]++;
+        sumaOc[li] += u;
+        maxOc[li] = Math.max(maxOc[li], u);
+    }
+    for (int i = 0; i &lt; 7; i++) {
+        int esperan = 0;
+        for (Anden&lt;Pasajero&gt; an : andenesDeLinea.get(i)) esperan += an.esperando();
+        filaLinea[i].setText(String.format("%2d trenes   ocup. %3.0f %% (max. %3.0f %%)   esperan %s",
+                trenes[i], trenes[i] == 0 ? 0 : 100 * sumaOc[i] / trenes[i], 100 * maxOc[i], miles(esperan)));
+    }
+    int muestra = (int) ((t - 5 * 3600) / 300);
+    if (muestra &gt;= 0 &amp;&amp; muestra &lt; barra.length &amp;&amp; muestra &gt; ultimaMuestra) {
+        ultimaMuestra = muestra;
+        barra[muestra].setDy(-Math.min(1.0, enSistema / 30000.0) * ALTO_GRAF);
+    }
+    if (hora != horaComparacion) {
+        horaComparacion = hora;
+        actualizarComparacion(hora);
+    }
+    actualizarBandas();
+    actualizarEstacion();
+}
+int horaComparacion = -1;
+</AdditionalClassCode>
+				<Import>import subte.*;
+import java.util.*;
+import com.anylogic.engine.presentation.*;</Import>
+				<Generic>false</Generic>
+				<GenericParameter>
+					<Id>1791253830831</Id>
+					<Name>1791253830831</Name>
+					<GenericParameterValue Class="CodeValue">
+						<Code>T extends Agent</Code>
+					</GenericParameterValue>
+					<GenericParameterLabel>Generic parameter:</GenericParameterLabel>
+				</GenericParameter>
+				<FlowChartsUsage>ENTITY</FlowChartsUsage>
+				<SamplesToKeep>100</SamplesToKeep>
+				<LimitNumberOfArrayElements>false</LimitNumberOfArrayElements>
+				<ElementsLimitValue>100</ElementsLimitValue>
+				<MakeDefaultViewArea>true</MakeDefaultViewArea>
+				<SceneGridColor />
+				<SceneBackgroundColor>-4144960</SceneBackgroundColor>
+				<EnvironmentResourceRef />
+				<EnvironmentType>NONE</EnvironmentType>
+				<EnvironmentRotationX>0</EnvironmentRotationX>
+				<EnvironmentRotationY>0</EnvironmentRotationY>
+				<EnvironmentRotationZ>0</EnvironmentRotationZ>
+				<EnvironmentIntensity>1</EnvironmentIntensity>
+				<AgentProperties>
+					<EnvironmentDefinesInitialLocation>true</EnvironmentDefinesInitialLocation>
+					<RotateAnimationTowardsMovement>true</RotateAnimationTowardsMovement>
+					<RotateAnimationVertically>false</RotateAnimationVertically>
+					<VelocityCode Class="CodeUnitValue">
+						<Code>10</Code>
+						<Unit Class="SpeedUnits">MPS</Unit>
+					</VelocityCode>
+					<PhysicalLength Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="LengthUnits">METER</Unit>
+					</PhysicalLength>
+					<PhysicalWidth Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="LengthUnits">METER</Unit>
+					</PhysicalWidth>
+					<PhysicalHeight Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="LengthUnits">METER</Unit>
+					</PhysicalHeight>
+				</AgentProperties>
+				<EnvironmentProperties>
+					<EnableSteps>false</EnableSteps>
+					<StepDurationCode Class="CodeUnitValue">
+						<Code>1.0</Code>
+						<Unit Class="TimeUnits">SECOND</Unit>
+					</StepDurationCode>
+					<SpaceType>CONTINUOUS</SpaceType>
+					<WidthCode>500</WidthCode>
+					<HeightCode>500</HeightCode>
+					<ZHeightCode>0</ZHeightCode>
+					<ColumnsCountCode>100</ColumnsCountCode>
+					<RowsCountCode>100</RowsCountCode>
+					<NeigborhoodType>MOORE</NeigborhoodType>
+					<LayoutType>USER_DEF</LayoutType>
+					<NetworkType>USER_DEF</NetworkType>
+					<ConnectionsPerAgentCode>2</ConnectionsPerAgentCode>
+					<ConnectionsRangeCode>50</ConnectionsRangeCode>
+					<NeighborLinkFractionCode>0.95</NeighborLinkFractionCode>
+					<MCode>10</MCode>
+				</EnvironmentProperties>
+				<DatasetsCreationProperties>
+					<AutoCreate>true</AutoCreate>
+					<Id>1791253830825</Id>
+					<OccurrenceAtTime>true</OccurrenceAtTime>
+					<OccurrenceDate>1791273600000</OccurrenceDate>
+					<OccurrenceTime Class="CodeUnitValue">
+						<Code>0</Code>
+						<Unit Class="TimeUnits">SECOND</Unit>
+					</OccurrenceTime>
+					<RecurrenceCode Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="TimeUnits">SECOND</Unit>
+					</RecurrenceCode>
+				</DatasetsCreationProperties>
+				<ScaleRuler>
+					<Id>1791253830829</Id>
+					<Name>scale</Name>
+					<X>0</X>
+					<Y>-150</Y>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>false</PresentationFlag>
+					<ShowLabel>false</ShowLabel>
+					<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+					<Length>100</Length>
+					<Rotation>0</Rotation>
+					<ScaleType>BASED_ON_LENGTH</ScaleType>
+					<ModelLength>10</ModelLength>
+					<LengthUnits>METER</LengthUnits>
+					<Scale>10</Scale>
+					<InheritedFromParentAgentType>true</InheritedFromParentAgentType>
+				</ScaleRuler>
+				<CurrentLevel>1791253830832</CurrentLevel>
+				<ConnectionsId>1791253830827</ConnectionsId>
+				<Variables>
+					<Variable Class="Parameter">
+						<Id>1791253990303</Id>
+						<Name>soloLinea</Name>
+						<X>50</X>
+						<Y>40</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Properties SaveInSnapshot="true" ModificatorType="STATIC">
+							<Type>String</Type>
+							<UnitType>NONE</UnitType>
+							<SdArray>false</SdArray>
+							<DefaultValue Class="CodeValue">
+								<Code>""</Code>
+							</DefaultValue>
+							<ParameterEditor>
+								<Id>1791253990301</Id>
+								<EditorContolType>TEXT_BOX</EditorContolType>
+								<MinSliderValue>0</MinSliderValue>
+								<MaxSliderValue>100</MaxSliderValue>
+								<DelimeterType>NO_DELIMETER</DelimeterType>
+							</ParameterEditor>
+						</Properties>
+					</Variable>
+					<Variable Class="Parameter">
+						<Id>1791260000108</Id>
+						<Name>carpetaDatos</Name>
+						<X>220</X>
+						<Y>40</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Properties SaveInSnapshot="true" ModificatorType="STATIC">
+							<Type>String</Type>
+							<UnitType>NONE</UnitType>
+							<SdArray>false</SdArray>
+							<DefaultValue Class="CodeValue">
+								<Code>"../../../data/processed/escenario_f/I100"</Code>
+							</DefaultValue>
+							<ParameterEditor>
+								<Id>1791260000109</Id>
+								<EditorContolType>TEXT_BOX</EditorContolType>
+								<MinSliderValue>0</MinSliderValue>
+								<MaxSliderValue>100</MaxSliderValue>
+								<DelimeterType>NO_DELIMETER</DelimeterType>
+							</ParameterEditor>
+						</Properties>
+					</Variable>
+					<Variable Class="Parameter">
+						<Id>1791260000110</Id>
+						<Name>carpetaOferta</Name>
+						<X>220</X>
+						<Y>70</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Properties SaveInSnapshot="true" ModificatorType="STATIC">
+							<Type>String</Type>
+							<UnitType>NONE</UnitType>
+							<SdArray>false</SdArray>
+							<DefaultValue Class="CodeValue">
+								<Code>"../../../data/processed/escenario_f/oferta_I100"</Code>
+							</DefaultValue>
+							<ParameterEditor>
+								<Id>1791260000111</Id>
+								<EditorContolType>TEXT_BOX</EditorContolType>
+								<MinSliderValue>0</MinSliderValue>
+								<MaxSliderValue>100</MaxSliderValue>
+								<DelimeterType>NO_DELIMETER</DelimeterType>
+							</ParameterEditor>
+						</Properties>
+					</Variable>
+					<Variable Class="Parameter">
+						<Id>1791260000112</Id>
+						<Name>carpetaMapa</Name>
+						<X>220</X>
+						<Y>130</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Properties SaveInSnapshot="true" ModificatorType="STATIC">
+							<Type>String</Type>
+							<UnitType>NONE</UnitType>
+							<SdArray>false</SdArray>
+							<DefaultValue Class="CodeValue">
+								<Code>""</Code>
+							</DefaultValue>
+							<ParameterEditor>
+								<Id>1791260000113</Id>
+								<EditorContolType>TEXT_BOX</EditorContolType>
+								<MinSliderValue>0</MinSliderValue>
+								<MaxSliderValue>100</MaxSliderValue>
+								<DelimeterType>NO_DELIMETER</DelimeterType>
+							</ParameterEditor>
+						</Properties>
+					</Variable>
+					<Variable Class="Parameter">
+						<Id>1791260000114</Id>
+						<Name>mapa</Name>
+						<X>220</X>
+						<Y>100</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Properties SaveInSnapshot="true" ModificatorType="STATIC">
+							<Type>String</Type>
+							<UnitType>NONE</UnitType>
+							<SdArray>false</SdArray>
+							<DefaultValue Class="CodeValue">
+								<Code>"si"</Code>
+							</DefaultValue>
+							<ParameterEditor>
+								<Id>1791260000115</Id>
+								<EditorContolType>TEXT_BOX</EditorContolType>
+								<MinSliderValue>0</MinSliderValue>
+								<MaxSliderValue>100</MaxSliderValue>
+								<DelimeterType>NO_DELIMETER</DelimeterType>
+							</ParameterEditor>
+						</Properties>
+					</Variable>
+					<Variable Class="CollectionVariable">
+						<Id>1791260000116</Id>
+						<Name>pasajerosLibres</Name>
+						<X>400</X>
+						<Y>40</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Properties SaveInSnapshot="true" AccessType="public" StaticVariable="false">
+							<CollectionClass>LinkedList</CollectionClass>
+							<ElementClass>Pasajero</ElementClass>
+							<ValueElementClass>String</ValueElementClass>
+						</Properties>
+					</Variable>
+					<Variable Class="CollectionVariable">
+						<Id>1791260000117</Id>
+						<Name>formacionesLibres</Name>
+						<X>520</X>
+						<Y>40</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Properties SaveInSnapshot="true" AccessType="public" StaticVariable="false">
+							<CollectionClass>LinkedList</CollectionClass>
+							<ElementClass>Formacion</ElementClass>
+							<ValueElementClass>String</ValueElementClass>
+						</Properties>
+					</Variable>
+				</Variables>
+				<Connectors>
+					<Connector>
+						<Id>1791260000152</Id>
+						<Name>connector0</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>enterPasajero</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Enter</ClassName>
+							<ItemName>out</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>enAnden</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Wait</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>90</X>
+								<Y>340</Y>
+							</Point>
+							<Point>
+								<X>140</X>
+								<Y>340</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000153</Id>
+						<Name>connector1</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>enAnden</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Wait</ClassName>
+							<ItemName>out</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>aBordo</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Wait</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>200</X>
+								<Y>340</Y>
+							</Point>
+							<Point>
+								<X>250</X>
+								<Y>340</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000154</Id>
+						<Name>connector2</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>aBordo</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Wait</ClassName>
+							<ItemName>out</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>llego</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>SelectOutput</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>310</X>
+								<Y>340</Y>
+							</Point>
+							<Point>
+								<X>360</X>
+								<Y>340</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000155</Id>
+						<Name>connector3</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>llego</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>SelectOutput</ClassName>
+							<ItemName>outT</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>salePasajero</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Exit</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>420</X>
+								<Y>340</Y>
+							</Point>
+							<Point>
+								<X>470</X>
+								<Y>340</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000156</Id>
+						<Name>connector4</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>llego</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>SelectOutput</ClassName>
+							<ItemName>outF</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>caminata</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>420</X>
+								<Y>340</Y>
+							</Point>
+							<Point>
+								<X>470</X>
+								<Y>340</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000157</Id>
+						<Name>connector5</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>caminata</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>out</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>enAnden</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Wait</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>420</X>
+								<Y>430</Y>
+							</Point>
+							<Point>
+								<X>470</X>
+								<Y>430</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000158</Id>
+						<Name>connector6</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>enterFormacion</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Enter</ClassName>
+							<ItemName>out</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>llegada</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>90</X>
+								<Y>530</Y>
+							</Point>
+							<Point>
+								<X>140</X>
+								<Y>530</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000159</Id>
+						<Name>connector7</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>llegada</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>out</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>detencion</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>190</X>
+								<Y>530</Y>
+							</Point>
+							<Point>
+								<X>240</X>
+								<Y>530</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000160</Id>
+						<Name>connector8</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>detencion</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>out</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>retencion</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>310</X>
+								<Y>530</Y>
+							</Point>
+							<Point>
+								<X>360</X>
+								<Y>530</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000161</Id>
+						<Name>connector9</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>retencion</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>out</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>esFinal</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>SelectOutput</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>430</X>
+								<Y>530</Y>
+							</Point>
+							<Point>
+								<X>480</X>
+								<Y>530</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000162</Id>
+						<Name>connector10</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>esFinal</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>SelectOutput</ClassName>
+							<ItemName>outT</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>saleFormacion</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Exit</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>550</X>
+								<Y>530</Y>
+							</Point>
+							<Point>
+								<X>600</X>
+								<Y>530</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000163</Id>
+						<Name>connector11</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>esFinal</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>SelectOutput</ClassName>
+							<ItemName>outF</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>tramo</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>550</X>
+								<Y>530</Y>
+							</Point>
+							<Point>
+								<X>600</X>
+								<Y>530</Y>
+							</Point>
+						</Points>
+					</Connector>
+					<Connector>
+						<Id>1791260000164</Id>
+						<Name>connector12</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<SourceEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>tramo</ItemName>
+						</SourceEmbeddedObjectReference>
+						<SourceConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>out</ItemName>
+						</SourceConnectableItemReference>
+						<TargetEmbeddedObjectReference>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Main</ClassName>
+							<ItemName>llegada</ItemName>
+						</TargetEmbeddedObjectReference>
+						<TargetConnectableItemReference>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+							<ItemName>in</ItemName>
+						</TargetConnectableItemReference>
+						<Points>
+							<Point>
+								<X>550</X>
+								<Y>620</Y>
+							</Point>
+							<Point>
+								<X>600</X>
+								<Y>620</Y>
+							</Point>
+						</Points>
+					</Connector>
+				</Connectors>
+				<DynamicEvents>
+					<DynamicEventClass>
+						<Id>1791260000118</Id>
+						<Name>LlegadaPasajero</Name>
+						<X>60</X>
+						<Y>100</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Action>String o = datos.demanda.sortearOrigen(time(), rng);
+String d = datos.demanda.sortearDestino(o, (int) (time() / 3600), rng);
+Ruta r = datos.ruta(o, d);
+if (correEnEstaCorrida(r)) {
+    Pasajero p = pasajerosLibres.poll();
+    if (p == null) error("Se agoto el pool de pasajeros a las " + time());
+    p.iniciar(r, time());
+    ingresados++;
+    maxVivos = Math.max(maxVivos, ingresados - arribados);
+    enterPasajero.take(p);
+} else {
+    descartados++;
+}
+double prox = datos.demanda.proximaLlegadaRed(time(), rng);
+if (prox &lt; Demanda.FIN_S) create_LlegadaPasajero(prox - time());</Action>
+					</DynamicEventClass>
+					<DynamicEventClass>
+						<Id>1791260000119</Id>
+						<Name>Arranque</Name>
+						<X>220</X>
+						<Y>100</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Parameter>
+							<Name>a</Name>
+							<Type>Oferta.Arranque</Type>
+						</Parameter>
+						<Action>lanzarFormacion(a.cabecera, a.indice);
+// la que arranca en la cabecera abre la secuencia de despachos regulares
+if (a.indice == 0) {
+    double s = datos.oferta.proximaSalida(a.cabecera, time(), rng);
+    if (s &lt; Double.POSITIVE_INFINITY) create_Despacho(s - time(), a.cabecera);
+}</Action>
+					</DynamicEventClass>
+					<DynamicEventClass>
+						<Id>1791260000120</Id>
+						<Name>Despacho</Name>
+						<X>380</X>
+						<Y>100</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Parameter>
+							<Name>c</Name>
+							<Type>Oferta.Cabecera</Type>
+						</Parameter>
+						<Action>lanzarFormacion(c, 0);
+double s = datos.oferta.proximaSalida(c, time(), rng);
+if (s &lt; Double.POSITIVE_INFINITY) create_Despacho(s - time(), c);</Action>
+					</DynamicEventClass>
+					<DynamicEventClass>
+						<Id>1791260000121</Id>
+						<Name>Animar</Name>
+						<X>540</X>
+						<Y>100</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<Action>actualizarMapa();
+create_Animar(2);</Action>
+					</DynamicEventClass>
+				</DynamicEvents>
+				<AgentLinks>
+					<AgentLink>
+						<Id>1791253830827</Id>
+						<Name>connections</Name>
+						<X>50</X>
+						<Y>-50</Y>
+						<Label>
+							<X>15</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<HandleReceiveInConnections>false</HandleReceiveInConnections>
+						<AgentLinkType>COLLECTION_OF_LINKS</AgentLinkType>
+						<AgentLinkBidirectional>true</AgentLinkBidirectional>
+						<MessageType>Object</MessageType>
+						<LineStyle>SOLID</LineStyle>
+						<LineWidth>1</LineWidth>
+						<LineColor>-16777216</LineColor>
+						<LineZOrder>UNDER_AGENTS</LineZOrder>
+						<LineArrow>NONE</LineArrow>
+						<LineArrowPosition>END</LineArrowPosition>
+					</AgentLink>
+				</AgentLinks>
+				<EmbeddedObjects>
+					<EmbeddedObject>
+						<Id>1791260000122</Id>
+						<Name>pasajeros</Name>
+						<X>60</X>
+						<Y>190</Y>
+						<Label>
+							<X>-15</X>
+							<Y>-30</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Pasajero</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>redsubte</PackageName>
+								<ClassName>Pasajero</ClassName>
+								<ItemName>1791253918542</ItemName>
+							</GenericParameterSubstituteReference>
+						</GenericParameterSubstitute>
+						<Parameters>
+					</Parameters>
+						<ReplicationFlag>true</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>32000</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InEnvironment>true</InEnvironment>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000123</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000124</Id>
+						<Name>formaciones</Name>
+						<X>180</X>
+						<Y>190</Y>
+						<Label>
+							<X>-15</X>
+							<Y>-30</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>redsubte</PackageName>
+							<ClassName>Formacion</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>redsubte</PackageName>
+								<ClassName>Formacion</ClassName>
+								<ItemName>1791260000104</ItemName>
+							</GenericParameterSubstituteReference>
+						</GenericParameterSubstitute>
+						<Parameters>
+					</Parameters>
+						<ReplicationFlag>true</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>150</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InEnvironment>true</InEnvironment>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000125</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000127</Id>
+						<Name>enterPasajero</Name>
+						<X>60</X>
+						<Y>330</Y>
+						<Label>
+							<X>-5</X>
+							<Y>-15</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Enter</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Enter</ClassName>
+								<ItemName>1412336242933</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Pasajero</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>locationType</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationX</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationY</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationZ</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationLatitude</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationLongitude</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationGeoPlaceName</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationXYZInNetwork</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationNetwork</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationLevel</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationNode</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationAttractor</Name>
+							</Parameter>
+							<Parameter>
+								<Name>speed</Name>
+							</Parameter>
+							<Parameter>
+								<Name>changeDimensions</Name>
+							</Parameter>
+							<Parameter>
+								<Name>length</Name>
+							</Parameter>
+							<Parameter>
+								<Name>width</Name>
+							</Parameter>
+							<Parameter>
+								<Name>height</Name>
+							</Parameter>
+							<Parameter>
+								<Name>addToCustomPopulation</Name>
+							</Parameter>
+							<Parameter>
+								<Name>population</Name>
+							</Parameter>
+							<Parameter>
+								<Name>pushProtocol</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onEnter</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onRemove</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onAtEnter</Name>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000126</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000129</Id>
+						<Name>enAnden</Name>
+						<X>170</X>
+						<Y>330</Y>
+						<Label>
+							<X>5</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Wait</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Wait</ClassName>
+								<ItemName>1412336243169</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Pasajero</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>maximumCapacity</Name>
+								<Value Class="CodeValue">
+									<Code>true</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>onEnter</Name>
+								<Value Class="CodeValue">
+									<Code>ascensos++;
+agent.tLlegoAnden = time();
+andenDe(agent).llega(agent);</Code>
+								</Value>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000128</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000131</Id>
+						<Name>aBordo</Name>
+						<X>280</X>
+						<Y>330</Y>
+						<Label>
+							<X>5</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Wait</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Wait</ClassName>
+								<ItemName>1412336243169</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Pasajero</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>maximumCapacity</Name>
+								<Value Class="CodeValue">
+									<Code>true</Code>
+								</Value>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000130</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000133</Id>
+						<Name>llego</Name>
+						<X>390</X>
+						<Y>330</Y>
+						<Label>
+							<X>5</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>SelectOutput</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>SelectOutput</ClassName>
+								<ItemName>1412336242931</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Pasajero</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>conditionIsProbabilistic</Name>
+								<Value Class="CodeValue">
+									<Code>false</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>condition</Name>
+								<Value Class="CodeValue">
+									<Code>!agent.transbordando</Code>
+								</Value>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000132</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000135</Id>
+						<Name>salePasajero</Name>
+						<X>500</X>
+						<Y>330</Y>
+						<Label>
+							<X>-5</X>
+							<Y>-15</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Exit</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Exit</ClassName>
+								<ItemName>1412336242934</ItemName>
+							</GenericParameterSubstituteReference>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>onExit</Name>
+								<Value Class="CodeValue">
+									<Code>arribados++;
+sumaTiempoViaje += time() - agent.tIngreso;
+sumaEspera += agent.tEspera;
+pasajerosLibres.add(agent);</Code>
+								</Value>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000134</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000137</Id>
+						<Name>caminata</Name>
+						<X>390</X>
+						<Y>420</Y>
+						<Label>
+							<X>0</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Delay</ClassName>
+								<ItemName>1412336242930</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Pasajero</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>type</Name>
+							</Parameter>
+							<Parameter>
+								<Name>delayTime</Name>
+								<Value Class="CodeUnitValue">
+									<Code>agent.etapaActual().caminataPrevia</Code>
+									<Unit Class="TimeUnits">SECOND</Unit>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>capacity</Name>
+							</Parameter>
+							<Parameter>
+								<Name>maximumCapacity</Name>
+								<Value Class="CodeValue">
+									<Code>true</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>entityLocation</Name>
+							</Parameter>
+							<Parameter>
+								<Name>pushProtocol</Name>
+							</Parameter>
+							<Parameter>
+								<Name>restoreEntityLocationOnExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>forceStatisticsCollection</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onEnter</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onAtExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onRemove</Name>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000136</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000139</Id>
+						<Name>enterFormacion</Name>
+						<X>60</X>
+						<Y>520</Y>
+						<Label>
+							<X>-5</X>
+							<Y>-15</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Enter</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Enter</ClassName>
+								<ItemName>1412336242933</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Formacion</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>locationType</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationX</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationY</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationZ</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationLatitude</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationLongitude</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationGeoPlaceName</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationXYZInNetwork</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationNetwork</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationLevel</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationNode</Name>
+							</Parameter>
+							<Parameter>
+								<Name>locationAttractor</Name>
+							</Parameter>
+							<Parameter>
+								<Name>speed</Name>
+							</Parameter>
+							<Parameter>
+								<Name>changeDimensions</Name>
+							</Parameter>
+							<Parameter>
+								<Name>length</Name>
+							</Parameter>
+							<Parameter>
+								<Name>width</Name>
+							</Parameter>
+							<Parameter>
+								<Name>height</Name>
+							</Parameter>
+							<Parameter>
+								<Name>addToCustomPopulation</Name>
+							</Parameter>
+							<Parameter>
+								<Name>population</Name>
+							</Parameter>
+							<Parameter>
+								<Name>pushProtocol</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onEnter</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onRemove</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onAtEnter</Name>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000138</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000141</Id>
+						<Name>llegada</Name>
+						<X>160</X>
+						<Y>520</Y>
+						<Label>
+							<X>0</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Delay</ClassName>
+								<ItemName>1412336242930</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Formacion</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>type</Name>
+							</Parameter>
+							<Parameter>
+								<Name>delayTime</Name>
+								<Value Class="CodeUnitValue">
+									<Code>0</Code>
+									<Unit Class="TimeUnits">SECOND</Unit>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>capacity</Name>
+							</Parameter>
+							<Parameter>
+								<Name>maximumCapacity</Name>
+								<Value Class="CodeValue">
+									<Code>true</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>entityLocation</Name>
+							</Parameter>
+							<Parameter>
+								<Name>pushProtocol</Name>
+							</Parameter>
+							<Parameter>
+								<Name>restoreEntityLocationOnExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>forceStatisticsCollection</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onEnter</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onAtExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onExit</Name>
+								<Value Class="CodeValue">
+									<Code>// bajan los que llegaron a su estacion y se calcula la detencion (D13)
+int bajan = 0;
+for (Pasajero p : agent.carga.bajar(agent.indice)) {
+    p.transbordando = p.etapa &lt; p.ruta.etapas.length - 1;
+    if (p.transbordando) p.etapa++;
+    aBordo.free(p);
+    bajan++;
+}
+boolean ultima = agent.indice == agent.recorrido.largo() - 1;
+if (agent.recienSale || ultima) {
+    agent.dwell = 0;
+} else {
+    int suben = Math.min(andenDe(agent).esperando(), agent.carga.lugares());
+    agent.dwell = modeloDetencion.segundos(agent.recorrido.detencion, agent.recorrido.linea,
+            Datos.COCHES.get(agent.recorrido.linea), bajan, suben);
+    sumaDetencion += agent.dwell;
+    paradas++;
+}</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>onRemove</Name>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000140</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000143</Id>
+						<Name>detencion</Name>
+						<X>280</X>
+						<Y>520</Y>
+						<Label>
+							<X>0</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Delay</ClassName>
+								<ItemName>1412336242930</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Formacion</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>type</Name>
+							</Parameter>
+							<Parameter>
+								<Name>delayTime</Name>
+								<Value Class="CodeUnitValue">
+									<Code>agent.dwell</Code>
+									<Unit Class="TimeUnits">SECOND</Unit>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>capacity</Name>
+							</Parameter>
+							<Parameter>
+								<Name>maximumCapacity</Name>
+								<Value Class="CodeValue">
+									<Code>true</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>entityLocation</Name>
+							</Parameter>
+							<Parameter>
+								<Name>pushProtocol</Name>
+							</Parameter>
+							<Parameter>
+								<Name>restoreEntityLocationOnExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>forceStatisticsCollection</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onEnter</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onAtExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onExit</Name>
+								<Value Class="CodeValue">
+									<Code>// fin de la detencion: se pide el tramo siguiente (D15)
+if (agent.indice &lt; agent.recorrido.largo() - 1) {
+    agent.espera = tramos.reservar(agent.recorrido, agent.indice, time()) - time();
+} else {
+    agent.espera = 0;
+}</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>onRemove</Name>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000142</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000145</Id>
+						<Name>retencion</Name>
+						<X>400</X>
+						<Y>520</Y>
+						<Label>
+							<X>0</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Delay</ClassName>
+								<ItemName>1412336242930</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Formacion</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>type</Name>
+							</Parameter>
+							<Parameter>
+								<Name>delayTime</Name>
+								<Value Class="CodeUnitValue">
+									<Code>agent.espera</Code>
+									<Unit Class="TimeUnits">SECOND</Unit>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>capacity</Name>
+							</Parameter>
+							<Parameter>
+								<Name>maximumCapacity</Name>
+								<Value Class="CodeValue">
+									<Code>true</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>entityLocation</Name>
+							</Parameter>
+							<Parameter>
+								<Name>pushProtocol</Name>
+							</Parameter>
+							<Parameter>
+								<Name>restoreEntityLocationOnExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>forceStatisticsCollection</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onEnter</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onAtExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onExit</Name>
+								<Value Class="CodeValue">
+									<Code>// sale de la estacion: suben los que esperan, al partir; los que no entran siguen (D12)
+agent.recienSale = false;
+agent.tSalida = time();
+agent.enMarcha = agent.indice &lt; agent.recorrido.largo() - 1;
+if (agent.indice &lt; agent.recorrido.largo() - 1) {
+    for (Pasajero p : andenDe(agent).subir(agent.carga.lugares())) {
+        agent.carga.subir(p, p.etapaActual().baja);
+        p.tEspera += time() - p.tLlegoAnden;
+        enAnden.free(p);
+    }
+}
+registrarSalida(agent);</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>onRemove</Name>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000144</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000147</Id>
+						<Name>esFinal</Name>
+						<X>520</X>
+						<Y>520</Y>
+						<Label>
+							<X>5</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>SelectOutput</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>SelectOutput</ClassName>
+								<ItemName>1412336242931</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Formacion</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>conditionIsProbabilistic</Name>
+								<Value Class="CodeValue">
+									<Code>false</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>condition</Name>
+								<Value Class="CodeValue">
+									<Code>agent.indice == agent.recorrido.largo() - 1</Code>
+								</Value>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000146</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000149</Id>
+						<Name>saleFormacion</Name>
+						<X>640</X>
+						<Y>520</Y>
+						<Label>
+							<X>-5</X>
+							<Y>-15</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Exit</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Exit</ClassName>
+								<ItemName>1412336242934</ItemName>
+							</GenericParameterSubstituteReference>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>onExit</Name>
+								<Value Class="CodeValue">
+									<Code>agent.activa = false;
+if (agent.carga.aBordo() != 0) error("Formacion llega a la cabecera con pasajeros");
+formacionesLibres.add(agent);</Code>
+								</Value>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000148</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+					<EmbeddedObject>
+						<Id>1791260000151</Id>
+						<Name>tramo</Name>
+						<X>520</X>
+						<Y>610</Y>
+						<Label>
+							<X>0</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<ActiveObjectClass>
+							<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+							<ClassName>Delay</ClassName>
+						</ActiveObjectClass>
+						<GenericParameterSubstitute>
+							<GenericParameterSubstituteReference>
+								<PackageName>com.anylogic.libraries.processmodeling</PackageName>
+								<ClassName>Delay</ClassName>
+								<ItemName>1412336242930</ItemName>
+							</GenericParameterSubstituteReference>
+							<GenericParameterSubstituteValue Class="CodeValue">
+								<Code>Formacion</Code>
+							</GenericParameterSubstituteValue>
+						</GenericParameterSubstitute>
+						<Parameters>
+							<Parameter>
+								<Name>type</Name>
+							</Parameter>
+							<Parameter>
+								<Name>delayTime</Name>
+								<Value Class="CodeUnitValue">
+									<Code>agent.recorrido.tramo[agent.indice]</Code>
+									<Unit Class="TimeUnits">SECOND</Unit>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>capacity</Name>
+							</Parameter>
+							<Parameter>
+								<Name>maximumCapacity</Name>
+								<Value Class="CodeValue">
+									<Code>true</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>entityLocation</Name>
+							</Parameter>
+							<Parameter>
+								<Name>pushProtocol</Name>
+							</Parameter>
+							<Parameter>
+								<Name>restoreEntityLocationOnExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>forceStatisticsCollection</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onEnter</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onAtExit</Name>
+							</Parameter>
+							<Parameter>
+								<Name>onExit</Name>
+								<Value Class="CodeValue">
+									<Code>agent.enMarcha = false;
+agent.indice++;</Code>
+								</Value>
+							</Parameter>
+							<Parameter>
+								<Name>onRemove</Name>
+							</Parameter>
+						</Parameters>
+						<ReplicationFlag>false</ReplicationFlag>
+						<Replication Class="CodeValue">
+							<Code>100</Code>
+						</Replication>
+						<CollectionType>ARRAY_LIST_BASED</CollectionType>
+						<InitialLocationType>XYZ</InitialLocationType>
+						<ColumnCode Class="CodeValue">
+							<Code>0</Code>
+						</ColumnCode>
+						<RowCode Class="CodeValue">
+							<Code>0</Code>
+						</RowCode>
+						<LocationNameCode Class="CodeValue">
+							<Code>""</Code>
+						</LocationNameCode>
+						<InitializationType>SPECIFIED_NUMBER</InitializationType>
+						<InitializationDatabaseTableQuery>
+							<Id>1791260000150</Id>
+							<TableReference>
+						</TableReference>
+						</InitializationDatabaseTableQuery>
+						<InitializationDatabaseType>ONE_AGENT_PER_DATABASE_RECORD</InitializationDatabaseType>
+						<QuantityColumn>
+					</QuantityColumn>
+					</EmbeddedObject>
+				</EmbeddedObjects>
+				<Presentation>
+					<Level>
+						<Id>1791253830832</Id>
+						<Name>level</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>false</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<Z>0</Z>
+						<LevelVisibility>DIM_NON_CURRENT</LevelVisibility>
+					</Level>
+				</Presentation>
+			</ActiveObjectClass>
+			<ActiveObjectClass>
+				<Id>1791253918537</Id>
+				<Name>Pasajero</Name>
+				<AdditionalClassCode>Ruta ruta;               // camino precalculado (caminos_minimos.csv)
+int etapa;               // indice de la etapa en curso
+boolean transbordando;   // true si al bajar le queda otra etapa
+double tIngreso;         // s desde medianoche
+double tLlegoAnden;      // cuando empezo a esperar en el anden actual
+double tEspera;          // espera acumulada en andenes
+
+void iniciar(Ruta r, double t) {
+    ruta = r;
+    etapa = 0;
+    transbordando = false;
+    tIngreso = t;
+    tLlegoAnden = t;
+    tEspera = 0;
+}
+
+Ruta.Etapa etapaActual() {
+    return ruta.etapas[etapa];
+}</AdditionalClassCode>
+				<Import>import subte.*;</Import>
+				<Generic>false</Generic>
+				<GenericParameter>
+					<Id>1791253918542</Id>
+					<Name>1791253918542</Name>
+					<GenericParameterValue Class="CodeValue">
+						<Code>T extends Agent</Code>
+					</GenericParameterValue>
+					<GenericParameterLabel>Generic parameter:</GenericParameterLabel>
+				</GenericParameter>
+				<FlowChartsUsage>ENTITY</FlowChartsUsage>
+				<SamplesToKeep>100</SamplesToKeep>
+				<LimitNumberOfArrayElements>false</LimitNumberOfArrayElements>
+				<ElementsLimitValue>100</ElementsLimitValue>
+				<MakeDefaultViewArea>true</MakeDefaultViewArea>
+				<SceneGridColor />
+				<SceneBackgroundColor>-4144960</SceneBackgroundColor>
+				<EnvironmentResourceRef />
+				<EnvironmentType>NONE</EnvironmentType>
+				<EnvironmentRotationX>0</EnvironmentRotationX>
+				<EnvironmentRotationY>0</EnvironmentRotationY>
+				<EnvironmentRotationZ>0</EnvironmentRotationZ>
+				<EnvironmentIntensity>1</EnvironmentIntensity>
+				<AgentProperties>
+					<EnvironmentDefinesInitialLocation>true</EnvironmentDefinesInitialLocation>
+					<RotateAnimationTowardsMovement>true</RotateAnimationTowardsMovement>
+					<RotateAnimationVertically>false</RotateAnimationVertically>
+					<VelocityCode Class="CodeUnitValue">
+						<Code>10</Code>
+						<Unit Class="SpeedUnits">MPS</Unit>
+					</VelocityCode>
+					<PhysicalLength Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="LengthUnits">METER</Unit>
+					</PhysicalLength>
+					<PhysicalWidth Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="LengthUnits">METER</Unit>
+					</PhysicalWidth>
+					<PhysicalHeight Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="LengthUnits">METER</Unit>
+					</PhysicalHeight>
+				</AgentProperties>
+				<EnvironmentProperties>
+					<EnableSteps>false</EnableSteps>
+					<StepDurationCode Class="CodeUnitValue">
+						<Code>1.0</Code>
+						<Unit Class="TimeUnits">SECOND</Unit>
+					</StepDurationCode>
+					<SpaceType>CONTINUOUS</SpaceType>
+					<WidthCode>500</WidthCode>
+					<HeightCode>500</HeightCode>
+					<ZHeightCode>0</ZHeightCode>
+					<ColumnsCountCode>100</ColumnsCountCode>
+					<RowsCountCode>100</RowsCountCode>
+					<NeigborhoodType>MOORE</NeigborhoodType>
+					<LayoutType>USER_DEF</LayoutType>
+					<NetworkType>USER_DEF</NetworkType>
+					<ConnectionsPerAgentCode>2</ConnectionsPerAgentCode>
+					<ConnectionsRangeCode>50</ConnectionsRangeCode>
+					<NeighborLinkFractionCode>0.95</NeighborLinkFractionCode>
+					<MCode>10</MCode>
+				</EnvironmentProperties>
+				<DatasetsCreationProperties>
+					<AutoCreate>true</AutoCreate>
+					<Id>1791253918536</Id>
+					<OccurrenceAtTime>true</OccurrenceAtTime>
+					<OccurrenceDate>1791273600000</OccurrenceDate>
+					<OccurrenceTime Class="CodeUnitValue">
+						<Code>0</Code>
+						<Unit Class="TimeUnits">SECOND</Unit>
+					</OccurrenceTime>
+					<RecurrenceCode Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="TimeUnits">SECOND</Unit>
+					</RecurrenceCode>
+				</DatasetsCreationProperties>
+				<ScaleRuler>
+					<Id>1791253918540</Id>
+					<Name>scale</Name>
+					<X>0</X>
+					<Y>-150</Y>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>false</PresentationFlag>
+					<ShowLabel>false</ShowLabel>
+					<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+					<Length>100</Length>
+					<Rotation>0</Rotation>
+					<ScaleType>BASED_ON_LENGTH</ScaleType>
+					<ModelLength>10</ModelLength>
+					<LengthUnits>METER</LengthUnits>
+					<Scale>10</Scale>
+					<InheritedFromParentAgentType>true</InheritedFromParentAgentType>
+				</ScaleRuler>
+				<CurrentLevel>1791253918543</CurrentLevel>
+				<ConnectionsId>1791253918538</ConnectionsId>
+				<AgentLinks>
+					<AgentLink>
+						<Id>1791253918538</Id>
+						<Name>connections</Name>
+						<X>50</X>
+						<Y>-50</Y>
+						<Label>
+							<X>15</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<HandleReceiveInConnections>false</HandleReceiveInConnections>
+						<AgentLinkType>COLLECTION_OF_LINKS</AgentLinkType>
+						<AgentLinkBidirectional>true</AgentLinkBidirectional>
+						<MessageType>Object</MessageType>
+						<LineStyle>SOLID</LineStyle>
+						<LineWidth>1</LineWidth>
+						<LineColor>-16777216</LineColor>
+						<LineZOrder>UNDER_AGENTS</LineZOrder>
+						<LineArrow>NONE</LineArrow>
+						<LineArrowPosition>END</LineArrowPosition>
+					</AgentLink>
+				</AgentLinks>
+				<Presentation>
+					<Level>
+						<Id>1791253918543</Id>
+						<Name>level</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<Z>0</Z>
+						<LevelVisibility>DIM_NON_CURRENT</LevelVisibility>
+					</Level>
+				</Presentation>
+			</ActiveObjectClass>
+			<ActiveObjectClass>
+				<Id>1791260000102</Id>
+				<Name>Formacion</Name>
+				<AdditionalClassCode>Recorrido recorrido;
+int indice;              // estacion donde esta (0 = cabecera)
+boolean recienSale;      // primera parada: no hay detencion
+double dwell;            // duracion de la detencion en la estacion actual (D13)
+double espera;           // espera por tramo ocupado antes de salir (D15)
+boolean activa;          // en circulacion (para la capa visual)
+boolean enMarcha;        // entre dos estaciones
+double tSalida;          // cuando salio de la ultima estacion
+Carga&lt;Pasajero&gt; carga;
+
+void iniciar(Recorrido r, int desde, int capacidad) {
+    recorrido = r;
+    indice = desde;
+    recienSale = true;
+    activa = true;
+    enMarcha = false;
+    carga = new Carga&lt;Pasajero&gt;(r.largo(), capacidad);
+}</AdditionalClassCode>
+				<Import>import subte.*;</Import>
+				<Generic>false</Generic>
+				<GenericParameter>
+					<Id>1791260000104</Id>
+					<Name>1791260000104</Name>
+					<GenericParameterValue Class="CodeValue">
+						<Code>T extends Agent</Code>
+					</GenericParameterValue>
+					<GenericParameterLabel>Generic parameter:</GenericParameterLabel>
+				</GenericParameter>
+				<FlowChartsUsage>ENTITY</FlowChartsUsage>
+				<SamplesToKeep>100</SamplesToKeep>
+				<LimitNumberOfArrayElements>false</LimitNumberOfArrayElements>
+				<ElementsLimitValue>100</ElementsLimitValue>
+				<MakeDefaultViewArea>true</MakeDefaultViewArea>
+				<SceneGridColor />
+				<SceneBackgroundColor>-4144960</SceneBackgroundColor>
+				<EnvironmentResourceRef />
+				<EnvironmentType>NONE</EnvironmentType>
+				<EnvironmentRotationX>0</EnvironmentRotationX>
+				<EnvironmentRotationY>0</EnvironmentRotationY>
+				<EnvironmentRotationZ>0</EnvironmentRotationZ>
+				<EnvironmentIntensity>1</EnvironmentIntensity>
+				<AgentProperties>
+					<EnvironmentDefinesInitialLocation>true</EnvironmentDefinesInitialLocation>
+					<RotateAnimationTowardsMovement>true</RotateAnimationTowardsMovement>
+					<RotateAnimationVertically>false</RotateAnimationVertically>
+					<VelocityCode Class="CodeUnitValue">
+						<Code>10</Code>
+						<Unit Class="SpeedUnits">MPS</Unit>
+					</VelocityCode>
+					<PhysicalLength Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="LengthUnits">METER</Unit>
+					</PhysicalLength>
+					<PhysicalWidth Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="LengthUnits">METER</Unit>
+					</PhysicalWidth>
+					<PhysicalHeight Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="LengthUnits">METER</Unit>
+					</PhysicalHeight>
+				</AgentProperties>
+				<EnvironmentProperties>
+					<EnableSteps>false</EnableSteps>
+					<StepDurationCode Class="CodeUnitValue">
+						<Code>1.0</Code>
+						<Unit Class="TimeUnits">SECOND</Unit>
+					</StepDurationCode>
+					<SpaceType>CONTINUOUS</SpaceType>
+					<WidthCode>500</WidthCode>
+					<HeightCode>500</HeightCode>
+					<ZHeightCode>0</ZHeightCode>
+					<ColumnsCountCode>100</ColumnsCountCode>
+					<RowsCountCode>100</RowsCountCode>
+					<NeigborhoodType>MOORE</NeigborhoodType>
+					<LayoutType>USER_DEF</LayoutType>
+					<NetworkType>USER_DEF</NetworkType>
+					<ConnectionsPerAgentCode>2</ConnectionsPerAgentCode>
+					<ConnectionsRangeCode>50</ConnectionsRangeCode>
+					<NeighborLinkFractionCode>0.95</NeighborLinkFractionCode>
+					<MCode>10</MCode>
+				</EnvironmentProperties>
+				<DatasetsCreationProperties>
+					<AutoCreate>true</AutoCreate>
+					<Id>1791260000105</Id>
+					<OccurrenceAtTime>true</OccurrenceAtTime>
+					<OccurrenceDate>1791273600000</OccurrenceDate>
+					<OccurrenceTime Class="CodeUnitValue">
+						<Code>0</Code>
+						<Unit Class="TimeUnits">SECOND</Unit>
+					</OccurrenceTime>
+					<RecurrenceCode Class="CodeUnitValue">
+						<Code>1</Code>
+						<Unit Class="TimeUnits">SECOND</Unit>
+					</RecurrenceCode>
+				</DatasetsCreationProperties>
+				<ScaleRuler>
+					<Id>1791260000107</Id>
+					<Name>scale</Name>
+					<X>0</X>
+					<Y>-150</Y>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>false</PresentationFlag>
+					<ShowLabel>false</ShowLabel>
+					<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+					<Length>100</Length>
+					<Rotation>0</Rotation>
+					<ScaleType>BASED_ON_LENGTH</ScaleType>
+					<ModelLength>10</ModelLength>
+					<LengthUnits>METER</LengthUnits>
+					<Scale>10</Scale>
+					<InheritedFromParentAgentType>true</InheritedFromParentAgentType>
+				</ScaleRuler>
+				<CurrentLevel>1791260000106</CurrentLevel>
+				<ConnectionsId>1791260000103</ConnectionsId>
+				<AgentLinks>
+					<AgentLink>
+						<Id>1791260000103</Id>
+						<Name>connections</Name>
+						<X>50</X>
+						<Y>-50</Y>
+						<Label>
+							<X>15</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<HandleReceiveInConnections>false</HandleReceiveInConnections>
+						<AgentLinkType>COLLECTION_OF_LINKS</AgentLinkType>
+						<AgentLinkBidirectional>true</AgentLinkBidirectional>
+						<MessageType>Object</MessageType>
+						<LineStyle>SOLID</LineStyle>
+						<LineWidth>1</LineWidth>
+						<LineColor>-16777216</LineColor>
+						<LineZOrder>UNDER_AGENTS</LineZOrder>
+						<LineArrow>NONE</LineArrow>
+						<LineArrowPosition>END</LineArrowPosition>
+					</AgentLink>
+				</AgentLinks>
+				<Presentation>
+					<Level>
+						<Id>1791260000106</Id>
+						<Name>level</Name>
+						<X>0</X>
+						<Y>0</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<Z>0</Z>
+						<LevelVisibility>DIM_NON_CURRENT</LevelVisibility>
+					</Level>
+				</Presentation>
+			</ActiveObjectClass>
+		</ActiveObjectClasses>
+		<DifferentialEquationsMethod>EULER</DifferentialEquationsMethod>
+		<MixedEquationsMethod>RK45_NEWTON</MixedEquationsMethod>
+		<AlgebraicEquationsMethod>MODIFIED_NEWTON</AlgebraicEquationsMethod>
+		<AbsoluteAccuracy>1.0E-5</AbsoluteAccuracy>
+		<FixedTimeStep>0.001</FixedTimeStep>
+		<RelativeAccuracy>1.0E-5</RelativeAccuracy>
+		<TimeAccuracy>1.0E-5</TimeAccuracy>
+		<Frame>
+			<Id>1791253830824</Id>
+			<Width>1200</Width>
+			<Height>780</Height>
+		</Frame>
+		<Database>
+			<Id>1791253830823</Id>
+			<Logging>false</Logging>
+			<AutoExport>false</AutoExport>
+			<ShutdownCompact>false</ShutdownCompact>
+			<ImportSettings>
+		</ImportSettings>
+			<ExportSettings>
+		</ExportSettings>
+		</Database>
+		<RunConfiguration ActiveObjectClassId="1791253830826">
+			<Id>1791253830837</Id>
+			<Name>RunConfiguration</Name>
+			<MaximumMemory>2048</MaximumMemory>
+			<ModelTimeProperties>
+				<StopOption>Stop at specified time</StopOption>
+				<InitialDate>1791244800000</InitialDate>
+				<InitialTime>0.0</InitialTime>
+				<FinalDate>1793923200000</FinalDate>
+				<FinalTime>100.0</FinalTime>
+			</ModelTimeProperties>
+			<AnimationProperties>
+				<StopNever>true</StopNever>
+				<ExecutionMode>realTimeScaled</ExecutionMode>
+				<RealTimeScale>1.0</RealTimeScale>
+				<EnableZoomAndPanning>true</EnableZoomAndPanning>
+				<EnableDeveloperPanel>false</EnableDeveloperPanel>
+				<ShowDeveloperPanelOnStart>false</ShowDeveloperPanelOnStart>
+			</AnimationProperties>
+			<Inputs>		
+		</Inputs>
+			<Outputs>
+		</Outputs>
+		</RunConfiguration>
+		<Experiments>
+			<SimulationExperiment ActiveObjectClassId="1791253830826">
+				<Id>1791253830834</Id>
+				<Name>Simulation</Name>
+				<CommandLineArguments />
+				<MaximumMemory>2048</MaximumMemory>
+				<RandomNumberGenerationType>fixedSeed</RandomNumberGenerationType>
+				<CustomGeneratorCode>new Random()</CustomGeneratorCode>
+				<AfterSimulationRunCode>long enSistema = root.enAnden.size() + root.aBordo.size() + root.caminata.size();
+traceln("Ingresados " + root.ingresados + ", arribados " + root.arribados
+        + ", en el sistema " + enSistema + ", descartados " + root.descartados);
+traceln("Conservacion: " + (root.ingresados == root.arribados + enSistema ? "OK" : "FALLA"));
+if (root.arribados &gt; 0) {
+    traceln("Tiempo medio de viaje " + Math.round(root.sumaTiempoViaje / root.arribados)
+            + " s, espera media " + Math.round(root.sumaEspera / root.arribados) + " s");
+}
+traceln("Ascensos por viaje " + String.format(java.util.Locale.ROOT, "%.3f", (double) root.ascensos / root.ingresados)
+        + ", no entran " + root.noEntran() + ", max pasajeros vivos " + root.maxVivos
+        + ", max formaciones " + root.maxFormaciones);
+traceln("Separacion por tramo: " + root.tramos.retenciones + " retenciones, " + Math.round(root.tramos.segundosRetenidos)
+        + " s; detencion media " + String.format(java.util.Locale.ROOT, "%.2f", root.paradas == 0 ? 0 : root.sumaDetencion / root.paradas) + " s");</AfterSimulationRunCode>
+				<SeedValue>1</SeedValue>
+				<SelectionModeForSimultaneousEvents>LIFO</SelectionModeForSimultaneousEvents>
+				<VmArgs />
+				<LoadRootFromSnapshot>false</LoadRootFromSnapshot>
+				<Presentation>
+					<Text>
+						<Id>1791253830836</Id>
+						<Name>text</Name>
+						<X>50</X>
+						<Y>30</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Z>0</Z>
+						<Rotation>0.0</Rotation>
+						<Color>-12490271</Color>
+						<Text>RedSubte</Text>
+						<Font>
+							<Name>SansSerif</Name>
+							<Size>24</Size>
+							<Style>0</Style>
+						</Font>
+						<Alignment>LEFT</Alignment>
+					</Text>
+				</Presentation>
+				<Parameters>
+					<Parameter>
+						<ParameterName>soloLinea</ParameterName>
+					</Parameter>
+				</Parameters>
+				<PresentationProperties>
+					<EnableZoomAndPanning>true</EnableZoomAndPanning>
+					<ExecutionMode>virtualTime</ExecutionMode>
+					<Title>RedSubte : Simulation</Title>
+					<EnableDeveloperPanel>true</EnableDeveloperPanel>
+					<ShowDeveloperPanelOnStart>false</ShowDeveloperPanelOnStart>
+					<RealTimeScale>1.0</RealTimeScale>
+				</PresentationProperties>
+				<ModelTimeProperties>
+					<StopOption>Stop at specified time</StopOption>
+					<InitialDate>1791244800000</InitialDate>
+					<InitialTime>18000.0</InitialTime>
+					<FinalDate>1791313200000</FinalDate>
+					<FinalTime>86400.0</FinalTime>
+				</ModelTimeProperties>
+				<BypassInitialScreen>true</BypassInitialScreen>
+			</SimulationExperiment>
+			<ParamVariationExperiment ActiveObjectClassId="1791253830826">
+				<Id>1791260000166</Id>
+				<Name>Replicas20</Name>
+				<CommandLineArguments />
+				<MaximumMemory>4096</MaximumMemory>
+				<RandomNumberGenerationType>randomSeed</RandomNumberGenerationType>
+				<CustomGeneratorCode>new Random()</CustomGeneratorCode>
+				<AfterSimulationRunCode>traceln("REP;" + root.resumen());</AfterSimulationRunCode>
+				<SeedValue>1</SeedValue>
+				<SelectionModeForSimultaneousEvents>LIFO</SelectionModeForSimultaneousEvents>
+				<VmArgs />
+				<LoadRootFromSnapshot>false</LoadRootFromSnapshot>
+				<AnalysisData>
+					<HistogramData>
+						<Id>1791260000181</Id>
+						<Name>hdWq</Name>
+						<X>60</X>
+						<Y>190</Y>
+						<Label>
+							<X>15</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<AutoUpdate>true</AutoUpdate>
+						<RecurrenceProperties>
+							<Id>1791260000182</Id>
+							<OccurrenceAtTime>true</OccurrenceAtTime>
+							<OccurrenceDate>1782892800000</OccurrenceDate>
+							<OccurrenceTime Class="CodeUnitValue">
+								<Code>0</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</OccurrenceTime>
+							<RecurrenceCode Class="CodeUnitValue">
+								<Code>1</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</RecurrenceCode>
+						</RecurrenceProperties>
+						<Value />
+						<NumberOfIntervals>10</NumberOfIntervals>
+						<MinMaxAutodetect>true</MinMaxAutodetect>
+						<RangeMinExpression>0</RangeMinExpression>
+						<RangeMaxExpression>1</RangeMaxExpression>
+						<InitialIntervalSize>0.1</InitialIntervalSize>
+						<CalculateCDF>true</CalculateCDF>
+						<CalculatePercentiles>false</CalculatePercentiles>
+						<LowPercent>10</LowPercent>
+						<HighPercent>10</HighPercent>
+						<Title />
+					</HistogramData>
+					<HistogramData>
+						<Id>1791260000165</Id>
+						<Name>hdL</Name>
+						<X>60</X>
+						<Y>230</Y>
+						<Label>
+							<X>15</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<AutoUpdate>true</AutoUpdate>
+						<RecurrenceProperties>
+							<Id>1791260000168</Id>
+							<OccurrenceAtTime>true</OccurrenceAtTime>
+							<OccurrenceDate>1782892800000</OccurrenceDate>
+							<OccurrenceTime Class="CodeUnitValue">
+								<Code>0</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</OccurrenceTime>
+							<RecurrenceCode Class="CodeUnitValue">
+								<Code>1</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</RecurrenceCode>
+						</RecurrenceProperties>
+						<Value />
+						<NumberOfIntervals>10</NumberOfIntervals>
+						<MinMaxAutodetect>true</MinMaxAutodetect>
+						<RangeMinExpression>0</RangeMinExpression>
+						<RangeMaxExpression>1</RangeMaxExpression>
+						<InitialIntervalSize>0.1</InitialIntervalSize>
+						<CalculateCDF>true</CalculateCDF>
+						<CalculatePercentiles>false</CalculatePercentiles>
+						<LowPercent>10</LowPercent>
+						<HighPercent>10</HighPercent>
+						<Title />
+					</HistogramData>
+					<HistogramData>
+						<Id>1791260000179</Id>
+						<Name>hdRho</Name>
+						<X>60</X>
+						<Y>270</Y>
+						<Label>
+							<X>15</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>false</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>true</ShowLabel>
+						<AutoUpdate>true</AutoUpdate>
+						<RecurrenceProperties>
+							<Id>1791260000171</Id>
+							<OccurrenceAtTime>true</OccurrenceAtTime>
+							<OccurrenceDate>1782892800000</OccurrenceDate>
+							<OccurrenceTime Class="CodeUnitValue">
+								<Code>0</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</OccurrenceTime>
+							<RecurrenceCode Class="CodeUnitValue">
+								<Code>1</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</RecurrenceCode>
+						</RecurrenceProperties>
+						<Value />
+						<NumberOfIntervals>10</NumberOfIntervals>
+						<MinMaxAutodetect>true</MinMaxAutodetect>
+						<RangeMinExpression>0</RangeMinExpression>
+						<RangeMaxExpression>1</RangeMaxExpression>
+						<InitialIntervalSize>0.1</InitialIntervalSize>
+						<CalculateCDF>true</CalculateCDF>
+						<CalculatePercentiles>false</CalculatePercentiles>
+						<LowPercent>10</LowPercent>
+						<HighPercent>10</HighPercent>
+						<Title />
+					</HistogramData>
+				</AnalysisData>
+				<Presentation>
+					<Text>
+						<Id>1791260000186</Id>
+						<Name>text</Name>
+						<X>40</X>
+						<Y>30</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Z>0</Z>
+						<Rotation>0.0</Rotation>
+						<Color>-12490271</Color>
+						<Text>RedSubte : Replicas20</Text>
+						<Font>
+							<Name>SansSerif</Name>
+							<Size>24</Size>
+							<Style>0</Style>
+						</Font>
+						<Alignment>LEFT</Alignment>
+					</Text>
+					<Text>
+						<Id>1791260000173</Id>
+						<Name>text1</Name>
+						<X>50</X>
+						<Y>80</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Z>0</Z>
+						<Rotation>0.0</Rotation>
+						<Color>-12171190</Color>
+						<Text>Iteración:</Text>
+						<Font>
+							<Name>SansSerif</Name>
+							<Size>12</Size>
+							<Style>0</Style>
+						</Font>
+						<Alignment>LEFT</Alignment>
+					</Text>
+					<Text>
+						<Id>1791260000183</Id>
+						<Name>text2</Name>
+						<X>240</X>
+						<Y>80</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Z>0</Z>
+						<Rotation>0.0</Rotation>
+						<Color>-12042869</Color>
+						<Text>?</Text>
+						<TextCode>format( getNumberOfCompletedIterations() )</TextCode>
+						<Font>
+							<Name>SansSerif</Name>
+							<Size>12</Size>
+							<Style>0</Style>
+						</Font>
+						<Alignment>RIGHT</Alignment>
+					</Text>
+					<Text>
+						<Id>1791260000170</Id>
+						<Name>text3</Name>
+						<X>50</X>
+						<Y>110</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Z>0</Z>
+						<Rotation>0.0</Rotation>
+						<Color>-12566464</Color>
+						<Text>Parámetros</Text>
+						<Font>
+							<Name>SansSerif</Name>
+							<Size>12</Size>
+							<Style>1</Style>
+						</Font>
+						<Alignment>LEFT</Alignment>
+					</Text>
+					<Line>
+						<Id>1791260000167</Id>
+						<Name>line</Name>
+						<X>40</X>
+						<Y>130</Y>
+						<Label>
+							<X>10</X>
+							<Y>0</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Z>0</Z>
+						<ZHeight>10</ZHeight>
+						<LineWidth>2</LineWidth>
+						<LineColor>-12566464</LineColor>
+						<LineMaterial>null</LineMaterial>
+						<LineStyle>SOLID</LineStyle>
+						<BeginArrowSize>1</BeginArrowSize>
+						<BeginArrowStyle>0</BeginArrowStyle>
+						<EndArrowSize>1</EndArrowSize>
+						<EndArrowStyle>0</EndArrowStyle>
+						<Dx>210</Dx>
+						<Dy>0</Dy>
+						<Dz>0</Dz>
+					</Line>
+					<Histogram>
+						<Id>1791260000172</Id>
+						<Name>chart</Name>
+						<X>50</X>
+						<Y>300</Y>
+						<Label>
+							<X>0</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<AutoUpdate>false</AutoUpdate>
+						<RecurrenceProperties>
+							<Id>1791260000175</Id>
+							<OccurrenceAtTime>true</OccurrenceAtTime>
+							<OccurrenceDate>1782892800000</OccurrenceDate>
+							<OccurrenceTime Class="CodeUnitValue">
+								<Code>0</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</OccurrenceTime>
+							<RecurrenceCode Class="CodeUnitValue">
+								<Code>1</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</RecurrenceCode>
+						</RecurrenceProperties>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Width>260</Width>
+						<Height>210</Height>
+						<BackgroundColor />
+						<BorderColor />
+						<ChartArea>
+							<XOffset>50</XOffset>
+							<YOffset>30</YOffset>
+							<Width>180</Width>
+							<Height>120</Height>
+							<BackgroundColor>-1</BackgroundColor>
+							<BorderColor>-16777216</BorderColor>
+							<GridColor>-12566464</GridColor>
+						</ChartArea>
+						<Legend>
+							<Place>SOUTH</Place>
+							<TextColor>-16777216</TextColor>
+							<Size>30</Size>
+						</Legend>
+						<Labels>
+							<HorLabelsPosition>DEFAULT</HorLabelsPosition>
+							<VerLabelsPosition>DEFAULT</VerLabelsPosition>
+							<TextColor>-12566464</TextColor>
+						</Labels>
+						<ShowLegend>true</ShowLegend>
+						<ShowPDF>true</ShowPDF>
+						<ShowCDF>false</ShowCDF>
+						<ShowMean>false</ShowMean>
+						<Bars>
+							<Direction>UP</Direction>
+							<RelativeWidth>0.8</RelativeWidth>
+						</Bars>
+						<HistogramDataExpression>
+							<Id>1791260000177</Id>
+							<Expression>hdWq</Expression>
+							<ColorPDF>-29696</ColorPDF>
+							<ColorCDF>-6632142</ColorCDF>
+							<ColorLowPercent>-10496</ColorLowPercent>
+							<ColorHighPercent>-8097537</ColorHighPercent>
+							<ColorMean>-9728477</ColorMean>
+							<LineWidth>1</LineWidth>
+							<Title>Title</Title>
+						</HistogramDataExpression>
+					</Histogram>
+					<Histogram>
+						<Id>1791260000178</Id>
+						<Name>chart1</Name>
+						<X>320</X>
+						<Y>300</Y>
+						<Label>
+							<X>0</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<AutoUpdate>false</AutoUpdate>
+						<RecurrenceProperties>
+							<Id>1791260000174</Id>
+							<OccurrenceAtTime>true</OccurrenceAtTime>
+							<OccurrenceDate>1782892800000</OccurrenceDate>
+							<OccurrenceTime Class="CodeUnitValue">
+								<Code>0</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</OccurrenceTime>
+							<RecurrenceCode Class="CodeUnitValue">
+								<Code>1</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</RecurrenceCode>
+						</RecurrenceProperties>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Width>260</Width>
+						<Height>210</Height>
+						<BackgroundColor />
+						<BorderColor />
+						<ChartArea>
+							<XOffset>50</XOffset>
+							<YOffset>30</YOffset>
+							<Width>180</Width>
+							<Height>120</Height>
+							<BackgroundColor>-1</BackgroundColor>
+							<BorderColor>-16777216</BorderColor>
+							<GridColor>-12566464</GridColor>
+						</ChartArea>
+						<Legend>
+							<Place>SOUTH</Place>
+							<TextColor>-16777216</TextColor>
+							<Size>30</Size>
+						</Legend>
+						<Labels>
+							<HorLabelsPosition>DEFAULT</HorLabelsPosition>
+							<VerLabelsPosition>DEFAULT</VerLabelsPosition>
+							<TextColor>-12566464</TextColor>
+						</Labels>
+						<ShowLegend>true</ShowLegend>
+						<ShowPDF>true</ShowPDF>
+						<ShowCDF>false</ShowCDF>
+						<ShowMean>false</ShowMean>
+						<Bars>
+							<Direction>UP</Direction>
+							<RelativeWidth>0.8</RelativeWidth>
+						</Bars>
+						<HistogramDataExpression>
+							<Id>1791260000169</Id>
+							<Expression>hdL</Expression>
+							<ColorPDF>-6632142</ColorPDF>
+							<ColorCDF>-10496</ColorCDF>
+							<ColorLowPercent>-2354116</ColorLowPercent>
+							<ColorHighPercent>-2987746</ColorHighPercent>
+							<ColorMean>-29696</ColorMean>
+							<LineWidth>1</LineWidth>
+							<Title>Title</Title>
+						</HistogramDataExpression>
+					</Histogram>
+					<Text>
+						<Id>1791260000180</Id>
+						<Name>text4</Name>
+						<X>60</X>
+						<Y>520</Y>
+						<Label>
+							<X>0</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D</DrawMode>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Z>0</Z>
+						<Rotation>0.0</Rotation>
+						<Color>-16777216</Color>
+						<Text>text</Text>
+						<TextCode>"Wq = " + hdWq.mean() + "   |   L = " + hdL.mean() + "   |   ρ = " + hdRho.mean()</TextCode>
+						<Font>
+							<Name>SansSerif</Name>
+							<Size>10</Size>
+							<Style>0</Style>
+						</Font>
+						<Alignment>LEFT</Alignment>
+					</Text>
+					<Histogram>
+						<Id>1791260000184</Id>
+						<Name>chart2</Name>
+						<X>600</X>
+						<Y>300</Y>
+						<Label>
+							<X>0</X>
+							<Y>-10</Y>
+						</Label>
+						<PublicFlag>true</PublicFlag>
+						<PresentationFlag>true</PresentationFlag>
+						<ShowLabel>false</ShowLabel>
+						<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+						<AutoUpdate>false</AutoUpdate>
+						<RecurrenceProperties>
+							<Id>1791260000176</Id>
+							<OccurrenceAtTime>true</OccurrenceAtTime>
+							<OccurrenceDate>1782892800000</OccurrenceDate>
+							<OccurrenceTime Class="CodeUnitValue">
+								<Code>0</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</OccurrenceTime>
+							<RecurrenceCode Class="CodeUnitValue">
+								<Code>1</Code>
+								<Unit Class="TimeUnits">SECOND</Unit>
+							</RecurrenceCode>
+						</RecurrenceProperties>
+						<EmbeddedIcon>false</EmbeddedIcon>
+						<Width>260</Width>
+						<Height>210</Height>
+						<BackgroundColor />
+						<BorderColor />
+						<ChartArea>
+							<XOffset>50</XOffset>
+							<YOffset>30</YOffset>
+							<Width>180</Width>
+							<Height>120</Height>
+							<BackgroundColor>-1</BackgroundColor>
+							<BorderColor>-16777216</BorderColor>
+							<GridColor>-12566464</GridColor>
+						</ChartArea>
+						<Legend>
+							<Place>SOUTH</Place>
+							<TextColor>-16777216</TextColor>
+							<Size>30</Size>
+						</Legend>
+						<Labels>
+							<HorLabelsPosition>DEFAULT</HorLabelsPosition>
+							<VerLabelsPosition>DEFAULT</VerLabelsPosition>
+							<TextColor>-12566464</TextColor>
+						</Labels>
+						<ShowLegend>true</ShowLegend>
+						<ShowPDF>true</ShowPDF>
+						<ShowCDF>false</ShowCDF>
+						<ShowMean>false</ShowMean>
+						<Bars>
+							<Direction>UP</Direction>
+							<RelativeWidth>0.8</RelativeWidth>
+						</Bars>
+						<HistogramDataExpression>
+							<Id>1791260000185</Id>
+							<Expression>hdRho</Expression>
+							<ColorPDF>-12799119</ColorPDF>
+							<ColorCDF>-13447886</ColorCDF>
+							<ColorLowPercent>-12004916</ColorLowPercent>
+							<ColorHighPercent>-6632142</ColorHighPercent>
+							<ColorMean>-4565549</ColorMean>
+							<LineWidth>1</LineWidth>
+							<Title>Title</Title>
+						</HistogramDataExpression>
+					</Histogram>
+				</Presentation>
+				<AllowParallelEvaluations>false</AllowParallelEvaluations>
+				<UseFreeformParameters>true</UseFreeformParameters>
+				<NumberOfRuns>20</NumberOfRuns>
+				<ModelTimeProperties>
+					<StopOption>Stop at specified time</StopOption>
+					<InitialDate>1782777600000</InitialDate>
+					<InitialTime>18000.0</InitialTime>
+					<FinalDate>1782807600000</FinalDate>
+					<FinalTime>86400.0</FinalTime>
+				</ModelTimeProperties>
+				<PresentationProperties>
+					<EnableZoomAndPanning>true</EnableZoomAndPanning>
+					<Title>RedSubte : Replicas20</Title>
+					<EnableDeveloperPanel>true</EnableDeveloperPanel>
+					<ShowDeveloperPanelOnStart>false</ShowDeveloperPanelOnStart>
+				</PresentationProperties>
+				<ReplicationsProperties>
+					<UseReplication>false</UseReplication>
+					<FixedReplicationsNumber>true</FixedReplicationsNumber>
+					<ReplicationPerIteration>10</ReplicationPerIteration>
+					<MinimumReplication>2</MinimumReplication>
+					<MaximumReplication>10</MaximumReplication>
+					<ConfidenceLevel>LEVEL_80</ConfidenceLevel>
+					<ErrorPercent>0.5</ErrorPercent>
+					<ExpressionForConfidenceComputation>0</ExpressionForConfidenceComputation>
+				</ReplicationsProperties>
+			</ParamVariationExperiment>
+		</Experiments>
+		<ModelResources>
+			<Resource>
+				<Id>1791253893380</Id>
+				<Path>../../biblioteca/subte.jar</Path>
+				<ReferencedFromUserCode>false</ReferencedFromUserCode>
+				<Location>FILE_SYSTEM</Location>
+			</Resource>
+		</ModelResources>
+		<RequiredLibraryReference>
+			<LibraryName>com.anylogic.libraries.modules.markup_descriptors</LibraryName>
+			<VersionMajor>1</VersionMajor>
+			<VersionMinor>0</VersionMinor>
+			<VersionBuild>0</VersionBuild>
+		</RequiredLibraryReference>
+		<RequiredLibraryReference>
+			<LibraryName>com.anylogic.libraries.processmodeling</LibraryName>
+			<VersionMajor>8</VersionMajor>
+			<VersionMinor>0</VersionMinor>
+			<VersionBuild>5</VersionBuild>
+		</RequiredLibraryReference>
+		<ClassPathEntry>
+			<ResourceReference>
+				<PackageName>redsubte</PackageName>
+				<ClassName>../../biblioteca/subte.jar</ClassName>
+			</ResourceReference>
+			<Imported>false</Imported>
+			<Folder>false</Folder>
+		</ClassPathEntry>
+	</Model>
+	<ConvertersApplied>
+		<Uuid>9f7858c9-b2c8-4ead-9244-fd08833f642b</Uuid>
+		<Uuid>404652e6-561a-404c-aab2-ab7415f40ef5</Uuid>
+		<Uuid>6fd6cd57-6dfe-4fc6-be0b-c74065351957</Uuid>
+		<Uuid>3325dc48-3ad4-41e3-836f-dfd0e98fe1ed</Uuid>
+		<Uuid>bb27038a-0f3a-48bb-b235-4a44066a14aa</Uuid>
+		<Uuid>3f69ef3d-706e-41a6-8af0-11658c5eef68</Uuid>
+		<Uuid>3f6fe405-e047-4304-91d6-6eee206d1106</Uuid>
+		<Uuid>820d2b51-5b4a-48e7-b0b6-e46418e3c0f2</Uuid>
+		<Uuid>630818fa-8975-4b70-976f-03180dce01db</Uuid>
+		<Uuid>7c7e471c-004e-495e-a4ad-d840620ab38e</Uuid>
+		<Uuid>3e38ff63-1f70-4ec0-b42c-e879b146785d</Uuid>
+		<Uuid>b1eb86e4-14b3-405c-8257-56b80f1b485d</Uuid>
+		<Uuid>d55f9fb6-86bb-45ea-9db1-79cecfa0ce91</Uuid>
+		<Uuid>ab77aafd-8f02-4354-b789-928d45b1f73c</Uuid>
+		<Uuid>e4f14fd7-1c4a-42e9-b91d-db2415f475db</Uuid>
+		<Uuid>6d208120-6c7a-45a6-b411-402f18890d9b</Uuid>
+		<Uuid>1816cdd0-177c-4973-9e88-dd8b95318556</Uuid>
+		<Uuid>5c23f62f-06dc-46ad-8ead-688ec434e3e5</Uuid>
+		<Uuid>5c7d7990-3f35-41eb-ae16-d0c16098acc6</Uuid>
+		<Uuid>02a16c52-a834-4f30-b6af-a6aee51a294e</Uuid>
+		<Uuid>f0988929-2718-4984-a1b6-c1f2ce152f1f</Uuid>
+		<Uuid>1c9d9cfe-ea2b-43f9-8f62-dc31d8ed3ae1</Uuid>
+		<Uuid>34cb742a-8ba4-47a7-87e6-f2685fe69e97</Uuid>
+		<Uuid>4fe10751-c399-4752-94b7-30113ad45070</Uuid>
+		<Uuid>c13fe5ac-6466-446e-886a-12df1431b1eb</Uuid>
+		<Uuid>714f9ca2-426e-4bff-8569-2d18f58fdcf8</Uuid>
+		<Uuid>045aeb5f-1087-4ac7-9702-a49404e7f7e8</Uuid>
+		<Uuid>840e9a0a-de98-4b7d-a172-f9bbda2d6b98</Uuid>
+		<Uuid>e342358b-75ed-4812-9376-6043fb6cb473</Uuid>
+		<Uuid>f3d5ccdc-1bb3-466f-871d-f6b92a26cbb4</Uuid>
+		<Uuid>59acb6fb-561c-4038-b722-a596a748b3c7</Uuid>
+		<Uuid>be7e6726-05c0-4228-821d-a8df91aeb5bc</Uuid>
+		<Uuid>df4a6a60-9ce8-4c6c-91c0-ad5a5d732259</Uuid>
+		<Uuid>47491eb9-4606-42bd-8399-125a2b95fded</Uuid>
+		<Uuid>9b2d1306-5d19-439a-8f2c-b144dd7e22fa</Uuid>
+		<Uuid>ef421152-8732-4f97-9acb-c8e9a6890d5e</Uuid>
+		<Uuid>d48f8080-25b1-44f5-8322-7bf2712ff974</Uuid>
+		<Uuid>6c4de826-daad-4cd4-b703-51dfe803e822</Uuid>
+		<Uuid>01af22d6-6889-4e98-a3df-e6eddc40fc92</Uuid>
+		<Uuid>ea3b3dbe-cca2-4bde-957b-feaef7e18789</Uuid>
+		<Uuid>e737c8c6-b526-4f88-b89e-554e205b0614</Uuid>
+		<Uuid>efd24e87-d7f7-425f-9cb0-3ee17c7b2116</Uuid>
+		<Uuid>a62607e6-047e-4910-a1ec-5426bf9283b5</Uuid>
+		<Uuid>64dceb5b-de05-47c7-8e40-e9b293e80d75</Uuid>
+		<Uuid>8d51c652-6aee-4de8-ba03-47b289a13ec5</Uuid>
+		<Uuid>51d7b5ce-5664-4750-b1a0-fabcdc31e49a</Uuid>
+		<Uuid>6522e3af-aa9e-421c-b667-e11db73cd8ca</Uuid>
+		<Uuid>9ac073a0-7abf-4dff-826f-9c44d4780590</Uuid>
+		<Uuid>2da9c21c-adc7-405a-a36e-46fbd9dfcd42</Uuid>
+		<Uuid>fe4d1053-9c84-4221-bac7-cb489a7064ff</Uuid>
+		<Uuid>1f005f88-e6d7-4bdc-81fa-3acf4c89cf64</Uuid>
+		<Uuid>42dc5a7c-d7b1-4653-92b9-9359b46cc2d4</Uuid>
+		<Uuid>e25721a9-34f9-479c-a4c3-31f5ec9e117d</Uuid>
+		<Uuid>506d1de3-06df-4131-9e88-e43f1768e3d8</Uuid>
+		<Uuid>e6625695-25a2-43d0-9056-1e9a1a594b1e</Uuid>
+		<Uuid>91990287-4edf-4e38-aa6c-66d0e906807b</Uuid>
+		<Uuid>2216cdd0-177c-5678-9e88-dd8b95312234</Uuid>
+		<Uuid>1737c8c6-b526-4dd8-589e-ee4e205b06f4</Uuid>
+		<Uuid>6a43bef6-8b70-4253-a828-82c3ab399655</Uuid>
+		<Uuid>0a27038a-0f3a-48bb-b235-4a44066a1402</Uuid>
+		<Uuid>0a9ec2c3-5e18-4c0a-a183-fd86d9d9a08b</Uuid>
+		<Uuid>2216cdd0-177c-5678-9e88-dd8b95313334</Uuid>
+		<Uuid>2216cdd0-177c-5678-9e88-dd8b95313335</Uuid>
+		<Uuid>5b8ebeed-6b58-4c3a-8d5f-0958b1a90ce6</Uuid>
+	</ConvertersApplied>
+</AnyLogicWorkspace>

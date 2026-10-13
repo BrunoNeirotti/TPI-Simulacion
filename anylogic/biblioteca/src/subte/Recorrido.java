@@ -25,6 +25,7 @@ public final class Recorrido {
         this.sentido = sentido;
         this.nodos = nodos;
         this.tramo = tramo;
+        this.detencion = linea.equals("F") ? 30.0 : 24.0;
         for (int i = 0; i < nodos.length; i++) {
             indice.put(nodos[i], i);
         }

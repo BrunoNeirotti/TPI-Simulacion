@@ -106,6 +106,11 @@ public final class Red {
         return r;
     }
 
+    /** Claves "de>a" de todos los transbordos y su tiempo (para dibujar la red). */
+    public Map<String, Double> transbordos() {
+        return java.util.Collections.unmodifiableMap(transbordo);
+    }
+
     /** Tiempo de caminata del transbordo de un nodo a otro, o NaN si no existe. */
     public double transbordo(String de, String a) {
         Double t = transbordo.get(de + ">" + a);

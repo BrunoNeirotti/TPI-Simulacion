@@ -43,6 +43,24 @@ public final class Anden<T> {
         return suben;
     }
 
+    /**
+     * Pasa revista a los que quedaron esperando despues de partir una formacion: a cada uno
+     * se le consulta {@code seVa}, que puede llevar la cuenta de trenes perdidos; los que
+     * responden verdadero salen del anden y se devuelven (sensibilidad de la regla de D12).
+     */
+    public List<T> revista(java.util.function.Predicate<T> seVa) {
+        List<T> fuera = new ArrayList<>();
+        java.util.Iterator<T> it = cola.iterator();
+        while (it.hasNext()) {
+            T p = it.next();
+            if (seVa.test(p)) {
+                it.remove();
+                fuera.add(p);
+            }
+        }
+        return fuera;
+    }
+
     public int esperando() {
         return cola.size();
     }

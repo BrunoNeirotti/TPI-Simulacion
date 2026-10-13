@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.PriorityQueue;
 import java.util.Random;
 
@@ -15,9 +16,11 @@ import subte.Anden;
 import subte.Carga;
 import subte.Datos;
 import subte.Demanda;
+import subte.Detencion;
 import subte.Oferta;
 import subte.Recorrido;
 import subte.Ruta;
+import subte.Tramos;
 
 /**
  * Simulador de referencia del modelo base, en Java plano, sin AnyLogic.
@@ -81,6 +84,7 @@ public final class SimuladorReferencia {
         double tLlegoAnden;
         double tEspera;
         int ascensos;
+        int perdidos;      // formaciones que partieron sin poder subir (regla "abandona")
 
         Ruta.Etapa etapaActual() {
             return ruta.etapas[etapa];
@@ -102,7 +106,15 @@ public final class SimuladorReferencia {
     private final String soloLinea;
     private final Random rng;
     private final Map<String, Anden<Pasajero>> andenes;
+    private final Detencion detencion;   // null = detencion fija (piso oficial)
+    private final Tramos tramos;
+    long retenciones;
+    double segundosRetenidos, sumaDetencion;
+    long paradas;
 
+    /** Regla del pasajero que no aborda: "espera" (D12), "ilimitada" o "abandonaK" (sale tras K trenes perdidos). */
+    static String REGLA = "espera";
+    long abandonaron;
     long ingresados, arribados, descartados, caminando, aBordo;
     long vivos, maxVivos, formacionesVivas, maxFormaciones;
     double sumaViaje, sumaEspera;
@@ -116,8 +128,17 @@ public final class SimuladorReferencia {
     final Map<String, double[]> cargaSaliente = new HashMap<>();
     final Map<String, double[]> trenesSalientes = new HashMap<>();
     final Map<String, Integer> maxOcupacion = new HashMap<>();
+    // ascensos por nodo y hora de la formacion que parte; y los que son de transbordo (etapa > 0)
+    final Map<String, double[]> ascensosNodo = new HashMap<>();
+    final Map<String, double[]> ascensosTransbordoNodo = new HashMap<>();
 
     SimuladorReferencia(Datos datos, String soloLinea, long semilla) {
+        this(datos, soloLinea, semilla, null, false);
+    }
+
+    SimuladorReferencia(Datos datos, String soloLinea, long semilla, Detencion detencion, boolean separacion) {
+        this.detencion = detencion;
+        this.tramos = new Tramos(separacion);
         this.datos = datos;
         this.soloLinea = soloLinea;
         this.rng = new Random(semilla);
@@ -206,7 +227,7 @@ public final class SimuladorReferencia {
         f.recorrido = c.recorrido;
         f.indice = desde;
         f.recienSale = true;
-        f.carga = new Carga<>(c.recorrido.largo(), Datos.capacidad(c.linea));
+        f.carga = new Carga<>(c.recorrido.largo(), REGLA.equals("ilimitada") ? 1_000_000 : Datos.capacidad(c.linea));
         formacionesVivas++;
         maxFormaciones = Math.max(maxFormaciones, formacionesVivas);
         llegaEstacion(f);
@@ -252,12 +273,40 @@ public final class SimuladorReferencia {
 
     private void llegaEstacion(Formacion f) {
         // bajan los que llegaron a su estacion
+        int bajan = 0;
         for (Pasajero p : f.carga.bajar(f.indice)) {
             baja(p);
+            bajan++;
         }
         boolean ultima = f.indice == f.recorrido.largo() - 1;
-        double detencion = (f.recienSale || ultima) ? 0 : f.recorrido.detencion;
-        programar(ahora + detencion, () -> parte(f));
+        double dwell = 0;
+        if (!f.recienSale && !ultima) {
+            dwell = f.recorrido.detencion;
+            if (detencion != null) {
+                // suben, estimados con los que esperan al llegar (D13)
+                Anden<Pasajero> anden = andenes.get(Datos.claveAnden(f.recorrido, f.indice));
+                int suben = Math.min(anden.esperando(), f.carga.lugares());
+                dwell = detencion.segundos(f.recorrido.detencion, f.recorrido.linea,
+                        Datos.COCHES.get(f.recorrido.linea), bajan, suben);
+            }
+            sumaDetencion += dwell;
+            paradas++;
+        }
+        programar(ahora + dwell, () -> separa(f));
+    }
+
+    /** Fin de la detencion: espera, si hace falta, a que el tramo siguiente este libre (D15). */
+    private void separa(Formacion f) {
+        if (f.indice == f.recorrido.largo() - 1) {
+            parte(f);
+            return;
+        }
+        double salida = tramos.reservar(f.recorrido, f.indice, ahora);
+        if (salida > ahora) {
+            programar(salida, () -> parte(f));
+        } else {
+            parte(f);
+        }
     }
 
     private void parte(Formacion f) {
@@ -276,6 +325,19 @@ public final class SimuladorReferencia {
             p.tEspera += ahora - p.tLlegoAnden;
             p.ascensos++;
             aBordo++;
+            String nodo = f.recorrido.nodos[f.indice];
+            int hh = Math.min(23, (int) (ahora / 3600));
+            ascensosNodo.computeIfAbsent(nodo, k -> new double[24])[hh]++;
+            if (p.etapa > 0) {
+                ascensosTransbordoNodo.computeIfAbsent(nodo, k -> new double[24])[hh]++;
+            }
+        }
+        if (REGLA.startsWith("abandona")) {
+            int k = Integer.parseInt(REGLA.substring("abandona".length()));
+            for (Pasajero q : anden.revista(p -> ++p.perdidos >= k)) {
+                abandonaron++;
+                vivos--;
+            }
         }
         registrarCarga(f);
         double viaje = f.recorrido.tramo[f.indice];
@@ -305,13 +367,21 @@ public final class SimuladorReferencia {
     // Programa
     // ------------------------------------------------------------------------
 
+    /** Detencion con los tiempos por pasajero multiplicados por k (sensibilidad de D13). */
+    private static Detencion escalar(Detencion d, double k) {
+        return new Detencion(d.tBaja * k, d.tSube * k, d.apertura, d.canalesPorPuerta);
+    }
+
     public static void main(String[] args) throws IOException {
         Map<String, String> op = new HashMap<>(Map.of(
                 "--datos", "../../data/processed", "--salida", "", "--replicas", "10",
-                "--semilla", "1", "--solo", "", "--oferta", "", "--prefijo", "referencia"));
+                "--semilla", "1", "--solo", "", "--oferta", "", "--prefijo", "referencia",
+                "--detencion", "fija", "--separacion", "contar", "--detencion-escala", "1"));
+        op.put("--regla", "espera");
         for (int i = 0; i + 1 < args.length; i += 2) {
             op.put(args[i], args[i + 1]);
         }
+        REGLA = op.get("--regla");
         Path carpetaDatos = Path.of(op.get("--datos"));
         Datos datos = op.get("--oferta").isEmpty() ? Datos.leer(carpetaDatos)
                 : Datos.leer(carpetaDatos, Path.of(op.get("--oferta")));
@@ -323,33 +393,39 @@ public final class SimuladorReferencia {
         List<String> resumen = new ArrayList<>();
         resumen.add("replica,semilla,ingresados,arribados,en_andenes,a_bordo,caminando,descartados,"
                 + "conservacion,viaje_medio_s,espera_media_s,ascensos_por_viaje,ascensos_por_viaje_hpm,"
-                + "ascensos_por_viaje_hpt,max_vivos,max_formaciones,quedaron_abajo,segundos_de_computo");
+                + "ascensos_por_viaje_hpt,max_vivos,max_formaciones,quedaron_abajo,segundos_de_computo,"
+                + "retenciones,segundos_retenidos,detencion_media_s,abandonaron");
         Map<String, double[]> cargaSum = new HashMap<>(), carga2 = new HashMap<>(), trenesSum = new HashMap<>();
         Map<String, Integer> maxOcup = new HashMap<>();
         Map<String, Long> maxAnden = new HashMap<>(), abajo = new HashMap<>();
+        Map<String, double[]> ascSum = new TreeMap<>(), ascTrSum = new TreeMap<>();
         double[] esperaH = new double[24], viajeH = new double[24], ascH = new double[24], arrH = new double[24];
 
         for (int r = 0; r < replicas; r++) {
             long s = semilla + r;
             long t0 = System.nanoTime();
-            SimuladorReferencia sim = new SimuladorReferencia(datos, solo, s);
+            SimuladorReferencia sim = new SimuladorReferencia(datos, solo, s,
+                    op.get("--detencion").equals("endogena") ? escalar(Detencion.porDefecto(), Double.parseDouble(op.get("--detencion-escala"))) : null,
+                    op.get("--separacion").equals("aplicar"));
             sim.correr();
             double seg = (System.nanoTime() - t0) / 1e9;
             long enAnd = sim.enAndenes();
-            boolean ok = sim.ingresados == sim.arribados + enAnd + sim.aBordo + sim.caminando;
+            boolean ok = sim.ingresados == sim.arribados + enAnd + sim.aBordo + sim.caminando + sim.abandonaron;
             long quedaron = 0;
             for (Map.Entry<String, Anden<Pasajero>> e : sim.andenes.entrySet()) {
                 quedaron += e.getValue().quedaronAbajo();
                 maxAnden.merge(e.getKey(), (long) e.getValue().maximo(), Math::max);
                 abajo.merge(e.getKey(), e.getValue().quedaronAbajo(), Long::sum);
             }
-            resumen.add(String.format(Locale.ROOT, "%d,%d,%d,%d,%d,%d,%d,%d,%s,%.1f,%.1f,%.4f,%.4f,%.4f,%d,%d,%d,%.1f",
+            resumen.add(String.format(Locale.ROOT, "%d,%d,%d,%d,%d,%d,%d,%d,%s,%.1f,%.1f,%.4f,%.4f,%.4f,%d,%d,%d,%.1f,%d,%.1f,%.2f,%d",
                     r + 1, s, sim.ingresados, sim.arribados, enAnd, sim.aBordo, sim.caminando, sim.descartados,
                     ok ? "OK" : "FALLA", sim.sumaViaje / sim.arribados, sim.sumaEspera / sim.arribados,
                     (double) sim.sumaAscensos / sim.arribados,
                     (double) sim.ascensosHora[8] / sim.arribadosHora[8],
                     (double) sim.ascensosHora[17] / sim.arribadosHora[17],
-                    sim.maxVivos, sim.maxFormaciones, quedaron, seg));
+                    sim.maxVivos, sim.maxFormaciones, quedaron, seg,
+                    sim.tramos.retenciones, sim.tramos.segundosRetenidos,
+                    sim.paradas == 0 ? 0 : sim.sumaDetencion / sim.paradas, sim.abandonaron));
             System.out.println(resumen.get(resumen.size() - 1));
             for (Map.Entry<String, double[]> e : sim.cargaSaliente.entrySet()) {
                 double[] a = cargaSum.computeIfAbsent(e.getKey(), x -> new double[24]);
@@ -363,6 +439,14 @@ public final class SimuladorReferencia {
                 }
             }
             sim.maxOcupacion.forEach((k, v) -> maxOcup.merge(k, v, Math::max));
+            sim.ascensosNodo.forEach((k, v) -> {
+                double[] a = ascSum.computeIfAbsent(k, x -> new double[24]);
+                for (int h = 0; h < 24; h++) a[h] += v[h];
+            });
+            sim.ascensosTransbordoNodo.forEach((k, v) -> {
+                double[] a = ascTrSum.computeIfAbsent(k, x -> new double[24]);
+                for (int h = 0; h < 24; h++) a[h] += v[h];
+            });
             for (int h = 0; h < 24; h++) {
                 esperaH[h] += sim.esperaHora[h];
                 viajeH[h] += sim.viajeHora[h];
@@ -407,6 +491,16 @@ public final class SimuladorReferencia {
                 }
                 w.println(String.format(Locale.ROOT, "%d,%.1f,%.1f,%.1f,%.4f", h, arrH[h] / replicas,
                         viajeH[h] / arrH[h], esperaH[h] / arrH[h], ascH[h] / arrH[h]));
+            }
+        }
+        try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(salida.resolve(prefijo + "_ascensos.csv")))) {
+            w.println("nodo,hora,ascensos_media,ascensos_transbordo_media");
+            for (Map.Entry<String, double[]> e : ascSum.entrySet()) {
+                double[] tr = ascTrSum.getOrDefault(e.getKey(), new double[24]);
+                for (int h = 5; h < 24; h++) {
+                    w.println(String.format(Locale.ROOT, "%s,%d,%.2f,%.2f", e.getKey(), h,
+                            e.getValue()[h] / replicas, tr[h] / replicas));
+                }
             }
         }
         System.out.println("Salidas en " + salida.toAbsolutePath());

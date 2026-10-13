@@ -15,7 +15,7 @@ public final class Datos {
 
     /** Coches por formacion, medianas medidas (reports/05_despachos.md, seccion 6). */
     public static final Map<String, Integer> COCHES = Map.of(
-            "A", 5, "B", 6, "C", 5, "D", 6, "E", 5, "H", 6);
+            "A", 5, "B", 6, "C", 5, "D", 6, "E", 5, "H", 6, "F", 6);
 
     public final Red red;
     public final Map<String, Ruta> rutas;

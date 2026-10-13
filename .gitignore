@@ -9,6 +9,7 @@ data/*
 # Unica salida derivada que no entra: 66 MB de etapas individuales. Se regenera
 # corriendo src/06_matriz_od.py.
 data/processed/etapas_subte.csv
+data/processed/variantes/*/etapas_subte.csv
 
 # ---------------------------------------------------------------------------
 # Documentacion oficial: se versiona, salvo lo que no entra en GitHub
@@ -85,3 +86,24 @@ anylogic/**/export/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Escenario con Linea F: se regenera con anylogic/biblioteca/referencia/correr_f.sh
+data/processed/escenario_f/oferta_I*/
+# Excepcion: la oferta del escenario que se muestra (RedSubte_redF100_mapa la lee al arrancar).
+!data/processed/escenario_f/oferta_I100/
+data/processed/escenario_f/ref_*.csv
+data/processed/escenario_f/v20_*.csv
+
+# ---------------------------------------------------------------------------
+# Submodelo peatonal de Constitucion (07/10/2026)
+# ---------------------------------------------------------------------------
+# PDF y DWG extraidos de BA Obras (~190 MB): se bajan del portal (ver docs/planos-constitucion-linea-f.md).
+docs/Documentos-BA-Obras/15ta-tanda-constitucion/
+docs/Documentos-BA-Obras/centro-trasbordo-constitucion-10241-0002-LPU26/
+# Versiones anteriores del generador y copias de las imagenes de fondo en cada carpeta de modelo (se regeneran).
+anylogic/peatonal/*.bak
+anylogic/peatonal/ConstitucionF*/*.png
+# Copias de los objetos 3D de la paleta de AnyLogic (se copian al generar con --tres-d).
+anylogic/peatonal/ConstitucionF*/3d/
+# Excepcion: el modelo que se muestra lleva sus .dae para abrirse en cualquier maquina.
+!anylogic/peatonal/ConstitucionF_3D/3d/

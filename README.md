@@ -9,6 +9,12 @@ Trabajo Práctico Integrador de la materia Simulación, UTN Facultad Regional Ro
 Título del trabajo: *Evaluación mediante simulación del impacto de la Línea F sobre la
 operación de la red de Subte de Buenos Aires*.
 
+> **Rama `entrega` (13/10/2026):** esta rama publica solo lo necesario para **abrir y correr los tres modelos de AnyLogic**
+> que se muestran (tabla de «Para ver el modelo funcionar», más abajo): los `.alp`, la biblioteca `subte.jar` con su
+> código fuente, los CSV que leen y los objetos 3D. El resto de lo que describe este README (pipeline completo, reportes 14 a 23,
+> decisiones D13 en adelante, submodelo peatonal con sus réplicas, informe) está en el repositorio de trabajo y se publica
+> en `main` cuando el grupo lo decida; los enlaces a esos archivos no funcionan en esta rama.
+
 ---
 
 ## Qué hay acá
@@ -22,8 +28,14 @@ Casi nada de lo que hace falta para eso estaba publicado en forma usable, así q
 parte del repositorio es el registro de cómo se consiguió cada cosa y qué problemas tiene
 cada fuente:
 
-- Un pipeline de datos de once pasos que va de los datasets crudos a los cinco archivos
-  que consume el modelo.
+- Un pipeline de datos que va de los datasets crudos a los archivos que consume el
+  modelo, con un reporte por paso.
+- El modelo de la red en AnyLogic, generado por script, y un simulador de referencia en
+  Java con la misma lógica que lo verifica.
+- El escenario con la Línea F y sus resultados: con la F el viaje medio de la red baja un
+  4 % y la carga máxima de la Línea C cae a la mitad.
+- Un submodelo peatonal de la estación Constitución de la Línea F, construido sobre los
+  planos oficiales, con sus tiempos de acceso al andén y de salida en hora pico.
 - La documentación oficial del proyecto Línea F: el expediente de evaluación ambiental,
   el pliego de licitación y las respuestas a los pedidos por Ley 104. Los juntamos acá
   porque los portales de origen ya dieron de baja recursos sin avisar.
@@ -39,16 +51,52 @@ tomamos y el plan de trabajo. Si lo que se busca es armar el modelo, el archivo 
 
 ---
 
+## Por dónde empezar
+
+El repositorio tiene el trabajo entero: datos, modelo, resultados y documentación oficial. Para entenderlo no hace falta
+abrir todo. En este orden:
+
+1. **Este README** (qué hay y cómo está organizado).
+2. [`docs/contexto-del-proyecto.md`](docs/contexto-del-proyecto.md): el proyecto, las fuentes y sus problemas, las cifras
+   oficiales y el plan. Es el documento que resume todo lo demás.
+3. [`decisiones.md`](decisiones.md): las 34 decisiones metodológicas (D1 a D34), cada una con fecha, opciones, evidencia
+   y consecuencias. Es la fundamentación de cada supuesto del modelo.
+4. Los resultados: [`reports/20_indicadores_finales.md`](reports/20_indicadores_finales.md) (la red con y sin la Línea F),
+   [`reports/21_escenarios_por_intervalo.md`](reports/21_escenarios_por_intervalo.md) (intervalo de la F) y
+   [`reports/23_submodelo_constitucion_resultados.md`](reports/23_submodelo_constitucion_resultados.md), última sección
+   (la estación Constitución).
+5. [`docs/inventario-archivos.md`](docs/inventario-archivos.md): qué es cada archivo, cuáles se presentan y cuáles son
+   solo historia del camino.
+
+**Para ver el modelo funcionar** hace falta AnyLogic 8.9 Personal Learning Edition. Se abren estos tres `.alp` y se
+corren con el botón de ejecutar; no hay que construir nada:
+
+| Modelo | Archivo | Qué se ve |
+|---|---|---|
+| Red con la Línea F | `anylogic/modelo/RedSubte_redF100_mapa/RedSubte.alp` | Mapa de la red con trenes, estaciones, carga por tramo, comparación con la red actual y ficha por estación al hacer clic |
+| Red actual | `anylogic/modelo/RedSubte_base_mapa/RedSubte.alp` | Lo mismo, sin la F |
+| Estación Constitución de la F | `anylogic/peatonal/ConstitucionF_3D/ConstitucionF_3D.alp` | Hora pico de la mañana en 3D: andén, entrepiso, vestíbulo, trenes, vínculo con la C; botones de cámara y de niveles arriba de la ventana |
+
+Los modelos que produjeron las cifras (`RedSubte_red`, `RedSubte_redF100` y los siete `ConstitucionF_rep_*`) corren el
+experimento de réplicas e imprimen una línea por corrida; no tienen animación.
+
+---
+
 ## Estado
+
+Al 09/10/2026.
 
 | Bloque | Estado |
 |---|---|
 | Propuesta escrita | Cerrada |
-| Pipeline de datos (pasos 1 a 6, 9 a 11) | Cerrado |
-| Insumos que consume el modelo | Generados y verificados |
+| Pipeline de datos (pasos 1 a 6, 9 a 12) | Cerrado |
 | Límites de AnyLogic PLE | Medidos |
-| Especificación del modelo (control de avance, Etapa 1/2) | Redactada, a revisar por el grupo antes de entregar |
-| Modelo en AnyLogic (pasos 7 y 8) | Pendiente |
+| Simulador de referencia (paso 13) | Hecho |
+| Modelo de la red en AnyLogic (paso 7) | Hecho y verificado |
+| Escenario con la Línea F (paso 8) | Hecho |
+| Submodelo peatonal de Constitución | Hecho, campaña definitiva corrida (D32–D34) |
+| Capa visual para la presentación | Hecha: mapa de la red con tres modos y estación 3D |
+| Informe final | Escrito (`docs/informe-final.tex`, 15 páginas); falta la revisión del grupo |
 
 ---
 
@@ -61,11 +109,14 @@ reports/      Resultado de cada paso, con sus verificaciones. Un archivo por pas
               generado por el script correspondiente.
 docs/         Propuesta en LaTeX, contexto del proyecto, fichas de análisis y
               documentación oficial.
-anylogic/     Modelos de AnyLogic. Por ahora, las pruebas de límites de la licencia.
+anylogic/     Modelos de AnyLogic: biblioteca Java del modelo, modelo de la red (generado
+              por script), submodelo peatonal de Constitución y pruebas de límites.
 data/         No se versiona entero. Ver "Datos" más abajo.
 ```
 
 Los documentos de `docs/` que conviene conocer:
+
+- [`docs/inventario-archivos.md`](docs/inventario-archivos.md): qué es cada archivo del repositorio, cuáles se presentan y defienden (lista corta en su sección 1) y cuáles sobran.
 
 | Archivo | Qué es |
 |---|---|
@@ -77,9 +128,11 @@ Los documentos de `docs/` que conviene conocer:
 | `pruebas-anylogic-topes.md` | Las cuatro pruebas de límites de AnyLogic y qué salió de cada una |
 | `respuestas-oficiales/` | Los informes oficiales que recibimos, con su ficha de análisis |
 | `definitivo-main.tex` | La propuesta |
-| `especificacion-modelo.tex` / `.pdf` | Especificación del modelo conceptual, entrega de control de avance (Etapa 1/2) |
-| `figuras/` | Figuras de la propuesta y diagramas del modelo (incluye la fuente editable de cada diagrama) |
-| `historico/` | Versiones superadas de la propuesta y entregas puntuales ya presentadas; no son documentos vigentes |
+| `informe-final.tex`, `.pdf` | El informe final del TPI |
+| `figuras/` | Figuras de la propuesta y el diagrama conceptual del modelo |
+| `planos-constitucion-linea-f.md`, `constitucion-inventario-peatonal.md` | Planos oficiales de la estación Constitución de la F y lo que se midió en ellos |
+| `decisiones-grupo-peatonal.md` | Los supuestos del submodelo peatonal, con opciones, evidencia y lo que decidió el grupo |
+| `historico/` | Entregas ya presentadas y preparaciones de decisiones ya tomadas; no son documentos vigentes |
 
 ---
 
@@ -114,6 +167,12 @@ y genera `reports/13_verificacion_referencia.md`:
 cd anylogic/biblioteca && ./compilar.sh && ./referencia/correr.sh
 ```
 
+El escenario con la Línea F se construye con `src/14` a `src/22` (grafo con la F, demanda
+local, oferta, caminos por intervalo, tablas e indicadores, mapa y sensibilidad), y el
+submodelo peatonal con `src/23` a `src/25`. Los runners del simulador de referencia para
+el escenario F están en `anylogic/biblioteca/referencia/` (`correr_f.sh`,
+`correr_informe.sh`, `correr_sensibilidad.sh`).
+
 `src/02_figuras_propuesta.py` genera las figuras de la propuesta y no depende del resto.
 `src/08_generar_pruebas_anylogic.py` genera los modelos de prueba de `anylogic/pruebas/`.
 
@@ -137,6 +196,22 @@ Al final del pipeline, AnyLogic necesita estos archivos:
 | `data/processed/apertura_formaciones.csv` | Desde qué estaciones arrancan las formaciones a las 5:30 |
 
 El detalle de cada columna está en [`docs/guia-del-modelo.md`](docs/guia-del-modelo.md).
+
+---
+
+## Modelos de AnyLogic
+
+Los `.alp` se generan por script y se abren en AnyLogic 8.9 PLE; no se editan a mano.
+
+| Qué | Dónde | Cómo |
+|---|---|---|
+| Modelo de la red (actual y con la F, con mapa) | `anylogic/modelo/` | `python generar_alp.py` con `--f <intervalo>` y `--mapa`; guía en `GUIA_CONSTRUCCION.md` |
+| Biblioteca Java que el modelo usa (`subte.jar`) y simulador de referencia | `anylogic/biblioteca/` | `compilar.sh`, `referencia/correr*.sh`; ver `LEEME.md` |
+| Submodelo peatonal de Constitución (3D para mostrar, siete modelos de la campaña de réplicas, prueba de capacidad) | `anylogic/peatonal/` | `bash regenerar_variantes.sh`; resumen de réplicas con `resumir_replicas.py`; ver `README.md` |
+| Plantillas que usan los generadores y pruebas de límites de la licencia | `anylogic/pruebas/` | las tres plantillas (E, F, F2) no se tocan; las pruebas A a D están en `historico/`, documentadas en `docs/pruebas-anylogic-topes.md` |
+
+Los resultados están en `reports/14` (verificación del modelo), `reports/15` a `21`
+(escenario con la Línea F) y `reports/22` y `23` (submodelo peatonal).
 
 ---
 

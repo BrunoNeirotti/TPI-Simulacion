@@ -36,9 +36,8 @@ observados, y después agregarle la Línea F para medir la diferencia.
   porque los portales de origen ya dieron de baja recursos sin avisar.
 - La propuesta y la especificación del modelo, en LaTeX.
 
-Cómo está armado el modelo de la red, bloque por bloque, está en
-[`anylogic/modelo/GUIA_CONSTRUCCION.md`](anylogic/modelo/GUIA_CONSTRUCCION.md); la
-biblioteca que lleva adentro, en [`anylogic/biblioteca/LEEME.md`](anylogic/biblioteca/LEEME.md).
+La biblioteca Java que el modelo de la red lleva adentro está descripta en
+[`anylogic/biblioteca/LEEME.md`](anylogic/biblioteca/LEEME.md).
 
 ---
 

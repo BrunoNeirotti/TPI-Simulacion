@@ -11,8 +11,8 @@ operación de la red de Subte de Buenos Aires*.
 
 > **Rama `entrega`.** Esta rama publica lo necesario para **abrir y correr los modelos de
 > AnyLogic** que se presentan (tabla de «Para ver el modelo funcionar», más abajo), los
-> datos que leen, el código que los produce y la documentación de las fuentes. El informe
-> final se agrega cuando el grupo lo cierre.
+> datos que leen, el código que los produce, la propuesta y la documentación oficial del
+> proyecto. El informe final se agrega cuando el grupo lo cierre.
 
 ---
 
@@ -23,12 +23,8 @@ millones y servicio previsto para 2031. Su objetivo declarado es descongestionar
 C. Lo que hacemos es armar un modelo de la red actual, calibrarlo contra datos
 observados, y después agregarle la Línea F para medir la diferencia.
 
-Casi nada de lo que hace falta para eso estaba publicado en forma usable, así que buena
-parte del repositorio es el registro de cómo se consiguió cada cosa y qué problemas tiene
-cada fuente:
-
 - Un pipeline de datos que va de los datasets crudos a los archivos que consume el
-  modelo, con un reporte por paso.
+  modelo.
 - El modelo de la red en AnyLogic y un simulador de referencia en Java con la misma
   lógica, que lo verifica.
 - El escenario con la Línea F y su resultado: con la F el viaje medio de la red baja un
@@ -36,18 +32,13 @@ cada fuente:
 - Un submodelo peatonal de la estación Constitución de la Línea F, construido sobre los
   planos oficiales, con sus tiempos de acceso al andén y de salida en hora pico.
 - La documentación oficial del proyecto Línea F: el expediente de evaluación ambiental,
-  el pliego de licitación y las respuestas a los pedidos por Ley 104. Los juntamos acá
+  el pliego de licitación y las respuestas a los pedidos por Ley 104. La juntamos acá
   porque los portales de origen ya dieron de baja recursos sin avisar.
-- Las fichas de análisis de esa documentación, con las tablas pasadas en limpio y las
-  contradicciones marcadas.
-- La propuesta en LaTeX.
+- La propuesta y la especificación del modelo, en LaTeX.
 
-Para empezar a leer conviene ir a
-[`docs/contexto-del-proyecto.md`](docs/contexto-del-proyecto.md), que junta el estado, las
-fuentes con sus problemas, las cifras oficiales con su procedencia y el plan de trabajo.
-Si lo que se busca es entender qué consume el modelo, el archivo es
-[`docs/guia-del-modelo.md`](docs/guia-del-modelo.md); cómo está armado, en
-[`anylogic/modelo/GUIA_CONSTRUCCION.md`](anylogic/modelo/GUIA_CONSTRUCCION.md).
+Cómo está armado el modelo de la red, bloque por bloque, está en
+[`anylogic/modelo/GUIA_CONSTRUCCION.md`](anylogic/modelo/GUIA_CONSTRUCCION.md); la
+biblioteca que lleva adentro, en [`anylogic/biblioteca/LEEME.md`](anylogic/biblioteca/LEEME.md).
 
 ---
 
@@ -84,32 +75,13 @@ y combinación con la Línea C.
 ```
 src/          Pipeline de datos. Un script numerado por paso, más las librerías
               de lectura de cada dataset (lib_*.py).
-reports/      Resultado de cada paso, con sus verificaciones.
-docs/         Propuesta en LaTeX, contexto del proyecto, fichas de análisis y
-              documentación oficial.
 anylogic/     Modelos de AnyLogic: modelo de la red, biblioteca Java (la misma que va
               dentro del modelo) y simulador de referencia, submodelo peatonal de
-              Constitución y plantillas de las pruebas de límites.
+              Constitución.
+docs/         Propuesta y especificación del modelo en LaTeX, figuras y documentación
+              oficial del proyecto Línea F.
 data/         No se versiona entero. Ver "Datos" más abajo.
 ```
-
-Los documentos de `docs/` que conviene conocer:
-
-| Archivo | Qué es |
-|---|---|
-| `contexto-del-proyecto.md` | Estado, fuentes, cifras y plan |
-| `guia-del-modelo.md` | Qué consume el modelo, qué es fijo y qué es variable |
-| `diseno-modelo-base.md` | El diseño del modelo de la red antes de construirlo |
-| `preparacion-de-datos.md` | Qué se hizo en cada paso del pipeline y con qué criterio |
-| `expediente-eia-linea-f.md` | Extracción del expediente ambiental, con cita por documento y página |
-| `pliego-licitacion-linea-f.md` | Análisis del pliego de licitación |
-| `pruebas-anylogic-topes.md` | Las pruebas de límites de AnyLogic y qué salió de cada una |
-| `respuestas-oficiales/` | Los informes oficiales que recibimos, con su ficha de análisis |
-| `definitivo-main.tex` | La propuesta |
-| `especificacion-modelo.md`, `.tex` | La especificación del modelo entregada en la materia |
-| `glosario.md` | Los términos del trabajo y las traducciones elegidas |
-| `figuras/` | Figuras de la propuesta y el diagrama conceptual del modelo |
-| `historico/` | Versiones ya superadas; no son documentos vigentes |
 
 ---
 
@@ -122,7 +94,7 @@ pip install pandas numpy networkx matplotlib scipy
 ```
 
 Los scripts se corren en orden y desde la raíz del repositorio. Cada uno deja sus salidas
-en `data/processed/` y su reporte en `reports/`.
+en `data/processed/` y un reporte con sus verificaciones en `reports/`.
 
 ```bash
 python src/01_tabla_maestra_estaciones.py    # 90 estaciones cruzadas entre 4 fuentes
@@ -137,8 +109,7 @@ python src/11_demanda_modelo.py              # matriz de demanda del modelo
 python src/12_ajuste_intervalos.py           # oferta: intervalos entre despachos y apertura
 ```
 
-El paso 13 corre el simulador de referencia (Java, ver `anylogic/biblioteca/LEEME.md`)
-y genera `reports/13_verificacion_referencia.md`:
+El paso 13 corre el simulador de referencia (Java, ver `anylogic/biblioteca/LEEME.md`):
 
 ```bash
 cd anylogic/biblioteca && ./compilar.sh && ./referencia/correr.sh
@@ -150,11 +121,11 @@ Los runners del simulador de referencia para el escenario con la Línea F están
 `data/processed/escenario_f/` (una carpeta por intervalo entre trenes).
 
 `src/02_figuras_propuesta.py` genera las figuras de la propuesta y no depende del resto.
-`src/08_generar_pruebas_anylogic.py` genera los modelos de prueba de `anylogic/pruebas/`.
+`src/08_generar_pruebas_anylogic.py` genera los modelos con que se midieron los límites
+de la licencia de AnyLogic.
 
 En `src/03_grafo_red.py` hay un interruptor, `REPARAR_LINEA_E`, que controla si se
-corrige el sentido 1 de la Línea E en el GTFS. Está en `True`, y el efecto de apagarlo
-está medido en `reports/07_caminos_minimos.md`.
+corrige el sentido 1 de la Línea E en el GTFS. Está en `True`.
 
 ### Lo que el modelo consume
 
@@ -173,17 +144,15 @@ Al final del pipeline, AnyLogic necesita estos archivos:
 | `data/processed/escenario_f/I<nnn>/`, `oferta_I<nnn>/` | Lo mismo para la red con la Línea F a 90, 100, 120, 150 y 189 s entre trenes |
 | `data/processed/escenario_f/mapa_esquematico.csv`, `mapa_tramos.csv`, `informe/` | Trazado del mapa y la carga de referencia por tramo para la comparación sin la F → con la F |
 
-El detalle de cada columna está en [`docs/guia-del-modelo.md`](docs/guia-del-modelo.md).
+Cada columna está descripta en el encabezado del script que la produce.
 
 ---
 
 ## Datos
 
 `data/raw/` no se versiona: son 2,2 GB y todo se puede volver a bajar de
-[data.buenosaires.gob.ar](https://data.buenosaires.gob.ar). Qué archivos hacen falta y
-qué aporta cada uno está en la sección 4 de
-[`docs/contexto-del-proyecto.md`](docs/contexto-del-proyecto.md), junto con los problemas
-de formato de cada uno, que en varios casos el publicador no documenta.
+[data.buenosaires.gob.ar](https://data.buenosaires.gob.ar). Qué archivos hacen falta está
+en el encabezado de cada script de `src/`.
 
 De `data/processed/` se versiona lo que los modelos leen. Con eso alcanza para correrlos
 y verificar los resultados sin tener que rearmar los datasets crudos.
@@ -208,14 +177,15 @@ Tres advertencias que conviene leer antes de tocar cualquier dataset:
 ## Documentación oficial
 
 El expediente de evaluación ambiental (98 documentos) y el pliego de licitación están en
-`docs/Documentos-EX-2026-20211143/` y `docs/Documentos-BA-Obras/`.
+`docs/Documentos-EX-2026-20211143/` y `docs/Documentos-BA-Obras/`. Las respuestas a los
+pedidos de información por Ley 104, con la matriz origen-destino y los perfiles de carga
+de SBASE que venían adjuntos, en `docs/respuestas-oficiales/`.
 
-Para cualquier cifra de la Línea F conviene ir a las fichas de análisis y no a los PDF
-sueltos ni a los diarios. Las fichas ya tienen las tablas pasadas en limpio y las
-contradicciones marcadas. Por ejemplo, que las tres longitudes que circulan (9,8, 10,9 y
-8,6 km) no se contradicen porque son magnitudes distintas, o que la cifra anunciada de
-270.000 a 300.000 pasajeros diarios no aparece en ninguna pieza del expediente y no cierra
-con el perfil de carga que el propio expediente publica.
+Para cualquier cifra de la Línea F conviene ir a esos documentos y no a los diarios. Dos
+ejemplos: las tres longitudes que circulan (9,8, 10,9 y 8,6 km) no se contradicen porque
+son magnitudes distintas; y la cifra anunciada de 270.000 a 300.000 pasajeros diarios no
+aparece en ninguna pieza del expediente y no cierra con el perfil de carga que el propio
+expediente publica.
 
 Queda afuera un solo archivo de BA Obras,
 `AnexosActualizacion+Documentacion+Tecnica+8ta+Tanda.zip` (138 MB), porque pasa el límite

@@ -39,10 +39,10 @@
 % encabezado de una sola línea (el título completo ocupaba dos y se pisaba con el texto)
 \renewcommand{\shorttitle}{Impacto de la Línea F sobre la red de Subte de Buenos Aires}
 
-% enlaces del trabajo; el de AnyLogic Cloud se completa al publicar el modelo:
-% \newcommand{\enlaceCloud}{\url{https://cloud.anylogic.com/model/...}}
+% enlaces del trabajo: repositorio y los dos modelos publicados en AnyLogic Cloud
 \newcommand{\enlaceRepositorio}{\url{https://github.com/BrunoNeirotti/TPI-Simulacion}}
-\newcommand{\enlaceCloud}{\textit{se agrega al publicar el modelo}}
+\newcommand{\enlaceCloudRed}{\url{https://cloud.anylogic.com/model/0bfb3484-d911-409e-bf99-d3563ca6d44a}}
+\newcommand{\enlaceCloudEstacion}{\url{https://cloud.anylogic.com/model/ea098342-e565-4808-b7ab-12621b2f76b4}}
 
 % el estilo arxiv escribe «Abstract»
 \renewenvironment{abstract}
@@ -62,8 +62,10 @@
   Zeballos 1341, S2000, Argentina \\
 }
 \date{Noviembre de 2026\\[1.5ex]
-  \small Modelos, planilla de resultados y fuentes oficiales: \enlaceRepositorio \\
-  Modelo para correr en el navegador (AnyLogic Cloud): \enlaceCloud}
+  \small Modelos, planilla de resultados y fuentes oficiales: \enlaceRepositorio \\[0.5ex]
+  Modelos para correr en el navegador (AnyLogic Cloud): \\
+  red de Subte: \enlaceCloudRed \\
+  estación Constitución en 3D: \enlaceCloudEstacion}
 
 \begin{document}
 \maketitle
@@ -378,8 +380,9 @@ actual o la red con la Línea F a cada una de las frecuencias que se prueban. Ti
 simula el día cien veces y muestra los histogramas del tiempo de viaje, de la espera y de los transbordos, y
 otro que recorre la red actual y las cinco frecuencias de la Línea F, diez días cada una. Los datos que lee
 viajan con el modelo, en su propia carpeta. El modelo se puede correr en el navegador, sin instalar AnyLogic,
-desde AnyLogic Cloud; el enlace está en la portada, junto con el del repositorio que reúne los modelos, la
-planilla con los resultados de todas las corridas y las fuentes oficiales del trabajo. La lógica que no se resuelve con bloques (las colas por andén
+desde AnyLogic Cloud, eligiendo el escenario; lo mismo la estación Constitución en 3D
+(sección~\ref{sec:peatonal}). Los enlaces están en la portada, junto con el del repositorio que reúne los
+modelos, la planilla con los resultados de todas las corridas y las fuentes oficiales del trabajo. La lógica que no se resuelve con bloques (las colas por andén
 y la lectura de las rutas) está escrita como clases Java dentro del mismo proyecto.
 
 % =====================================================================

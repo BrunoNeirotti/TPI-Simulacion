@@ -26,6 +26,7 @@ Cada cifra lleva su intervalo de confianza del 95 % en el informe.
 |---|---|
 | Informe final | [`informe/informe-final.pdf`](informe/informe-final.pdf) (y su fuente LaTeX) |
 | Modelos de AnyLogic | [`anylogic/`](anylogic/) |
+| Modelos en AnyLogic Cloud, para correr en el navegador | [Red de Subte](https://cloud.anylogic.com/model/0bfb3484-d911-409e-bf99-d3563ca6d44a) · [Estación Constitución en 3D](https://cloud.anylogic.com/model/ea098342-e565-4808-b7ab-12621b2f76b4) |
 | Resultados de las corridas | [`resultados-corridas.xlsx`](resultados-corridas.xlsx) |
 | Documentos oficiales del proyecto Línea F y datos obtenidos por pedidos de información | [`fuentes/`](fuentes/) |
 
@@ -60,8 +61,13 @@ mientras se hacía el trabajo: así quedan disponibles tal como se usaron.
 
 ## Cómo ver los modelos
 
-Hace falta **AnyLogic 8.9 Personal Learning Edition** (gratuita). Se abre el `.alp`, se elige el
-experimento y se corre con el botón de ejecutar; no hay que instalar nada más.
+**Sin instalar nada**, los dos modelos principales corren en el navegador desde AnyLogic Cloud:
+[la red de Subte](https://cloud.anylogic.com/model/0bfb3484-d911-409e-bf99-d3563ca6d44a), donde se
+elige el escenario antes de correr, y
+[la estación Constitución en 3D](https://cloud.anylogic.com/model/ea098342-e565-4808-b7ab-12621b2f76b4).
+
+**En la computadora** hace falta **AnyLogic 8.9 Personal Learning Edition** (gratuita). Se abre el
+`.alp`, se elige el experimento y se corre con el botón de ejecutar; no hay que instalar nada más.
 
 | Modelo | Qué se ve |
 |---|---|

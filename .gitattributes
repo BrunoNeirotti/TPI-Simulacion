@@ -1,0 +1,21 @@
+# Normalizacion de fin de linea: LF en el repositorio, nativo en la copia local.
+* text=auto
+
+# Binarios: que git no intente normalizarlos ni mostrar diffs.
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.avif  binary
+*.xlsx  binary
+*.zip   binary
+
+# Los .alp de AnyLogic son XML, pero conviene tratarlos como binarios: los
+# diffs no son legibles y AnyLogic los reescribe entero en cada guardado.
+*.alp   -diff
+
+# Los scripts de shell tienen que quedar con LF tambien en la copia local: con
+# CRLF, bash falla con "$'\r': command not found".
+*.sh    text eol=lf
+
+# Biblioteca armada del modelo (anylogic/biblioteca/subte.jar).
+*.jar   binary

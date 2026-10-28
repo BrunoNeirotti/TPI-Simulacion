@@ -1,0 +1,16 @@
+# Lo que generan AnyLogic y el simulador de control al compilar o correr
+build/
+bin/
+export/
+salida/
+*.class
+*.bak
+anylogic/**/*.png
+
+# Copias de trabajo de LaTeX
+informe/*.aux
+informe/*.log
+informe/*.out
+informe/*.fls
+informe/*.fdb_latexmk
+informe/*.synctex.gz

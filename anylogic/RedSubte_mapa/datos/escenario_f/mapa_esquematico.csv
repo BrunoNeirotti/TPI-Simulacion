@@ -1,0 +1,103 @@
+nodo_id,linea,nombre,x,y
+LineaA:1076,A,Plaza de Mayo,1096.5,326.6
+LineaA:1075,A,Peru,1068.1,326.6
+LineaA:1074,A,Piedras,1049.7,326.5
+LineaA:1073,A,Lima,1008.9,326.5
+LineaA:1072,A,Saenz Peña,984.9,326.5
+LineaA:1071,A,Congreso,958.6,326.5
+LineaA:1069,A,Alberti,905.7,326.5
+LineaA:1068,A,Plaza Miserere,882.0,326.5
+LineaA:1067,A,Loria,830.6,326.5
+LineaA:1066,A,Castro Barros,775.6,326.5
+LineaA:1065,A,Rio de Janeiro,734.2,326.5
+LineaA:1064,A,Acoyte,681.2,326.4
+LineaA:1063,A,Primera Junta,603.8,351.9
+LineaA:1062,A,Puan,511.4,444.5
+LineaA:1061,A,Carabobo,473.7,482.3
+LineaA:1060,A,San Jose de Flores,451.7,504.3
+LineaA:1059,A,San Pedrito,405.0,551.0
+LineaA:1070,A,Pasco,931.6,326.5
+LineaB:1093,B,Leandro N. Alem,1101.2,251.8
+LineaB:1092,B,Florida,1072.7,251.8
+LineaB:1091,B,Carlos Pellegrini,1031.1,251.7
+LineaB:1090,B,Uruguay,994.0,251.7
+LineaB:1089,B,Callao,958.1,251.7
+LineaB:1088,B,Pasteur,919.9,251.7
+LineaB:1087,B,Pueyrredon,882.0,251.7
+LineaB:1086,B,Carlos Gardel,838.5,251.7
+LineaB:1085,B,Medrano,784.2,251.7
+LineaB:1083,B,angel Gallardo,743.5,249.8
+LineaB:1084,B,Malabia,710.4,216.8
+LineaB:1082,B,Dorrego,635.2,175.2
+LineaB:1081,B,Federico Lacroze,561.1,175.2
+LineaB:1080,B,Tronador - Villa Ortuzar,528.6,175.2
+LineaB:1079,B,De Los Incas - Parque Chas,463.5,175.2
+LineaB:1078,B,Echeverria,399.5,175.3
+LineaB:1077,B,Juan Manuel de Rosas,345.0,175.3
+LineaC:1102,C,Retiro,1107.5,142.5
+LineaC:1101,C,General San Martin,1078.8,171.3
+LineaC:1100,C,Lavalle,1056.3,229.6
+LineaC:1099,C,Diagonal Norte,1046.1,275.4
+LineaC:1098,C,Avenida de Mayo,1027.4,326.5
+LineaC:1097,C,Moreno,1027.4,363.0
+LineaC:1096,C,Independencia,1027.5,440.6
+LineaC:1095,C,San Juan,1027.5,494.7
+LineaC:1094,C,Constitucion,1027.5,574.3
+LineaD:1118,D,Catedral,1074.1,305.4
+LineaD:1117,D,9 de Julio,1031.5,262.8
+LineaD:1116,D,Tribunales,993.8,225.0
+LineaD:1115,D,Callao,958.1,195.6
+LineaD:1114,D,Facultad de Medicina,915.2,195.2
+LineaD:1113,D,Pueyrredon,881.4,165.9
+LineaD:1112,D,Agüero,848.8,164.9
+LineaD:1111,D,Bulnes,829.1,146.4
+LineaD:1110,D,Scalabrini Ortiz,813.2,130.5
+LineaD:1109,D,Plaza Italia,789.7,107.2
+LineaD:1108,D,Palermo,766.5,86.3
+LineaD:1107,D,Ministro Carranza,731.5,86.1
+LineaD:1106,D,Olleros,664.1,86.1
+LineaD:1105,D,Jose Hernandez,541.1,86.1
+LineaD:1104,D,Juramento,469.8,86.1
+LineaD:1103,D,Congreso de Tucuman,398.5,86.2
+LineaE:1164,E,Retiro,1101.1,149.4
+LineaE:1165,E,Catalinas,1101.0,188.6
+LineaE:1166,E,Correo Central,1100.9,266.5
+LineaE:1119,E,Bolivar,1073.0,346.8
+LineaE:1120,E,Belgrano,1038.5,383.1
+LineaE:1121,E,Independencia,999.8,440.6
+LineaE:1122,E,San Jose,985.0,498.2
+LineaE:1123,E,Entre Rios,958.4,498.2
+LineaE:1124,E,Pichincha,918.6,498.2
+LineaE:1125,E,Jujuy,882.0,498.2
+LineaE:1126,E,General Urquiza,843.3,498.2
+LineaE:1127,E,Boedo,806.4,498.2
+LineaE:1128,E,La Plata,734.3,498.2
+LineaE:1129,E,Jose Maria Moreno,680.6,498.2
+LineaE:1130,E,Emilio Mitre,607.7,510.6
+LineaE:1131,E,Medalla Milagrosa,566.5,551.7
+LineaE:1132,E,Varela,507.9,592.7
+LineaE:1133,E,Plaza de los Virreyes,489.1,631.8
+LineaH:1163,H,Facultad de Derecho,985.3,26.0
+LineaH:1162,H,Las Heras,906.9,107.3
+LineaH:1161,H,Santa Fe,881.8,155.0
+LineaH:1160,H,Cordoba,881.8,196.8
+LineaH:1141,H,Corrientes,881.8,240.1
+LineaH:1140,H,Once,881.8,310.7
+LineaH:1139,H,Venezuela,881.8,408.8
+LineaH:1138,H,Humberto 1,881.8,482.5
+LineaH:1137,H,Inclan,881.8,586.3
+LineaH:1136,H,Caseros,881.8,629.6
+LineaH:1135,H,Parque Patricios,855.6,641.4
+LineaH:1134,H,Hospitales,830.6,659.0
+LineaF:F01,F,Brandsen,1080.1,627.0
+LineaF:F02,F,Constitucion,1027.5,574.3
+LineaF:F03,F,Cochabamba,958.3,498.2
+LineaF:F04,F,Chile,958.3,423.5
+LineaF:F05,F,Congreso,958.3,326.5
+LineaF:F06,F,Corrientes,958.3,251.7
+LineaF:F07,F,Pizzurno,958.3,195.6
+LineaF:F08,F,Junin,939.6,140.0
+LineaF:F09,F,Pueyrredon,906.9,107.3
+LineaF:F10,F,Parque Las Heras,861.2,107.3
+LineaF:F11,F,Ecoparque,806.0,107.3
+LineaF:F12,F,Palermo/Pacifico,775.2,77.5

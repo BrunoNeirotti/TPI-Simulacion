@@ -39,6 +39,11 @@
 % encabezado de una sola línea (el título completo ocupaba dos y se pisaba con el texto)
 \renewcommand{\shorttitle}{Impacto de la Línea F sobre la red de Subte de Buenos Aires}
 
+% enlaces del trabajo; el de AnyLogic Cloud se completa al publicar el modelo:
+% \newcommand{\enlaceCloud}{\url{https://cloud.anylogic.com/model/...}}
+\newcommand{\enlaceRepositorio}{\url{https://github.com/BrunoNeirotti/TPI-Simulacion}}
+\newcommand{\enlaceCloud}{\textit{se agrega al publicar el modelo}}
+
 % el estilo arxiv escribe «Abstract»
 \renewenvironment{abstract}
 {\centerline{\large\bfseries\scshape Resumen}\begin{quote}}
@@ -56,7 +61,9 @@
   Universidad Tecnológica Nacional -- FRRo \\
   Zeballos 1341, S2000, Argentina \\
 }
-\date{Noviembre de 2026}
+\date{Noviembre de 2026\\[1.5ex]
+  \small Modelos, planilla de resultados y fuentes oficiales: \enlaceRepositorio \\
+  Modelo para correr en el navegador (AnyLogic Cloud): \enlaceCloud}
 
 \begin{document}
 \maketitle
@@ -370,7 +377,9 @@ El modelo es un único proyecto de AnyLogic. Un parámetro, \texttt{escenario}, 
 actual o la red con la Línea F a cada una de las frecuencias que se prueban. Tiene dos experimentos: uno que
 simula el día cien veces y muestra los histogramas del tiempo de viaje, de la espera y de los transbordos, y
 otro que recorre la red actual y las cinco frecuencias de la Línea F, diez días cada una. Los datos que lee
-viajan con el modelo, en su propia carpeta. La lógica que no se resuelve con bloques (las colas por andén
+viajan con el modelo, en su propia carpeta. El modelo se puede correr en el navegador, sin instalar AnyLogic,
+desde AnyLogic Cloud; el enlace está en la portada, junto con el del repositorio que reúne los modelos, la
+planilla con los resultados de todas las corridas y las fuentes oficiales del trabajo. La lógica que no se resuelve con bloques (las colas por andén
 y la lectura de las rutas) está escrita como clases Java dentro del mismo proyecto.
 
 % =====================================================================

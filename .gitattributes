@@ -19,3 +19,6 @@
 
 # Biblioteca armada del modelo (anylogic/biblioteca/subte.jar).
 *.jar   binary
+
+# Planos de AutoCAD de la licitacion.
+*.dwg   binary

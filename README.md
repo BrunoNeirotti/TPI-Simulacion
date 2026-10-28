@@ -27,7 +27,7 @@ Cada cifra lleva su intervalo de confianza del 95 % en el informe.
 | Informe final | [`informe/informe-final.pdf`](informe/informe-final.pdf) (y su fuente LaTeX) |
 | Modelos de AnyLogic | [`anylogic/`](anylogic/) |
 | Resultados de las corridas | [`resultados-corridas.xlsx`](resultados-corridas.xlsx) |
-| Datos oficiales de SBASE y propuesta del trabajo | [`fuentes/`](fuentes/) |
+| Documentos oficiales del proyecto Línea F y datos obtenidos por pedidos de información | [`fuentes/`](fuentes/) |
 
 ```
 informe/                  Informe final (PDF), su fuente LaTeX y las figuras
@@ -39,10 +39,22 @@ anylogic/
   ConstitucionF_3D/       Submodelo peatonal de la estación Constitución de la Línea F, en 3D
   simulador-control/      Programa Java independiente que verifica el modelo de la red
 fuentes/
-  sbase/                  Matriz de viajes, carga por tramo y estudio de demanda de la Línea F
-                          entregados por SBASE por pedido de acceso a la información
-  propuesta.pdf           Propuesta del trabajo
+  pedidos-de-informacion/        Respuestas oficiales a los pedidos de acceso a la información
+                                 (Ley 104) del Ministerio de Movilidad, SBASE y otros organismos
+    sbase/                       Matriz de viajes entre estaciones, carga por tramo y estudio de
+                                 demanda de la Línea F entregados por SBASE
+  expediente-impacto-ambiental/  Los 98 documentos del expediente de evaluación ambiental de la
+                                 Línea F (EX-2026-20211143-GCABA-APRA)
+  licitacion/                    Pliego, anexos, resolución y especificaciones de la licitación
+    documentacion-tecnica-8va-tanda/   Documentación técnica y planos publicados en BA Obras
+    documentacion-tecnica-15va-tanda/  Ídem, con los planos 1:100 de la estación Constitución
+    centro-trasbordo-constitucion/     Planos (PDF y CAD) del centro de trasbordo de Constitución
+  mapas/                         Mapas oficiales de la red (EMOVA) y de la Línea F
+  propuesta.pdf                  Propuesta del trabajo
 ```
+
+Los documentos oficiales están acá porque los portales de origen dieron de baja recursos sin aviso
+mientras se hacía el trabajo: así quedan disponibles tal como se usaron.
 
 ---
 
@@ -75,6 +87,11 @@ el `2`, un tren cada 100 s, y es el que abre `RedSubte_mapa`.
 Todo el modelo se apoya en datos oficiales: los ingresos por molinete, los trenes despachados y
 los horarios en formato GTFS de Buenos Aires Data; la encuesta de viajes y etapas del área
 metropolitana; la matriz de viajes entre estaciones y la carga por tramo que entregó SBASE por
-pedido de acceso a la información (en `fuentes/sbase/`); y el estudio de impacto ambiental, el
-pliego de licitación y los planos de la Línea F. El informe cita cada fuente y explica cómo se
-prepararon los datos.
+pedido de acceso a la información (en `fuentes/pedidos-de-informacion/`); y el estudio de impacto
+ambiental, el pliego de licitación y los planos de la Línea F (en `fuentes/`). El informe cita
+cada fuente y explica cómo se prepararon los datos. Los datos abiertos de Buenos Aires Data no se
+copian acá porque son muy grandes y siguen publicados:
+[molinetes](https://data.buenosaires.gob.ar/dataset/subte-viajes-molinetes),
+[trenes despachados](https://data.buenosaires.gob.ar/dataset/subte-trenes-despachados),
+[GTFS](https://data.buenosaires.gob.ar/dataset/subte-gtfs) y
+[viajes y etapas](https://data.buenosaires.gob.ar/dataset/viajes-etapas-transporte-publico).
